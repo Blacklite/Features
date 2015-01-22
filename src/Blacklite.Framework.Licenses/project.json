@@ -1,0 +1,32 @@
+﻿{
+	"version": "1.0.0-*",
+	"dependencies": {
+        "Blacklite.Framework.Features": "1.0.0-beta-*"
+	},
+
+	"compilationOptions": {
+		"warningsAsErrors": true
+	},
+
+	"frameworks": {
+		"net45": {
+			"frameworkAssemblies": {
+				"System.Runtime": "4.0.0.0"
+			},
+			"dependencies": {
+			}
+		},
+		"aspnet50": {
+			"frameworkAssemblies": {
+				"System.Runtime": "4.0.20.0"
+			},
+			"dependencies": {
+			}
+		},
+		"aspnetcore50": {
+			"dependencies": {
+				"System.Runtime": "4.0.20-beta-*"
+			}
+		}
+	}
+}
