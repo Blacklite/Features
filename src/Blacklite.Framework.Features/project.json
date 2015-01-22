@@ -1,6 +1,10 @@
 ﻿{
 	"version": "1.0.0-*",
 	"dependencies": {
+		"Blacklite.Framework.Shared.Reflection": "1.0.0-*",
+		"Microsoft.Framework.Runtime.Interfaces": { "version": "1.0.0-beta3-*", "type": "build" },
+		"Rx-Core": "2.2.5",
+		"Rx-Linq": "2.2.5"
 	},
 
 	"compilationOptions": {
@@ -8,23 +12,26 @@
 	},
 
 	"frameworks": {
-		"net45": {
-			"frameworkAssemblies": {
-				"System.Runtime": "4.0.0.0"
-			},
-			"dependencies": {
-			}
-		},
 		"aspnet50": {
 			"frameworkAssemblies": {
-				"System.Runtime": "4.0.20.0"
+				"System.Runtime": "4.0.20.0",
+				"System.ObjectModel": "4.0.10.0",
+				"System.Collections.Concurrent": "4.0.0.0",
+				"System.Reflection": "4.0.10.0",
+				"System.Reflection.Extensions": "4.0.0.0",
+				"System.Threading.Tasks": "4.0.10.0"
 			},
 			"dependencies": {
 			}
 		},
 		"aspnetcore50": {
 			"dependencies": {
-				"System.Runtime": "4.0.20-beta-*"
+				"System.Runtime": "4.0.20-beta-*",
+				"System.ObjectModel": "4.0.10-beta-*",
+				"System.Collections.Concurrent": "4.0.10-beta-*",
+				"System.Reflection": "4.0.10-beta-*",
+				"System.Reflection.Extensions": "4.0.0-beta-*",
+				"System.Threading.Tasks": "4.0.10-beta-*"
 			}
 		}
 	}
