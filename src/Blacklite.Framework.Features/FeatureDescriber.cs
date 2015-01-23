@@ -8,7 +8,7 @@ namespace Blacklite.Framework.Features
 {
     public interface IFeatureDescriber
     {
-        TypeInfo FeatureType { get; }
+        Type FeatureType { get; }
         bool IsScoped { get; }
         bool IsObservable { get; }
         IReadOnlyDictionary<IFeatureDescriber, bool> DependsOn { get; }
@@ -19,15 +19,18 @@ namespace Blacklite.Framework.Features
     {
         public FeatureDescriber(TypeInfo type)
         {
-            FeatureType = type;
+            FeatureType = type.AsType();
             IsScoped = type.ImplementedInterfaces.Contains(typeof(IScopedFeature));
             IsObservable = type.ImplementedInterfaces.Contains(typeof(IObservableFeature));
 
             Requires = type.GetCustomAttributes<RequiredFeatureAttribute>();
             Parent = type.GetCustomAttribute<ParentFeatureAttribute>()?.Feature.GetTypeInfo();
+
+            DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(new Dictionary<IFeatureDescriber, bool>());
+            Children = Enumerable.Empty<IFeatureDescriber>();
         }
 
-        public TypeInfo FeatureType { get; }
+        public Type FeatureType { get; }
         public bool IsScoped { get; }
         public bool IsObservable { get; }
 
@@ -46,11 +49,11 @@ namespace Blacklite.Framework.Features
         {
             foreach (var describer in describers)
             {
-                describer.Children = describers.Where(x => x.Parent == describer.FeatureType).ToArray();
+                describer.Children = describers.Where(x => x.Parent == describer.FeatureType.GetTypeInfo()).ToArray();
                 describer.DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(
                     describer.Requires
                         .ToDictionary(
-                            x => (IFeatureDescriber)describers.Single(z => z.FeatureType.AsType() == x.FeatureType),
+                            x => (IFeatureDescriber)describers.Single(z => z.FeatureType == x.FeatureType),
                             x => x.IsEnabled)
                         );
 

@@ -9,6 +9,6 @@ namespace Blacklite.Framework.Features.Resolvers
 
         public abstract int Priority { get; }
 
-        public bool CanResolve<T>(IFeatureResolutionContext context) where T : IFeature => typeof(TFeature) == typeof(T);
+        public bool CanResolve(IFeatureResolutionContext context) => typeof(TFeature) == context.FeatureType;
     }
 }

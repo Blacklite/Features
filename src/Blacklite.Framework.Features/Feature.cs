@@ -5,7 +5,7 @@ namespace Blacklite.Framework.Features
 {
     public interface IFeature
     {
-        bool IsEnabled { get; }
+        bool IsEnabled { get; set; }
     }
 
     public abstract partial class Feature : IFeature
@@ -14,6 +14,7 @@ namespace Blacklite.Framework.Features
         public virtual bool IsEnabled
         {
             get { return _enabled; }
+            set { _enabled = true; }
         }
     }
 }

@@ -16,11 +16,11 @@ namespace Blacklite.Framework.Features.Resolvers
 
         public int Priority { get; } = int.MaxValue;
 
-        public bool CanResolve<T>(IFeatureResolutionContext context) where T : IFeature => CommonTypes.Contains(typeof(T).GetTypeInfo().BaseType);
+        public bool CanResolve(IFeatureResolutionContext context) => CommonTypes.Contains(context.FeatureType);
 
-        public T Resolve<T>() where T : IFeature
+        public IFeature Resolve(IFeatureResolutionContext context)
         {
-            return (T)Activator.CreateInstance(typeof(T));
+            return (IFeature)Activator.CreateInstance(context.FeatureType);
         }
     }
 }

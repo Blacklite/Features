@@ -7,6 +7,6 @@ namespace Blacklite.Framework.Features.Resolvers
     {
         Type GetFeatureType();
         int Priority { get; }
-        bool CanResolve<T>(IFeatureResolutionContext context) where T : IFeature;
+        bool CanResolve(IFeatureResolutionContext context);
     }
 }

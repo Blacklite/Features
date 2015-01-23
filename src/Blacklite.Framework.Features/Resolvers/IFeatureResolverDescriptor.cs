@@ -6,7 +6,7 @@ namespace Blacklite.Framework.Features.Resolvers
     {
         bool IsGlobal { get; }
         Type FeatureType { get; }
-        T Resolve<T>(IFeatureResolutionContext context) where T : IFeature;
-        bool CanResolve<T>(IFeatureResolutionContext context) where T : IFeature;
+        IFeature Resolve(IFeatureResolutionContext context);
+        bool CanResolve(IFeatureResolutionContext context);
     }
 }

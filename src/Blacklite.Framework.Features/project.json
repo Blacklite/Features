@@ -1,6 +1,7 @@
 ﻿{
 	"version": "1.0.0-*",
 	"dependencies": {
+		"Blacklite.Framework.Interfaces": "1.0.0-*",
 		"Blacklite.Framework.Shared.Reflection": "1.0.0-*",
 		"Microsoft.Framework.Runtime.Interfaces": { "version": "1.0.0-beta3-*", "type": "build" },
 		"Rx-Core": "2.2.5",

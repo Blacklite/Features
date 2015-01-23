@@ -21,7 +21,7 @@ namespace Blacklite.Framework.Features
 
         public T Value { get; private set; }
 
-        public bool IsEnabled { get { return Value?.IsEnabled ?? false; } }
+        public bool IsEnabled { get { return Value?.IsEnabled ?? false; } set { } }
 
         public IDisposable Subscribe(IObserver<T> observer) => _feature.Subscribe(observer);
 

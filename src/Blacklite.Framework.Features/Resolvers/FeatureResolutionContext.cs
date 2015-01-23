@@ -5,10 +5,10 @@ namespace Blacklite.Framework.Features.Resolvers
 {
     class FeatureResolutionContext : IFeatureResolutionContext
     {
-        public FeatureResolutionContext(IServiceProvider serviceProvider, Type metadatumType)
+        public FeatureResolutionContext(IServiceProvider serviceProvider, Type featureType)
         {
             ServiceProvider = serviceProvider;
-            FeatureType = metadatumType;
+            FeatureType = featureType;
         }
 
         public Type FeatureType { get; }

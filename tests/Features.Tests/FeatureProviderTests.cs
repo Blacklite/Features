@@ -17,9 +17,9 @@ namespace Features.Tests
         {
             public abstract int Priority { get; }
 
-            public abstract bool CanResolve<T>(IFeatureResolutionContext context) where T : IFeature;
+            public abstract bool CanResolve(IFeatureResolutionContext context);
             public abstract Type GetFeatureType();
-            public abstract T Resolve<T>(IFeatureResolutionContext context) where T : IFeature;
+            public abstract IFeature Resolve(IFeatureResolutionContext context);
         }
 
         [Fact]
@@ -30,8 +30,8 @@ namespace Features.Tests
             var simple = new Simple();
 
             var scopedResolver = new Mock<FeatureResolver>();
-            scopedResolver.Setup(x => x.CanResolve<Scoped>(It.IsAny<IFeatureResolutionContext>())).Returns(true);
-            scopedResolver.Setup(x => x.Resolve<Scoped>(It.IsAny<IFeatureResolutionContext>())).Returns(new Scoped());
+            scopedResolver.Setup(x => x.CanResolve(It.IsAny<IFeatureResolutionContext>())).Returns(true);
+            scopedResolver.Setup(x => x.Resolve(It.IsAny<IFeatureResolutionContext>())).Returns(new Scoped());
 
             var featureResolverProviderMock = new Mock<IFeatureResolverProvider>();
             featureResolverProviderMock.Setup(x => x.Resolvers).Returns(new ReadOnlyDictionary<Type, IEnumerable<IFeatureResolverDescriptor>>(
@@ -48,7 +48,7 @@ namespace Features.Tests
                 [typeof(Simple)] = FeatureDescriber.Create(typeof(Simple).GetTypeInfo()),
             });
 
-            globalFeatureProviderMock.Setup(x => x.GetFeature<Simple>()).Returns(simple);
+            globalFeatureProviderMock.Setup(x => x.GetFeature(typeof(Simple))).Returns(simple);
 
             var globalFeatureProvider = globalFeatureProviderMock.Object;
 
@@ -74,12 +74,12 @@ namespace Features.Tests
             var simple = new Simple();
 
             var scopedResolver = new Mock<FeatureResolver>();
-            scopedResolver.Setup(x => x.CanResolve<Scoped>(It.IsAny<IFeatureResolutionContext>())).Returns(true);
-            scopedResolver.Setup(x => x.Resolve<Scoped>(It.IsAny<IFeatureResolutionContext>())).Returns(scoped);
+            scopedResolver.Setup(x => x.CanResolve(It.IsAny<IFeatureResolutionContext>())).Returns(true);
+            scopedResolver.Setup(x => x.Resolve(It.IsAny<IFeatureResolutionContext>())).Returns(scoped);
 
             var simpleResolver = new Mock<FeatureResolver>();
-            simpleResolver.Setup(x => x.CanResolve<Simple>(It.IsAny<IFeatureResolutionContext>())).Returns(true);
-            simpleResolver.Setup(x => x.Resolve<Simple>(It.IsAny<IFeatureResolutionContext>())).Returns(simple);
+            simpleResolver.Setup(x => x.CanResolve(It.IsAny<IFeatureResolutionContext>())).Returns(true);
+            simpleResolver.Setup(x => x.Resolve(It.IsAny<IFeatureResolutionContext>())).Returns(simple);
 
             var featureResolverProviderMock = new Mock<IFeatureResolverProvider>();
             featureResolverProviderMock.Setup(x => x.Resolvers).Returns(new ReadOnlyDictionary<Type, IEnumerable<IFeatureResolverDescriptor>>(

@@ -7,12 +7,11 @@ using Blacklite.Framework.Shared.Reflection;
 
 namespace Blacklite.Framework.Features.Resolvers
 {
-    class FeatureResolverDescriptor: IFeatureResolverDescriptor
+    class FeatureResolverDescriptor : IFeatureResolverDescriptor
     {
-        public IFeatureResolver Resolver { get; }
+        private readonly Func<IServiceProvider, IFeatureResolutionContext, IFeature> _resolveFunc;
 
-        private readonly IDictionary<Type, Func<IServiceProvider, IFeatureResolutionContext, object>> _resolversCache = new Dictionary<Type, Func<IServiceProvider, IFeatureResolutionContext, object>>();
-        private readonly MethodInfo _resolveMethod;
+        public IFeatureResolver Resolver { get; }
 
         public bool IsGlobal { get; }
 
@@ -23,37 +22,29 @@ namespace Blacklite.Framework.Features.Resolvers
         public FeatureResolverDescriptor(IFeatureResolver resolver)
         {
             Resolver = resolver;
-            var typeInfo = Resolver.GetType().GetTypeInfo();
 
-            _resolveMethod = typeInfo.DeclaredMethods.SingleOrDefault(x => x.Name == nameof(Resolve));
+            var resolveMethod = resolver.GetType().GetTypeInfo().DeclaredMethods.SingleOrDefault(x => x.Name == nameof(Resolve));
 
             FeatureType = resolver.GetFeatureType();
             IsGlobal = FeatureType == null;
             Priority = resolver.Priority;
+
+            var contextTypeInfo = typeof(IFeatureResolutionContext).GetTypeInfo();
+
+            _resolveFunc = resolveMethod.CreateInjectableMethod()
+                .ConfigureParameter(x => contextTypeInfo.IsAssignableFrom(x.ParameterType.GetTypeInfo()))
+                .ReturnType(typeof(IFeature))
+                .CreateFunc<IFeatureResolutionContext, IFeature>(resolver);
         }
 
-        public bool CanResolve<T>(IFeatureResolutionContext context) where T : IFeature
+        public bool CanResolve(IFeatureResolutionContext context)
         {
-            return Resolver.CanResolve<T>(context);
+            return Resolver.CanResolve(context);
         }
 
-        public T Resolve<T>(IFeatureResolutionContext context) where T : IFeature
+        public IFeature Resolve(IFeatureResolutionContext context)
         {
-            Func<IServiceProvider, IFeatureResolutionContext, object> method;
-            if (!_resolversCache.TryGetValue(typeof(T), out method))
-            {
-                var genericMethod = _resolveMethod.MakeGenericMethod(typeof(T));
-                var contextTypeInfo = typeof(IFeatureResolutionContext).GetTypeInfo();
-
-                method = genericMethod.CreateInjectableMethod()
-                    .ConfigureParameter(x => contextTypeInfo.IsAssignableFrom(x.ParameterType.GetTypeInfo()))
-                    .ReturnType(typeof(IFeature))
-                    .CreateFunc<IFeatureResolutionContext, IFeature>(Resolver);
-
-                _resolversCache.Add(typeof(T), method);
-            }
-
-            return (T)method(context.ServiceProvider, context);
+            return _resolveFunc(context.ServiceProvider, context);
         }
     }
 

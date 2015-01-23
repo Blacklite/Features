@@ -9,6 +9,7 @@ namespace Blacklite.Framework.Features
     public interface IFeatureProvider
     {
         T GetFeature<T>() where T : IFeature;
+        IFeature GetFeature(Type type);
     }
 
     public interface IGlobalFeatureProvider : IFeatureProvider
@@ -28,18 +29,17 @@ namespace Blacklite.Framework.Features
             _serviceProvider = serviceProvider;
         }
 
-        public abstract T GetFeature<T>() where T : IFeature;
+        public T GetFeature<T>() where T : IFeature => (T)GetFeature(typeof(T));
 
-        protected T ResolveValue<T>()
-            where T : IFeature
+        protected IFeature ResolveValue(Type type)
         {
             IEnumerable<IFeatureResolverDescriptor> values;
-            if (_featureResolverProvider.Resolvers.TryGetValue(typeof(T), out values))
+            if (_featureResolverProvider.Resolvers.TryGetValue(type, out values))
             {
-                var context = new FeatureResolutionContext(_serviceProvider, typeof(T));
+                var context = new FeatureResolutionContext(_serviceProvider, type);
                 var resolvedValue = values
-                    .Where(z => z.CanResolve<T>(context))
-                    .Select(x => x.Resolve<T>(context))
+                    .Where(z => z.CanResolve(context))
+                    .Select(x => x.Resolve(context))
                     .FirstOrDefault(x => x != null);
 
                 if (resolvedValue != null)
@@ -48,8 +48,10 @@ namespace Blacklite.Framework.Features
                 }
             }
 
-            throw new ArgumentOutOfRangeException("T", $"Feature type '{typeof(T).Name}' must have at least one resolver registered.");
+            throw new ArgumentOutOfRangeException("type", $"Feature type '{type.Name}' must have at least one resolver registered.");
         }
+
+        public abstract IFeature GetFeature(Type type);
     }
 
     public class FeatureProvider : FeatureProviderBase
@@ -61,31 +63,36 @@ namespace Blacklite.Framework.Features
             _globalFeatureProvider = globalFeatureProvider;
         }
 
-        public override T GetFeature<T>()
+        public override IFeature GetFeature(Type type)
         {
-            var describer = _globalFeatureProvider.FeatureDescribers[typeof(T)];
+            var describer = _globalFeatureProvider.FeatureDescribers[type];
+
+            var dependsOnSet = describer.DependsOn.Select(x => GetFeature(x.Key.FeatureType));
+
             if (describer.IsScoped)
             {
-                var resolvedValue = ResolveValue<T>();
-                Features.TryAdd(typeof(T), resolvedValue);
+                var resolvedValue = ResolveValue(type);
+                Features.TryAdd(type, resolvedValue);
                 return resolvedValue;
             }
 
             IFeature value;
-            if (!Features.TryGetValue(typeof(T), out value))
+            if (!Features.TryGetValue(type, out value))
             {
-                value = ResolveOther<T>();
-                if (EqualityComparer<T>.Default.Equals((T)value, default(T)))
-                    value = _globalFeatureProvider.GetFeature<T>();
-                Features.TryAdd(typeof(T), value);
+                value = ResolveOther(type);
+
+                if (value == null)
+                    value = _globalFeatureProvider.GetFeature(type);
+
+                Features.TryAdd(type, value);
             }
 
-            return (T)value;
+            return value;
         }
 
-        public virtual T ResolveOther<T>() where T : IFeature
+        public virtual IFeature ResolveOther(Type type)
         {
-            return default(T);
+            return default(IFeature);
         }
     }
 
@@ -94,20 +101,20 @@ namespace Blacklite.Framework.Features
         public GlobalFeatureProvider(IServiceProvider serviceProvider, IFeatureDescriberProvider featureDescriberProvider, IFeatureResolverProvider featureResolverProvider)
             : base(serviceProvider, featureResolverProvider)
         {
-            FeatureDescribers = featureDescriberProvider.Describers.ToDictionary(x => x.FeatureType.AsType());
+            FeatureDescribers = featureDescriberProvider.Describers.ToDictionary(x => x.FeatureType);
         }
 
         public IDictionary<Type, IFeatureDescriber> FeatureDescribers { get; }
 
-        public override T GetFeature<T>()
+        public override IFeature GetFeature(Type type)
         {
             IFeature value;
-            if (!Features.TryGetValue(typeof(T), out value))
+            if (!Features.TryGetValue(type, out value))
             {
-                value = ResolveValue<T>();
+                value = ResolveValue(type);
             }
 
-            return (T)value;
+            return value;
         }
     }
 }
