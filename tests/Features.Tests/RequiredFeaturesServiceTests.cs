@@ -88,11 +88,13 @@ namespace Features.Tests
             serviceProviderMock.Setup(x => x.GetService(typeof(SingletonFeature))).Returns(new SingletonFeature(service));
             serviceProviderMock.Setup(x => x.GetService(typeof(SingletonFeature2))).Returns(new SingletonFeature2(service));
             var realObservableFeature = new RealObservableFeature(service);
+            var realObservableSubject = new SubjectFeature<RealObservableFeature>(realObservableFeature);
             serviceProviderMock.Setup(x => x.GetService(typeof(RealObservableFeature))).Returns(realObservableFeature);
-            serviceProviderMock.Setup(x => x.GetService(typeof(IObservableFeature<RealObservableFeature>))).Returns(new ObservableFeature<RealObservableFeature>(new SubjectFeature<RealObservableFeature>(realObservableFeature)));
+            serviceProviderMock.Setup(x => x.GetService(typeof(IObservableFeature<RealObservableFeature>))).Returns(new ObservableFeature<RealObservableFeature>(realObservableSubject));
             var realObservableFeature2 = new RealObservableFeature2(service);
+            var realObservableSubject2 = new SubjectFeature<RealObservableFeature2>(realObservableFeature2);
             serviceProviderMock.Setup(x => x.GetService(typeof(RealObservableFeature2))).Returns(realObservableFeature2);
-            serviceProviderMock.Setup(x => x.GetService(typeof(IObservableFeature<RealObservableFeature2>))).Returns(new ObservableFeature<RealObservableFeature2>(new SubjectFeature<RealObservableFeature2>(realObservableFeature2)));
+            serviceProviderMock.Setup(x => x.GetService(typeof(IObservableFeature<RealObservableFeature2>))).Returns(new ObservableFeature<RealObservableFeature2>(realObservableSubject2));
 
             IValidateFeatureService result = null;
             result = service.ValidateFeaturesAreInTheCorrectState(typeof(TransientFeature));
@@ -120,6 +122,58 @@ namespace Features.Tests
             Assert.True(result.Validate());
 
             Assert.Equal(8, featureDescriberProvider.Describers.Count);
+
+            realObservableFeature.IsEnabled = false;
+            //realObservableSubject.OnNext(realObservableFeature);
+
+        }
+
+        [Fact]
+        public void HandlesObservables()
+        {
+
+            var servicesCollection = new ServiceCollection();
+            servicesCollection.AddTransient<TransientFeature>();
+            servicesCollection.AddTransient<TransientFeature2>();
+            servicesCollection.AddScoped<ScopedFeature>();
+            servicesCollection.AddScoped<ScopedFeature2>();
+            servicesCollection.AddSingleton<SingletonFeature>();
+            servicesCollection.AddSingleton<SingletonFeature2>();
+            servicesCollection.AddSingleton<RealObservableFeature>();
+            servicesCollection.AddSingleton<RealObservableFeature2>();
+
+            var featureDescriberProvider = new FeatureDescriberProvider(
+                new FeatureServicesCollection(servicesCollection));
+
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            var serviceProvider = serviceProviderMock.Object;
+
+            var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
+
+            serviceProviderMock.Setup(x => x.GetService(typeof(TransientFeature))).Returns(() => new TransientFeature(service));
+            serviceProviderMock.Setup(x => x.GetService(typeof(TransientFeature2))).Returns(() => new TransientFeature2(service));
+            serviceProviderMock.Setup(x => x.GetService(typeof(ScopedFeature))).Returns(new ScopedFeature(service));
+            serviceProviderMock.Setup(x => x.GetService(typeof(ScopedFeature2))).Returns(new ScopedFeature2(service));
+            serviceProviderMock.Setup(x => x.GetService(typeof(SingletonFeature))).Returns(new SingletonFeature(service));
+            serviceProviderMock.Setup(x => x.GetService(typeof(SingletonFeature2))).Returns(new SingletonFeature2(service));
+            var realObservableFeature = new RealObservableFeature(service);
+            var realObservableSubject = new SubjectFeature<RealObservableFeature>(realObservableFeature);
+            serviceProviderMock.Setup(x => x.GetService(typeof(RealObservableFeature))).Returns(realObservableFeature);
+            serviceProviderMock.Setup(x => x.GetService(typeof(IObservableFeature<RealObservableFeature>))).Returns(new ObservableFeature<RealObservableFeature>(realObservableSubject));
+            var realObservableFeature2 = new RealObservableFeature2(service);
+            var realObservableSubject2 = new SubjectFeature<RealObservableFeature2>(realObservableFeature2);
+            serviceProviderMock.Setup(x => x.GetService(typeof(RealObservableFeature2))).Returns(realObservableFeature2);
+            serviceProviderMock.Setup(x => x.GetService(typeof(IObservableFeature<RealObservableFeature2>))).Returns(new ObservableFeature<RealObservableFeature2>(realObservableSubject2));
+
+            IValidateFeatureService result = null;
+
+            result = service.ValidateFeaturesAreInTheCorrectState(typeof(TransientFeature2));
+            Assert.True(result.Validate());
+
+            realObservableFeature.IsEnabled = false;
+            Assert.True(result.Validate());
+            realObservableSubject.OnNext(realObservableFeature);
+            Assert.False(result.Validate());
 
         }
     }

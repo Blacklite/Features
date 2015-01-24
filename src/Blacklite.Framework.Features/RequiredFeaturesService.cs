@@ -49,10 +49,12 @@ namespace Blacklite.Framework.Features
                 {
                     Service = (IFeature)x.Service,
                     x.IsEnabled
-                });
+                })
+                .ToArray();
 
             var observableFeatures = allFeatures
-                .Where(x => x.IsObservable);
+                .Where(x => x.IsObservable)
+                .ToArray() ;
 
             if (observableFeatures.Any())
             {
@@ -66,14 +68,14 @@ namespace Blacklite.Framework.Features
 
                         return new
                         {
+                            x.IsEnabled,
                             Method = tuple.Item1,
                             Disposable = tuple.Item2
                         };
-                    });
+                    }).ToArray();
 
-                    var disposables = observableSubscriptions.Select(x => x.Disposable);
-                    var methods = observableSubscriptions.Select(x => x.Method);
-                    return new ValidateFeatureService(() => methods.All(z => z()), disposables);
+                    var disposables = observableSubscriptions.Select(x => x.Disposable).ToArray();
+                    return new ValidateFeatureService(() => observableSubscriptions.All(z => z.Method() == z.IsEnabled), disposables);
                 }
             }
 

@@ -30,7 +30,7 @@ namespace Blacklite.Framework.Features
 
                 return _enabled && _validateFeatureService.Validate();
             }
-            protected set { _enabled = value; }
+            set { _enabled = value; }
         }
 
         public void Dispose()
