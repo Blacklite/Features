@@ -17,17 +17,15 @@ namespace Blacklite.Framework.Features
     class FeatureDescriberProvider : IFeatureDescriberProvider
     {
         //private readonly IEnumerable<IServiceDescriptor> _describers;
-        public FeatureDescriberProvider(FeatureServicesCollection collection)
+        public FeatureDescriberProvider(FeatureServicesCollection collection, IFeatureDescriberFactory factory)
         {
-            var dictionary = FeatureDescriber.Fixup(
+            var dictionary = factory.Create(
                     collection.Descriptors
                         .Where(x => x.ServiceType
                             .GetTypeInfo()
                             .ImplementedInterfaces.Contains(typeof(IFeature))
-                        )
-                        .Select(FeatureDescriber.Create))
-                        .ToDictionary(x => x.FeatureType, x => (IFeatureDescriber)x);
-
+                        ))
+                        .ToDictionary(x => x.FeatureType);
 
             Describers = new ReadOnlyDictionary<Type, IFeatureDescriber>(dictionary);
         }

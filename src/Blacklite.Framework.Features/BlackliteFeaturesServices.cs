@@ -14,6 +14,7 @@ namespace Blacklite.Framework.Features
             var describe = new ServiceDescriber(configuration);
 
             yield return describe.Singleton<IFeatureDescriberProvider, FeatureDescriberProvider>();
+            yield return describe.Singleton<IFeatureDescriberFactory, FeatureDescriberFactory>();
             yield return describe.Singleton(typeof(ISubjectFeature<>), typeof(SubjectFeature<>));
             yield return describe.Singleton(typeof(IObservableFeature<>), typeof(IObservableFeature<>));
             yield return describe.Transient<IRequiredFeaturesService, RequiredFeaturesService>();
