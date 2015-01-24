@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Framework.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Blacklite.Framework.Features
     public interface IFeatureDescriber
     {
         Type FeatureType { get; }
-        bool IsScoped { get; }
+        LifecycleKind Lifecycle { get; }
         bool IsObservable { get; }
         IReadOnlyDictionary<IFeatureDescriber, bool> DependsOn { get; }
         IEnumerable<IFeatureDescriber> Children { get; }
@@ -17,21 +18,23 @@ namespace Blacklite.Framework.Features
 
     class FeatureDescriber : IFeatureDescriber
     {
-        public FeatureDescriber(TypeInfo type)
+        public FeatureDescriber(IServiceDescriptor descriptor, LifecycleKind lifecycle)
         {
-            FeatureType = type.AsType();
-            IsScoped = type.ImplementedInterfaces.Contains(typeof(IScopedFeature));
-            IsObservable = type.ImplementedInterfaces.Contains(typeof(IObservableFeature));
+            FeatureType = descriptor.ServiceType;
+            FeatureTypeInfo = FeatureType.GetTypeInfo();
+            Lifecycle = descriptor.Lifecycle;
+            IsObservable = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IObservableFeature));
 
-            Requires = type.GetCustomAttributes<RequiredFeatureAttribute>();
-            Parent = type.GetCustomAttribute<ParentFeatureAttribute>()?.Feature.GetTypeInfo();
+            Requires = FeatureTypeInfo.GetCustomAttributes<RequiredFeatureAttribute>();
+            Parent = FeatureTypeInfo.GetCustomAttribute<ParentFeatureAttribute>()?.Feature;
 
             DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(new Dictionary<IFeatureDescriber, bool>());
             Children = Enumerable.Empty<IFeatureDescriber>();
         }
 
         public Type FeatureType { get; }
-        public bool IsScoped { get; }
+        public TypeInfo FeatureTypeInfo { get; }
+        public LifecycleKind Lifecycle { get; }
         public bool IsObservable { get; }
 
         private IEnumerable<RequiredFeatureAttribute> Requires { get; }
@@ -40,22 +43,39 @@ namespace Blacklite.Framework.Features
         public IReadOnlyDictionary<IFeatureDescriber, bool> DependsOn { get; private set; }
         public IEnumerable<IFeatureDescriber> Children { get; private set; }
 
-        public static FeatureDescriber Create(TypeInfo type)
+        public static FeatureDescriber Create(IServiceDescriptor descriptor)
         {
-            return new FeatureDescriber(type);
+            return new FeatureDescriber(descriptor, descriptor.Lifecycle);
         }
 
         public static IEnumerable<FeatureDescriber> Fixup(IEnumerable<FeatureDescriber> describers)
         {
             foreach (var describer in describers)
             {
-                describer.Children = describers.Where(x => x.Parent == describer.FeatureType.GetTypeInfo()).ToArray();
-                describer.DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(
-                    describer.Requires
-                        .ToDictionary(
-                            x => (IFeatureDescriber)describers.Single(z => z.FeatureType == x.FeatureType),
-                            x => x.IsEnabled)
-                        );
+                describer.Children = describers.Where(x => x.Parent == describer.FeatureTypeInfo).ToArray();
+
+                var requires = describers
+                    .Join(describer.Requires, x => x.FeatureTypeInfo, x => x.FeatureType, (z, x) => z);
+
+                if (describer.Lifecycle == LifecycleKind.Singleton && requires.Any(z => z.Lifecycle == LifecycleKind.Scoped))
+                {
+                    throw new NotSupportedException($"Lifecycle '{LifecycleKind.Scoped}' is not supported for features with a lifecycle of '{describer.Lifecycle}'.");
+                }
+
+                if ((describer.Lifecycle == LifecycleKind.Singleton || describer.Lifecycle == LifecycleKind.Scoped) && requires.Any(z => z.Lifecycle == LifecycleKind.Transient))
+                {
+                    throw new NotSupportedException($"Lifecycle '{LifecycleKind.Transient}' is not supported for features with a lifecycle of '{describer.Lifecycle}'.");
+                }
+
+                if (describer.IsObservable && (describer.Lifecycle == LifecycleKind.Scoped || describer.Lifecycle == LifecycleKind.Transient))
+                {
+                    throw new NotSupportedException($"Lifecycle '{describer.Lifecycle}' is not supported by observable features'.");
+                }
+
+                var requiresDictionary = requires.Join(describer.Requires, x => x.FeatureTypeInfo,
+                    x => x.FeatureType, (d, x) => new { d, x.IsEnabled }).ToDictionary(x => (IFeatureDescriber)x.d, x => x.IsEnabled);
+
+                describer.DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(requiresDictionary);
 
                 yield return describer;
             }

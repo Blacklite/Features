@@ -15,7 +15,9 @@ namespace Microsoft.Framework.DependencyInjection
             IConfiguration configuration = null)
         {
             services.TryAdd(BlackliteFeaturesServices.GetFeatures(configuration));
-            services.Add(BlackliteFeaturesServices.GetResolvers(configuration));
+            //services.Add(BlackliteFeaturesServices.GetResolvers(configuration));
+            services.AddInstance(new FeatureServicesCollection(services));
+
             return services;
         }
     }

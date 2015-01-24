@@ -1,20 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Framework.DependencyInjection;
+using System.Linq;
 
 namespace Blacklite.Framework.Features
 {
     public interface IFeature
     {
-        bool IsEnabled { get; set; }
+        bool IsEnabled { get; }
     }
 
-    public abstract partial class Feature : IFeature
+    public abstract partial class Feature : IFeature, IDisposable
     {
-        private bool _enabled;
+        private readonly IRequiredFeaturesService _requiredFeatures;
+        private IValidateFeatureService _validateFeatureService;
+
+        protected Feature(IRequiredFeaturesService requiredFeatures)
+        {
+            _requiredFeatures = requiredFeatures;
+        }
+
+        private bool _enabled = true;
         public virtual bool IsEnabled
         {
-            get { return _enabled; }
-            set { _enabled = true; }
+            get
+            {
+                if (_validateFeatureService == null)
+                    _validateFeatureService = _requiredFeatures.ValidateFeaturesAreInTheCorrectState(this.GetType());
+
+                return _enabled && _validateFeatureService.Validate();
+            }
+            protected set { _enabled = value; }
+        }
+
+        public void Dispose()
+        {
+            ((IDisposable)_validateFeatureService).Dispose();
         }
     }
 }

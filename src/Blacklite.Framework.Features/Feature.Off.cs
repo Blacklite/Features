@@ -8,9 +8,9 @@ namespace Blacklite.Framework.Features
         /// <summary>
         /// Allows a feature to be always off
         /// </summary>
-        public class AlwaysOff : Feature
+        public class AlwaysOff : IFeature
         {
-            public override bool IsEnabled { get { return false; } }
+            public bool IsEnabled { get { return false; } }
         }
     }
 }

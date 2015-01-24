@@ -1,27 +1,36 @@
 ﻿using System;
+using System.Reactive.Subjects;
 
 namespace Blacklite.Framework.Features
 {
+    // Create analyzier to identify miss used IObservableFeatures
     public interface IObservableFeature : IFeature { }
-    public interface IObservableFeature<T> : IObservableFeature, IObservable<T>, IDisposable where T : IFeature
+
+    public abstract class ObservableFeature : Feature, IObservableFeature
     {
-        T Value { get; }
+        protected ObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
+        {
+        }
     }
 
-    public class ObservableFeature<T> : IObservableFeature<T>
-        where T : IFeature
+    public interface IObservableFeature<T> : IObservable<T>, IDisposable
+        where T : IObservableFeature
     {
-        private readonly IObservable<T> _feature;
+    }
+
+    class ObservableFeature<T> : IObservableFeature<T>
+        where T : IObservableFeature
+    {
+        private readonly ISubject<T> _feature;
         private readonly IDisposable _subscription;
-        public ObservableFeature(IObservable<T> feature)
+        private T _value;
+        public ObservableFeature(ISubjectFeature<T> feature)
         {
             _feature = feature;
-            _subscription = _feature.Subscribe(x => Value = x);
+            _subscription = _feature.Subscribe(x => _value = x);
         }
 
-        public T Value { get; private set; }
-
-        public bool IsEnabled { get { return Value?.IsEnabled ?? false; } set { } }
+        public bool IsEnabled { get { return _value?.IsEnabled ?? false; } set { } }
 
         public IDisposable Subscribe(IObserver<T> observer) => _feature.Subscribe(observer);
 
@@ -59,5 +68,40 @@ namespace Blacklite.Framework.Features
             // GC.SuppressFinalize(this);
         }
         #endregion
+    }
+
+    interface ISubjectFeature<T> : ISubject<T> where T : IFeature
+    {
+
+    }
+
+    class SubjectFeature<T> : ISubjectFeature<T>
+        where T : IObservableFeature
+    {
+        private readonly ISubject<T> _feature;
+        public SubjectFeature(T feature)
+        {
+            _feature = new BehaviorSubject<T>(feature);
+        }
+
+        void IObserver<T>.OnNext(T value)
+        {
+            _feature.OnNext(value);
+        }
+
+        void IObserver<T>.OnError(Exception error)
+        {
+            _feature.OnError(error);
+        }
+
+        void IObserver<T>.OnCompleted()
+        {
+            _feature.OnCompleted();
+        }
+
+        IDisposable IObservable<T>.Subscribe(IObserver<T> observer)
+        {
+            return _feature.Subscribe(observer);
+        }
     }
 }

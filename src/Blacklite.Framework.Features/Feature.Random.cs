@@ -8,18 +8,17 @@ namespace Blacklite.Framework.Features
         /// <summary>
         /// Allows a feature to behave randomly
         /// </summary>
-        public class Random : ScopedFeature
+        public class Random : IFeature
         {
             public Random()
             {
-                _enabled = RandomGenerator.Next() % 2 == 0;
+                IsEnabled = RandomGenerator.Next() % 2 == 0;
             }
 
-            private bool _enabled;
-            public override bool IsEnabled { get { return _enabled; } }
+            public bool IsEnabled { get; }
 
             // Based on: http://blogs.msdn.com/b/pfxteam/archive/2009/02/19/9434171.aspx
-            static class RandomGenerator
+            private static class RandomGenerator
             {
                 private static readonly System.Random NonThreadLocalInstance = new System.Random();
 
