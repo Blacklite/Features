@@ -8,13 +8,15 @@ using System.Collections.Generic;
 
 namespace Microsoft.Framework.DependencyInjection
 {
-    public static class BlackliteFeaturesCollectionExtensions
+    public static class BlackliteMultitenancyFeaturesCollectionExtensions
     {
-        public static IServiceCollection AddFeatures(
+        public static IServiceCollection AddMultitenancyFeatures(
             [NotNull] this IServiceCollection services,
             IConfiguration configuration = null)
         {
-            services.TryAdd(BlackliteFeaturesServices.GetFeatures(services, configuration));
+            services.AddFeatures()
+                    .Add(BlackliteMultitenancyFeaturesServices.GetMultitenancyFeatures(configuration));
+
             return services;
         }
     }

@@ -1,6 +1,7 @@
 ﻿{
 	"dependencies": {
-		"Blacklite.Framework.Features": "",
+        "Blacklite.Framework.Features": "",
+        "Blacklite.Framework.Multitenancy.Features": "",
 		"Moq": "4.2.1408.619",
 		"xunit": " 2.0.0-*",
 		"xunit.runner.aspnet": "2.0.0-*"

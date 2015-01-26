@@ -59,6 +59,16 @@ namespace Features.Tests
             public RealObservableFeature2(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
+        class TransientObservableFeature : ObservableFeature
+        {
+            public TransientObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
+        }
+
+        class ScopedObservableFeature : ObservableFeature
+        {
+            public ScopedObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
+        }
+
         [Fact]
         public void ReturnsTrueByDefault()
         {
@@ -74,7 +84,7 @@ namespace Features.Tests
             servicesCollection.AddSingleton<RealObservableFeature2>();
 
             var featureDescriberProvider = new FeatureDescriberProvider(
-                new FeatureServicesCollection(servicesCollection));
+                new FeatureServicesCollection(servicesCollection), new FeatureDescriberFactory());
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             var serviceProvider = serviceProviderMock.Object;
@@ -143,7 +153,7 @@ namespace Features.Tests
             servicesCollection.AddSingleton<RealObservableFeature2>();
 
             var featureDescriberProvider = new FeatureDescriberProvider(
-                new FeatureServicesCollection(servicesCollection));
+                new FeatureServicesCollection(servicesCollection), new FeatureDescriberFactory());
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             var serviceProvider = serviceProviderMock.Object;
@@ -197,7 +207,7 @@ namespace Features.Tests
             servicesCollection.AddSingleton<RealObservableFeature2>();
 
             var featureDescriberProvider = new FeatureDescriberProvider(
-                new FeatureServicesCollection(servicesCollection));
+                new FeatureServicesCollection(servicesCollection), new FeatureDescriberFactory());
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             var serviceProvider = serviceProviderMock.Object;
@@ -267,7 +277,6 @@ namespace Features.Tests
         [Fact]
         public void ReturnsFalseWhenAppropriate2()
         {
-
             var servicesCollection = new ServiceCollection();
             servicesCollection.AddTransient<TransientFeature>();
             servicesCollection.AddTransient<TransientFeature3>();
@@ -279,7 +288,7 @@ namespace Features.Tests
             servicesCollection.AddSingleton<RealObservableFeature2>();
 
             var featureDescriberProvider = new FeatureDescriberProvider(
-                new FeatureServicesCollection(servicesCollection));
+                new FeatureServicesCollection(servicesCollection), new FeatureDescriberFactory());
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             var serviceProvider = serviceProviderMock.Object;
