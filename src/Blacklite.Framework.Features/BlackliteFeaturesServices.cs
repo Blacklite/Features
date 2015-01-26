@@ -9,7 +9,7 @@ namespace Blacklite.Framework.Features
 {
     public static class BlackliteFeaturesServices
     {
-        internal static IEnumerable<IServiceDescriptor> GetFeatures(IConfiguration configuration = null)
+        internal static IEnumerable<IServiceDescriptor> GetFeatures(IServiceCollection services, IConfiguration configuration = null)
         {
             var describe = new ServiceDescriber(configuration);
 
@@ -18,6 +18,7 @@ namespace Blacklite.Framework.Features
             yield return describe.Singleton(typeof(ISubjectFeature<>), typeof(SubjectFeature<>));
             yield return describe.Singleton(typeof(IObservableFeature<>), typeof(IObservableFeature<>));
             yield return describe.Transient<IRequiredFeaturesService, RequiredFeaturesService>();
+            yield return describe.Instance(new FeatureServicesCollection(services));
         }
     }
 }

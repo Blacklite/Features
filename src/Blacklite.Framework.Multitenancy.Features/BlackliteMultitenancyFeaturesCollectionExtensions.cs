@@ -14,8 +14,8 @@ namespace Microsoft.Framework.DependencyInjection
             [NotNull] this IServiceCollection services,
             IConfiguration configuration = null)
         {
-            services.TryAdd(BlackliteFeaturesServices.GetFeatures(configuration));
-            services.Add(BlackliteMultitenancyFeaturesServices.GetMultitenancyFeatures(configuration));
+            services.AddFeatures()
+                    .Add(BlackliteMultitenancyFeaturesServices.GetMultitenancyFeatures(configuration));
 
             return services;
         }

@@ -50,8 +50,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multite
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy", "..\Multitenancy\src\Blacklite.Framework.Multitenancy\Blacklite.Framework.Multitenancy.kproj", "{1628899E-71FF-4D91-8AD3-42E5C8DC384E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.DependencyInjection", "..\Multitenancy\src\Blacklite.Framework.Multitenancy.DependencyInjection\Blacklite.Framework.Multitenancy.DependencyInjection.kproj", "{DC952956-2454-4EB6-A1EB-9BBCBC8059C2}"
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Interfaces", "..\Multitenancy\src\Blacklite.Framework.Multitenancy.Interfaces\Blacklite.Framework.Multitenancy.Interfaces.kproj", "{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Events", "..\Common\src\Blacklite.Framework.Events\Blacklite.Framework.Events.kproj", "{161CF813-CA55-49ED-B0A5-CB1A7F1CC43D}"
@@ -98,10 +96,6 @@ Global
 		{1628899E-71FF-4D91-8AD3-42E5C8DC384E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1628899E-71FF-4D91-8AD3-42E5C8DC384E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1628899E-71FF-4D91-8AD3-42E5C8DC384E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC952956-2454-4EB6-A1EB-9BBCBC8059C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC952956-2454-4EB6-A1EB-9BBCBC8059C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC952956-2454-4EB6-A1EB-9BBCBC8059C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC952956-2454-4EB6-A1EB-9BBCBC8059C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -2,6 +2,7 @@
     "version": "1.0.0-*",
     "dependencies": {
         "Blacklite.Framework.Interfaces": "1.0.0-*",
+        "Blacklite.Framework.Shared": "1.0.0-*",
         "Blacklite.Framework.Features": "1.0.0-*",
         "Blacklite.Framework.Multitenancy": "1.0.0-*"
     },

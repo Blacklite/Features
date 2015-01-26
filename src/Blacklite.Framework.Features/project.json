@@ -2,7 +2,7 @@
     "version": "1.0.0-*",
     "dependencies": {
         "Blacklite.Framework.Interfaces": "1.0.0-*",
-        "Microsoft.Framework.DependencyInjection": "1.0.0-beta3-*",
+        "Microsoft.Framework.DependencyInjection": "1.0.0-beta4-*",
         "Rx-Core": "2.2.5",
         "Rx-Linq": "2.2.5"
     },
