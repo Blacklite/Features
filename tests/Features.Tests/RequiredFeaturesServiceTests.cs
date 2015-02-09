@@ -8,17 +8,17 @@ namespace Features.Tests
 {
     public class RequiredFeaturesServiceTests
     {
-        class TransientFeature : SetableFeature
+        class TransientFeature : Feature
         {
             public TransientFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
-        class ScopedFeature : SetableFeature
+        class ScopedFeature : Feature
         {
             public ScopedFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
-        class SingletonFeature : SetableFeature
+        class SingletonFeature : Feature
         {
             public SingletonFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
@@ -191,7 +191,7 @@ namespace Features.Tests
             Assert.True(result.Validate());
 
         }
-        
+
         [Fact]
         public void ReturnsFalseWhenAppropriate()
         {

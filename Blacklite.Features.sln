@@ -58,6 +58,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Feature
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Features.EditorModelSchema.Tests", "tests\Features.EditorModelSchema.Tests\Features.EditorModelSchema.Tests.kproj", "{AE095B69-8BA5-4676-8358-118DDBA801B5}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Newtonsoft.Temp", "src\Newtonsoft.Temp\Newtonsoft.Temp.kproj", "{4C0FAAB8-135D-493A-A127-8A1036CF7E16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +118,10 @@ Global
 		{AE095B69-8BA5-4676-8358-118DDBA801B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE095B69-8BA5-4676-8358-118DDBA801B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE095B69-8BA5-4676-8358-118DDBA801B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C0FAAB8-135D-493A-A127-8A1036CF7E16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C0FAAB8-135D-493A-A127-8A1036CF7E16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C0FAAB8-135D-493A-A127-8A1036CF7E16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C0FAAB8-135D-493A-A127-8A1036CF7E16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -128,5 +134,6 @@ Global
 		{C38447EA-DC80-4B1E-A2F1-8CD6CF6A0B57} = {DA14626D-5B88-46ED-937C-4405E5CBD44C}
 		{39889730-3AFE-45A5-857F-008833DBC7A0} = {DA14626D-5B88-46ED-937C-4405E5CBD44C}
 		{AE095B69-8BA5-4676-8358-118DDBA801B5} = {7FC6126C-D58C-4F31-BCCC-BAF0F0B8A5E3}
+		{4C0FAAB8-135D-493A-A127-8A1036CF7E16} = {DA14626D-5B88-46ED-937C-4405E5CBD44C}
 	EndGlobalSection
 EndGlobal

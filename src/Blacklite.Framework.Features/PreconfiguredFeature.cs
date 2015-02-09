@@ -3,21 +3,31 @@ using System.Collections.Generic;
 using Microsoft.Framework.DependencyInjection;
 using System.Linq;
 using Blacklite.Framework.Features.OptionModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Blacklite.Framework.Features
 {
+    public interface IFeature
+    {
+        [Display(Name ="On")]
+        bool IsEnabled { get; }
+    }
 
-    public abstract class SetableFeature : IFeature, IDisposable
+    public interface IFeature<TOptions> : IFeature, IFeatureOptions where TOptions : class, new()
+    {
+        TOptions Options { get; }
+    }
+
+    public abstract class PreconfiguredFeature : IFeature, IDisposable
     {
         private readonly IRequiredFeaturesService _requiredFeatures;
         private IValidateFeatureService _validateFeatureService;
 
-        protected SetableFeature(IRequiredFeaturesService requiredFeatures)
+        public PreconfiguredFeature(IRequiredFeaturesService requiredFeatures)
         {
             _requiredFeatures = requiredFeatures;
         }
 
-        private bool _enabled = true;
         public virtual bool IsEnabled
         {
             get
@@ -25,9 +35,8 @@ namespace Blacklite.Framework.Features
                 if (_validateFeatureService == null)
                     _validateFeatureService = _requiredFeatures.ValidateFeaturesAreInTheCorrectState(this.GetType());
 
-                return _enabled && _validateFeatureService.Validate();
+                return _validateFeatureService.Validate();
             }
-            set { _enabled = value; }
         }
 
         public void Dispose()
@@ -36,12 +45,12 @@ namespace Blacklite.Framework.Features
         }
     }
 
-    public abstract class SetableFeature<TOptions> : SetableFeature, IFeature<TOptions>
+    public abstract class PreconfiguredFeature<TOptions> : PreconfiguredFeature, IFeature<TOptions>
         where TOptions : class, new()
     {
         public TOptions Options { get; }
 
-        protected SetableFeature(IRequiredFeaturesService requiredFeatures, IFeatureOptions<TOptions> _optionsContainer) : base(requiredFeatures)
+        public PreconfiguredFeature(IRequiredFeaturesService requiredFeatures, IFeatureOptions<TOptions> _optionsContainer) : base(requiredFeatures)
         {
             Options = _optionsContainer.Options;
         }

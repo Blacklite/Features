@@ -6,9 +6,16 @@ namespace Blacklite.Framework.Features
     // Create analyzier to identify miss used IObservableFeatures
     public interface IObservableFeature : IFeature { }
 
-    public abstract class ObservableFeature : SetableFeature, IObservableFeature
+    public abstract class ObservableFeature : Feature, IObservableFeature
     {
-        protected ObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
+        public ObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
+        {
+        }
+    }
+
+    public abstract class PreconfiguredObservableFeature : PreconfiguredFeature, IObservableFeature
+    {
+        public PreconfiguredObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {
         }
     }

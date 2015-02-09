@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Blacklite.Framework.Features.OptionModel;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,6 +15,8 @@ namespace Blacklite.Framework.Features.EditorModel
     {
         private readonly IFeatureDescriberProvider _describerProvider;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ConcurrentDictionary<Type, IFeature> _features;
+        private readonly ConcurrentDictionary<Type, object> _options;
 
         public FeatureEditorFactory(IFeatureDescriberProvider describerProvider, IServiceProvider serviceProvider)
         {
@@ -47,7 +51,8 @@ namespace Blacklite.Framework.Features.EditorModel
             if (!describer.HasOptions)
                 return null;
 
-            return _serviceProvider.GetService(describer.OptionsType);
+            var service = _serviceProvider.GetService(typeof(IFeatureOptions<>).MakeGenericType(describer.OptionsType)) as IFeatureOptions<object>;
+            return service.Options;
         }
     }
 }

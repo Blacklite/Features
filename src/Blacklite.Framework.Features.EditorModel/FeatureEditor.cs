@@ -1,6 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
+﻿using Temp.Newtonsoft.Json;
+using Temp.Newtonsoft.Json.Converters;
+using Temp.Newtonsoft.Json.Linq;
+using Temp.Newtonsoft.Json.Schema;
+using Temp.Newtonsoft.Json.Schema.Generation;
+using Temp.Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,21 +12,46 @@ using System.Reflection;
 
 namespace Blacklite.Framework.Features.EditorModel
 {
+    class SchemaContractResolver : DefaultContractResolver
+    {
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        {
+            var property =  base.CreateProperty(member, memberSerialization);
+            return property;
+        }
+    }
+
     public class FeatureEditor
     {
         private readonly IEnumerable<FeatureModel> _models;
         private readonly Func<Type, IFeature> _getFeature;
         private readonly Func<Type, object> _getFeatureOption;
+        private readonly JSchemaGenerator _schemaGenerator;
+        private readonly JsonSerializer _serializer;
 
         public FeatureEditor(IEnumerable<FeatureModel> models, Func<Type, IFeature> feature, Func<Type, object> featureOption)
         {
             _models = models;
             _getFeature = feature;
             _getFeatureOption = featureOption;
+
+            var contractResolver = new SchemaContractResolver();
+            _schemaGenerator = new JSchemaGenerator()
+            {
+                ContractResolver = contractResolver,
+            };
+            _schemaGenerator.GenerationProviders.Add(new StringEnumGenerationProvider());
+
+            _serializer = new JsonSerializer()
+            {
+                ContractResolver = contractResolver,
+            };
+
+            _serializer.Converters.Add(new StringEnumConverter());
         }
 
-        private JsonSchema _schema;
-        public JsonSchema Schema
+        private JSchema _schema;
+        public JSchema Schema
         {
             get
             {
@@ -60,15 +88,9 @@ namespace Blacklite.Framework.Features.EditorModel
             else
                 json.Add("Enabled", new JValue(model.Enabled.GetValue(_getFeature(model.FeatureType))));
 
-            if (model.Properties.Any())
+            if (model.OptionsType != null)
             {
-                var options = new JObject();
-                json.Add("Options", options);
-
-                foreach (var property in model.Properties)
-                {
-                    options.Add(property.Name, new JValue(property.GetValue(_getFeatureOption(model.FeatureType))));
-                }
+                json.Add("Options", JObject.FromObject(_getFeatureOption(model.FeatureType), _serializer));
             }
 
             foreach (var child in model.Children)
@@ -79,42 +101,47 @@ namespace Blacklite.Framework.Features.EditorModel
             return json;
         }
 
-        private JsonSchema GenerateSchema()
+        private JSchema GenerateSchema()
         {
-            var schema = new JsonSchema();
+            var schema = new JSchema();
             schema.Title = "Features";
-            schema.Type = JsonSchemaType.Object;
-            schema.Properties = new Dictionary<string, JsonSchema>();
 
+            schema.Type = JSchemaType.Object;
+            //schema.Format = "tabs";
             foreach (var model in _models)
             {
                 schema.Properties.Add(model.Name, GetModelSchema(model));
             }
 
+            //schema.Type = JSchemaType.Array;
+            //schema.Format = "tabs";
+            //foreach (var model in _models)
+            //{
+            //    schema.Items.Add(GetModelSchema(model));
+            //}
+
             return schema;
         }
 
-        private JsonSchema GetModelSchema(FeatureModel model)
+        private JSchema GetModelSchema(FeatureModel model)
         {
-            var schema = new JsonSchema();
-            schema.Type = JsonSchemaType.Object;
+            var schema = new JSchema();
+            schema.Type = JSchemaType.Object;
             schema.Title = model.Name;
             schema.Description = model.Description;
-            schema.Properties = new Dictionary<string, JsonSchema>();
+            schema.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
 
-            schema.Properties.Add("Enabled", GetPropertySchema(model.Enabled));
+            schema.Properties.Add("Enabled", GetOrUpdatePropertySchema(model.Enabled));
 
-            if (model.Properties.Any())
+            if (model.OptionsType != null)
             {
-                var options = new JsonSchema();
-                options.Properties = new Dictionary<string, JsonSchema>();
+                var options = _schemaGenerator.Generate(model.OptionsType);
                 options.Title = "Options";
-                options.Type = JsonSchemaType.Object;
-                foreach (var property in model.Properties.Skip(1))
+                options.ExtensionData["options"] = JObject.FromObject(new { collapsed = true });
+                foreach (var property in options.Properties)
                 {
-                    options.Properties.Add(property.Name, GetPropertySchema(property));
+                    GetOrUpdatePropertySchema(model.Properties[property.Key], property.Value);
                 }
-
                 schema.Properties.Add("Options", options);
             }
 
@@ -126,12 +153,24 @@ namespace Blacklite.Framework.Features.EditorModel
             return schema;
         }
 
-        private JsonSchema GetPropertySchema(FeatureOptionPropertyModel property)
+        private JSchema GetOrUpdatePropertySchema(FeatureOptionPropertyModel property, JSchema schema = null)
         {
             // change this
-            var schema = new JsonSchemaGenerator().Generate(property.Type);
+            schema = schema ?? _schemaGenerator.Generate(property.Type);
             schema.Description = property.Description;
-            schema.ReadOnly = property.IsReadOnly;
+
+            schema.ExtensionData["readonly"] = new JValue(property.IsReadOnly);
+
+            schema.Type = schema.Type.Value & (JSchemaType.String | JSchemaType.Float | JSchemaType.Integer | JSchemaType.Boolean | JSchemaType.Object | JSchemaType.Array);
+
+            //schema.AdditionalProperties.
+            //schema. = property.IsReadOnly;
+
+            //if (schema.Enum != null)
+            //{
+            //    schema.Enum = schema.Enum.Select(x => Enum.getva)
+            //}
+
             return schema;
         }
     }
@@ -143,9 +182,10 @@ namespace Blacklite.Framework.Features.EditorModel
             Name = describer.FeatureType.Name;
             Description = describer.Description;
             FeatureType = describer.FeatureType;
+            OptionsType = describer.OptionsType;
             Children = describer.Children.Select(x => new FeatureModel(x)).ToArray();
             Enabled = new FeatureOptionPropertyModel(typeof(bool), nameof(IFeature.IsEnabled), null, x => describer.GetIsEnabled<bool>(x), describer.IsReadOnly, describer.OptionsHasIsEnabled);
-            Properties = GetProperties(describer).ToArray();
+            Properties = GetProperties(describer).ToDictionary(x => x.Name);
             Dependencies = describer.DependsOn.Select(x => new FeatureDependencyModel(x.Key, x.Value)).ToArray();
         }
 
@@ -157,21 +197,23 @@ namespace Blacklite.Framework.Features.EditorModel
 
                 foreach (var property in properties.Where(x => x.Name != nameof(IFeature.IsEnabled)))
                 {
-                    yield return new FeatureOptionPropertyModel(property.PropertyType, GetPropertyDisplayName(property), GetPropertyDescription(property), property.GetValue, property.CanWrite);
+                    yield return new FeatureOptionPropertyModel(property.PropertyType, property.Name, GetPropertyDescription(property), property.GetValue, !property.CanWrite);
                 }
             }
         }
 
         private string GetPropertyDisplayName(PropertyInfo property) => property.GetCustomAttribute<DisplayAttribute>()?.Name ?? property.Name;
-        private string GetPropertyDescription(PropertyInfo property) => property.GetCustomAttribute<DisplayAttribute>()?.Description ?? property.Name;
+        private string GetPropertyDescription(PropertyInfo property) => property.GetCustomAttribute<DisplayAttribute>()?.Description;
 
         public string Name { get; }
         public Type FeatureType { get; }
+        public Type OptionsType { get; }
         public string Description { get; }
         public FeatureOptionPropertyModel Enabled { get; }
+        public IDictionary<string, FeatureOptionPropertyModel> Properties { get; }
         public IEnumerable<FeatureModel> Children { get; }
         public IEnumerable<FeatureDependencyModel> Dependencies { get; }
-        public IEnumerable<FeatureOptionPropertyModel> Properties { get; }
+
     }
 
     public class FeatureDependencyModel

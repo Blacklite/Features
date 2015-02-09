@@ -37,10 +37,7 @@ namespace Features.EditorModelSchema.Tests
             // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
             // services.AddWebApiConventions();
             services.AddFeatures();
-
-            services.AddTransient<FeatureA>();
-            services.AddTransient<FeatureB>();
-            services.AddTransient<FeatureC>();
+            FeatureRegistry.Register(services);
 
             services.AddTransient<IFeatureEditorFactory, FeatureEditorFactory>();
         }
