@@ -1,4 +1,5 @@
-﻿using Microsoft.Framework.ConfigurationModel;
+﻿using Blacklite.Framework.Features.OptionModel;
+using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace Blacklite.Framework.Features
             yield return describe.Singleton(typeof(ISubjectFeature<>), typeof(SubjectFeature<>));
             yield return describe.Singleton(typeof(IObservableFeature<>), typeof(ObservableFeature<>));
             yield return describe.Transient<IRequiredFeaturesService, RequiredFeaturesService>();
+            yield return describe.Singleton(typeof(IFeatureOptions<>), typeof(FeatureOptionsManager<>));
             yield return describe.Instance(new FeatureServicesCollection(services));
         }
     }

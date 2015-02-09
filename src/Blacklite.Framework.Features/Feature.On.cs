@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blacklite.Framework.Features.OptionModel;
+using System;
 using System.Collections.Generic;
 
 namespace Blacklite.Framework.Features
@@ -11,6 +12,17 @@ namespace Blacklite.Framework.Features
         public class AlwaysOn : IFeature
         {
             public bool IsEnabled { get { return true; } }
+        }
+
+        public class AlwaysOn<TOptions> : AlwaysOn, IFeature<TOptions>
+            where TOptions : class, new()
+        {
+            public TOptions Options { get; }
+
+            protected AlwaysOn(IFeatureOptions<TOptions> _optionsContainer)
+            {
+                Options = _optionsContainer.Options;
+            }
         }
     }
 }

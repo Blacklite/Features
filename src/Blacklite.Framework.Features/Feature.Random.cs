@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blacklite.Framework.Features.OptionModel;
+using System;
 using System.Collections.Generic;
 
 namespace Blacklite.Framework.Features
@@ -42,6 +43,17 @@ namespace Blacklite.Framework.Features
 
                     return rnd.Next();
                 }
+            }
+        }
+
+        public class Random<TOptions> : Random, IFeature<TOptions>
+            where TOptions : class, new()
+        {
+            public TOptions Options { get; }
+
+            protected Random(IFeatureOptions<TOptions> _optionsContainer)
+            {
+                Options = _optionsContainer.Options;
             }
         }
     }

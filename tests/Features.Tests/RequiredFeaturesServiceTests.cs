@@ -8,17 +8,17 @@ namespace Features.Tests
 {
     public class RequiredFeaturesServiceTests
     {
-        class TransientFeature : Feature
+        class TransientFeature : SetableFeature
         {
             public TransientFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
-        class ScopedFeature : Feature
+        class ScopedFeature : SetableFeature
         {
             public ScopedFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
-        class SingletonFeature : Feature
+        class SingletonFeature : SetableFeature
         {
             public SingletonFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }

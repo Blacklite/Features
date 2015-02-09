@@ -1,0 +1,24 @@
+﻿{
+    "version": "1.0.0-*",
+    "dependencies": {
+        "Blacklite.Framework.Features": "",
+        "Newtonsoft.Json": "6.0.6"
+    },
+
+    "frameworks": {
+        "aspnet50": {
+            "frameworkAssemblies": {
+                "System.Runtime": "4.0.20.0",
+                "System.ComponentModel.DataAnnotations": "4.0.0.0"
+            },
+            "dependencies": {
+            }
+        },
+        "aspnetcore50": {
+            "dependencies": {
+                "System.Runtime": "4.0.20-beta-*",
+                "System.ComponentModel.Annotations": "4.0.10-beta-*"
+            }
+        }
+    }
+}

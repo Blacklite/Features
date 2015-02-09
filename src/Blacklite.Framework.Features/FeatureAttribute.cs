@@ -24,4 +24,24 @@ namespace Blacklite.Framework.Features
             IsEnabled = isEnabled;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class FeatureDisplayNameAttribute : Attribute
+    {
+        public string DisplayName { get; }
+        public FeatureDisplayNameAttribute(string displayName)
+        {
+            DisplayName = displayName;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class FeatureDescriptionAttribute : Attribute
+    {
+        public string Description { get; }
+        public FeatureDescriptionAttribute(string description)
+        {
+            Description = description;
+        }
+    }
 }
