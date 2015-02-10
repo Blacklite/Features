@@ -36,8 +36,10 @@ namespace Blacklite.Framework.Features
     {
         private readonly PropertyInfo _isEnabledProperty;
         private readonly PropertyInfo _optionsProperty;
+        private readonly IServiceDescriptor _descriptor;
         public FeatureDescriber(IServiceDescriptor descriptor)
         {
+            _descriptor = descriptor;
             FeatureType = descriptor.ServiceType;
             FeatureTypeInfo = FeatureType.GetTypeInfo();
             Lifecycle = descriptor.Lifecycle;
@@ -112,6 +114,19 @@ namespace Blacklite.Framework.Features
             if (HasOptions)
                 return (T)_optionsProperty.GetValue(instance);
             return default(T);
+        }
+
+        public override int GetHashCode()
+        {
+            return _descriptor.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as FeatureDescriber;
+            if (item != null)
+                return _descriptor.Equals(item._descriptor);
+            return false;
         }
     }
 }

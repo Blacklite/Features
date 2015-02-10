@@ -25,6 +25,10 @@
                 disable_array_reorder: true,
                 no_additional_properties: true
             });
+
+            editor.on('change', function() {
+                $('[data-schemapath*="root."]').filter(function() { return $(this).attr('data-schemapath').split('.').length < 3; }).children('h3').remove();
+            })
         </script>
     </div>
     @*<div class="col-md-4">

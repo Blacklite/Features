@@ -59,8 +59,8 @@ namespace Blacklite.Framework.Features.EditorModel
             }
         }
 
-        private JObject _model;
-        public JObject Model
+        private JToken _model;
+        public JToken Model
         {
             get
             {
@@ -68,12 +68,20 @@ namespace Blacklite.Framework.Features.EditorModel
             }
         }
 
-        private JObject GenerateJObject()
+        private JToken GenerateJObject()
         {
+            //var json = new JObject();
+            //foreach (var model in _models)
+            //{
+            //    json.Add(model.Name, GetModelJObject(model));
+            //    //model.Properties.Add(model.Name, GetModelSchema(model));
+            //}
             var json = new JObject();
+            var jarray = new JObject();
+            json.Add("General", jarray);
             foreach (var model in _models)
             {
-                json.Add(model.Name, GetModelJObject(model));
+                jarray.Add(model.Name, GetModelJObject(model));
                 //model.Properties.Add(model.Name, GetModelSchema(model));
             }
             return json;
@@ -104,17 +112,34 @@ namespace Blacklite.Framework.Features.EditorModel
         private JSchema GenerateSchema()
         {
             var schema = new JSchema();
+            schema.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
+            var group = new JSchema();
+            group.Title = "General";
+            group.Type = JSchemaType.Object;
+            group.Format = "grid";
+            group.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
+            schema.Properties.Add("General", group);
             schema.Title = "Features";
-
             schema.Type = JSchemaType.Object;
-            //schema.Format = "tabs";
+            schema.Format = "objecttabs";
             foreach (var model in _models)
             {
-                schema.Properties.Add(model.Name, GetModelSchema(model));
+                group.Properties.Add(model.Name, GetModelSchema(model));
             }
 
+            //var modelSchemas = _models.Select(model => GetModelSchema(model));
+            //schema.ExtensionData["definitions"] = JObject.FromObject(modelSchemas.ToDictionary(x => x.Title));
+
             //schema.Type = JSchemaType.Array;
-            //schema.Format = "tabs";
+            //schema.Format = "table";
+
+            //var items = new JSchema();
+            //schema.Items.Add(items);
+            //items.Title = "General";
+            //items.Format = "tabs";
+            //foreach (var model in modelSchemas)
+            //    items.OneOf.Add(model);
+
             //foreach (var model in _models)
             //{
             //    schema.Items.Add(GetModelSchema(model));
@@ -129,6 +154,7 @@ namespace Blacklite.Framework.Features.EditorModel
             schema.Type = JSchemaType.Object;
             schema.Title = model.Name;
             schema.Description = model.Description;
+            schema.Format = "grid";
             schema.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
 
             schema.Properties.Add("Enabled", GetOrUpdatePropertySchema(model.Enabled));
