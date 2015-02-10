@@ -20,6 +20,16 @@ namespace Features.EditorModelSchema.Tests.Controllers
             return View(_editor);
         }
 
+        public string Schema()
+        {
+            return _editor.Schema.ToString();
+        }
+
+        public string Json()
+        {
+            return _editor.Model.ToString();
+        }
+
         public IActionResult About()
         {
             ViewBag.Message = "Your application description page.";

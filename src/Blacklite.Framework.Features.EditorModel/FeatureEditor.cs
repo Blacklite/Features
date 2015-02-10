@@ -16,38 +16,184 @@ namespace Blacklite.Framework.Features.EditorModel
     {
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
-            var property =  base.CreateProperty(member, memberSerialization);
+            var property = base.CreateProperty(member, memberSerialization);
             return property;
+        }
+    }
+
+    class ModelSchemaContainer
+    {
+        private readonly IEnumerable<FeatureModel> _models;
+        private readonly IDictionary<string, JSchema> _optionSchemas;
+        private readonly IDictionary<string, JSchema> _modelSchemas;
+        private readonly JSchemaGenerator _schemaGenerator;
+        private readonly JObject _definitions;
+        private readonly JSchema _schema;
+        public ModelSchemaContainer(JSchema master, IEnumerable<FeatureModel> models, IEnumerable<FeatureModel> rootModels, IContractResolver resolver)
+        {
+            _schema = master;
+            _models = models;
+            _modelSchemas = new Dictionary<string, JSchema>();
+            _optionSchemas = new Dictionary<string, JSchema>();
+
+            _schemaGenerator = new JSchemaGenerator()
+            {
+                ContractResolver = resolver,
+            };
+            _schemaGenerator.GenerationProviders.Add(new StringEnumGenerationProvider());
+
+            var allModels = new List<FeatureModel>();
+            var currentModels = models.Where(x => rootModels.Any(z => z.Name == x.Name)).ToArray();
+            while (currentModels.Any())
+            {
+                foreach (var model in currentModels)
+                {
+                    allModels.Add(model);
+                }
+
+                currentModels = currentModels.SelectMany(x => x.Children).ToArray();
+            }
+
+            var definitions = _definitions = new JObject();
+            master.ExtensionData["definitions"] = definitions;
+            foreach (var model in allModels.AsEnumerable().Reverse())
+            {
+                //foreach (var model in _schemaContainer.OptionSchemas.Union(_schemaContainer.Schemas))
+                GetSchema(model);
+            }
+
+        }
+
+        public IEnumerable<FeatureModel> Models { get { return _models; } }
+        public IEnumerable<KeyValuePair<string, JSchema>> Schemas { get { return _modelSchemas; } }
+        public IEnumerable<KeyValuePair<string, JSchema>> OptionSchemas { get { return _optionSchemas; } }
+
+        public JSchema GetSchema(FeatureModel model)
+        {
+            JSchema schema;
+            if (!_modelSchemas.TryGetValue(model.Name, out schema))
+            {
+                schema = GetModelSchema(model);
+                _modelSchemas.Add(model.Name, schema);
+            }
+
+            return schema;
+        }
+
+        private JSchema GetModelSchema(FeatureModel model)
+        {
+            var schema = new JSchema();
+
+            JToken bogus;
+
+            if (model.OptionsType != null)
+            {
+                var options = _schemaGenerator.Generate(model.OptionsType);
+                if (!_definitions.TryGetValue(model.OptionsType.Name, out bogus))
+                    _definitions.Add(model.OptionsType.Name, options);
+
+                _optionSchemas.Add(model.OptionsType.Name, options);
+                //options.Title = "Options";
+                options.ExtensionData["options"] = JObject.FromObject(new { collapsed = true });
+                foreach (var property in options.Properties)
+                {
+                    GetOrUpdatePropertySchema(model.Properties[property.Key], property.Value);
+                }
+                schema.Properties.Add("Settings", options);
+            }
+
+            if (!_definitions.TryGetValue(model.Name, out bogus))
+                _definitions.Add(model.Name, schema);
+
+            schema.Type = JSchemaType.Object;
+            schema.Title = model.Name;
+            schema.Description = model.Description;
+            schema.Format = "grid";
+            schema.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
+            //schema.AllowAdditionalItems = false;
+
+            var hidden = new JSchema();
+            hidden.Type = JSchemaType.String;
+            //hidden.Enum.Add(new JValue(model.Name));
+            hidden.ExtensionData["options"] = JObject.FromObject(new { hidden = true });
+            schema.Properties.Add(model.Name, hidden);
+            schema.Properties.Add("Enabled", GetOrUpdatePropertySchema(model.Enabled));
+
+            //var constraint = new JSchema();
+            //schema.AllOf.Add(constraint);
+            //var constraintProperty = new JSchema();
+            //constraintProperty.Enum.Add(new JValue(model.Name));
+            //constraint.Properties.Add("$feature", constraintProperty);
+
+            if (model.Children.Any())
+            {
+                var childrenSchema = new JSchema();
+                schema.Properties.Add("children", childrenSchema);
+                childrenSchema.Title = "";
+
+                childrenSchema.Type = JSchemaType.Array;
+                var itemSchema = new JSchema();
+                childrenSchema.Items.Add(itemSchema);
+                //itemSchema.Type = JSchemaType.Object;
+                //itemSchema.Title = "General";
+
+                foreach (var child in model.Children.Select(GetSchema))
+                {
+                    itemSchema.AnyOf.Add(child);
+                }
+            }
+
+            schema.AllowAdditionalProperties = false;
+            return schema;
+        }
+
+        private JSchema GetOrUpdatePropertySchema(FeatureOptionPropertyModel property, JSchema schema = null)
+        {
+            // change this
+            schema = schema ?? _schemaGenerator.Generate(property.Type);
+            schema.Description = property.Description;
+
+            schema.ExtensionData["readonly"] = new JValue(property.IsReadOnly);
+
+            schema.Type = schema.Type.Value & (JSchemaType.String | JSchemaType.Float | JSchemaType.Integer | JSchemaType.Boolean | JSchemaType.Object | JSchemaType.Array);
+
+            //schema.AdditionalProperties.
+            //schema. = property.IsReadOnly;
+
+            //if (schema.Enum != null)
+            //{
+            //    schema.Enum = schema.Enum.Select(x => Enum.getva)
+            //}
+
+            return schema;
         }
     }
 
     public class FeatureEditor
     {
         private readonly IEnumerable<FeatureModel> _models;
+        private readonly IEnumerable<FeatureModel> _rootModels;
         private readonly Func<Type, IFeature> _getFeature;
         private readonly Func<Type, object> _getFeatureOption;
-        private readonly JSchemaGenerator _schemaGenerator;
         private readonly JsonSerializer _serializer;
+        private readonly ModelSchemaContainer _schemaContainer;
+        private readonly IContractResolver _resolver;
 
-        public FeatureEditor(IEnumerable<FeatureModel> models, Func<Type, IFeature> feature, Func<Type, object> featureOption)
+        public FeatureEditor(IEnumerable<FeatureModel> models, IEnumerable<FeatureModel> rootModels, Func<Type, IFeature> feature, Func<Type, object> featureOption)
         {
             _models = models;
+            _rootModels = rootModels;
             _getFeature = feature;
             _getFeatureOption = featureOption;
 
-            var contractResolver = new SchemaContractResolver();
-            _schemaGenerator = new JSchemaGenerator()
-            {
-                ContractResolver = contractResolver,
-            };
-            _schemaGenerator.GenerationProviders.Add(new StringEnumGenerationProvider());
-
+            var contractResolver = _resolver = new SchemaContractResolver();
             _serializer = new JsonSerializer()
             {
                 ContractResolver = contractResolver,
             };
 
             _serializer.Converters.Add(new StringEnumConverter());
+            //_modelSchema = _models.ToDictionary(model => model.Name, model => GetModelSchema(model));
         }
 
         private JSchema _schema;
@@ -77,11 +223,11 @@ namespace Blacklite.Framework.Features.EditorModel
             //    //model.Properties.Add(model.Name, GetModelSchema(model));
             //}
             var json = new JObject();
-            var jarray = new JObject();
+            var jarray = new JArray();
             json.Add("General", jarray);
-            foreach (var model in _models)
+            foreach (var model in _rootModels)
             {
-                jarray.Add(model.Name, GetModelJObject(model));
+                jarray.Add(GetModelJObject(model));
                 //model.Properties.Add(model.Name, GetModelSchema(model));
             }
             return json;
@@ -91,6 +237,8 @@ namespace Blacklite.Framework.Features.EditorModel
         {
             var json = new JObject();
 
+            json.Add(model.Name, model.Name);
+
             if (model.Enabled.OptionsHasIsEnabled)
                 json.Add("Enabled", new JValue(model.Enabled.GetValue(_getFeatureOption(model.FeatureType))));
             else
@@ -98,12 +246,17 @@ namespace Blacklite.Framework.Features.EditorModel
 
             if (model.OptionsType != null)
             {
-                json.Add("Options", JObject.FromObject(_getFeatureOption(model.FeatureType), _serializer));
+                json.Add("Settings", JObject.FromObject(_getFeatureOption(model.FeatureType), _serializer));
             }
 
-            foreach (var child in model.Children)
+            if (model.Children.Any())
             {
-                json.Add(child.Name, GetModelJObject(child));
+                var children = new JArray();
+                json.Add("children", children);
+                foreach (var child in model.Children)
+                {
+                    children.Add(GetModelJObject(child));
+                }
             }
 
             return json;
@@ -112,19 +265,39 @@ namespace Blacklite.Framework.Features.EditorModel
         private JSchema GenerateSchema()
         {
             var schema = new JSchema();
+            schema.Type = JSchemaType.Object;
             schema.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
+            schema.Title = "Features";
+
+            var schemaContainer = new ModelSchemaContainer(schema, _models, _rootModels, _resolver);
+
+
+
             var group = new JSchema();
             group.Title = "General";
-            group.Type = JSchemaType.Object;
-            group.Format = "grid";
+            group.Type = JSchemaType.Array;
+            group.Format = "tabs";
             group.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
             schema.Properties.Add("General", group);
-            schema.Title = "Features";
-            schema.Type = JSchemaType.Object;
-            schema.Format = "objecttabs";
-            foreach (var model in _models)
+
+            var itemSchema = new JSchema();
+            group.Items.Add(itemSchema);
+            //itemSchema.Type = JSchemaType.Object;
+            //itemSchema.Title = "General";
+
+            foreach (var model in schemaContainer.Schemas.Where(x => _rootModels.Any(z => z.Name == x.Key)).OrderBy(x => x.Key).Select(x => x.Value))
             {
-                group.Properties.Add(model.Name, GetModelSchema(model));
+
+                //var constraint = new JSchema();
+                //schema.AllOf.Add(constraint);
+                //var constraintProperty = new JSchema();
+                //constraintProperty.Enum.Add(new JValue(model.Name));
+                //constraint.Properties.Add("$feature", constraintProperty);
+
+                //var newSchema = new JSchema();
+                //newSchema.
+
+                itemSchema.AnyOf.Add(model);
             }
 
             //var modelSchemas = _models.Select(model => GetModelSchema(model));
@@ -143,58 +316,6 @@ namespace Blacklite.Framework.Features.EditorModel
             //foreach (var model in _models)
             //{
             //    schema.Items.Add(GetModelSchema(model));
-            //}
-
-            return schema;
-        }
-
-        private JSchema GetModelSchema(FeatureModel model)
-        {
-            var schema = new JSchema();
-            schema.Type = JSchemaType.Object;
-            schema.Title = model.Name;
-            schema.Description = model.Description;
-            schema.Format = "grid";
-            schema.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
-
-            schema.Properties.Add("Enabled", GetOrUpdatePropertySchema(model.Enabled));
-
-            if (model.OptionsType != null)
-            {
-                var options = _schemaGenerator.Generate(model.OptionsType);
-                options.Title = "Options";
-                options.ExtensionData["options"] = JObject.FromObject(new { collapsed = true });
-                foreach (var property in options.Properties)
-                {
-                    GetOrUpdatePropertySchema(model.Properties[property.Key], property.Value);
-                }
-                schema.Properties.Add("Options", options);
-            }
-
-            foreach (var child in model.Children)
-            {
-                schema.Properties.Add(child.Name, GetModelSchema(child));
-            }
-
-            return schema;
-        }
-
-        private JSchema GetOrUpdatePropertySchema(FeatureOptionPropertyModel property, JSchema schema = null)
-        {
-            // change this
-            schema = schema ?? _schemaGenerator.Generate(property.Type);
-            schema.Description = property.Description;
-
-            schema.ExtensionData["readonly"] = new JValue(property.IsReadOnly);
-
-            schema.Type = schema.Type.Value & (JSchemaType.String | JSchemaType.Float | JSchemaType.Integer | JSchemaType.Boolean | JSchemaType.Object | JSchemaType.Array);
-
-            //schema.AdditionalProperties.
-            //schema. = property.IsReadOnly;
-
-            //if (schema.Enum != null)
-            //{
-            //    schema.Enum = schema.Enum.Select(x => Enum.getva)
             //}
 
             return schema;
@@ -240,6 +361,16 @@ namespace Blacklite.Framework.Features.EditorModel
         public IEnumerable<FeatureModel> Children { get; }
         public IEnumerable<FeatureDependencyModel> Dependencies { get; }
 
+
+        public override int GetHashCode()
+        {
+            return this.Name.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"Editor for {this.Name}";
+        }
     }
 
     public class FeatureDependencyModel

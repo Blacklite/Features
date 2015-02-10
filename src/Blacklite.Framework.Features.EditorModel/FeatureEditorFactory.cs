@@ -28,16 +28,20 @@ namespace Blacklite.Framework.Features.EditorModel
         {
             var featureDescribers = _describerProvider.Describers.Values;
 
-            var childFeatures = featureDescribers
-                .SelectMany(x => x.Children)
-                .Distinct();
+            //var childFeatures = featureDescribers
+            //    .SelectMany(x => x.Children)
+            //    .Distinct();
 
             var models = featureDescribers
-                .Except(childFeatures)
+                //.Except(childFeatures)
                 .OrderBy(x => x.FeatureType.Name)
                 .Select(x => new FeatureModel(x));
 
-            return new FeatureEditor(models, GetFeature, GetFeatureOptions);
+            var rootModels = models.Except(models
+                .SelectMany(x => x.Children)
+                .Distinct());
+
+            return new FeatureEditor(models, rootModels, GetFeature, GetFeatureOptions);
         }
 
         private IFeature GetFeature(Type type)
