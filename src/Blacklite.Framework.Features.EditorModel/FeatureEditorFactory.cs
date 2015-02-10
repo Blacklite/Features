@@ -37,9 +37,11 @@ namespace Blacklite.Framework.Features.EditorModel
                 .OrderBy(x => x.FeatureType.Name)
                 .Select(x => new FeatureModel(x));
 
-            var rootModels = models.Except(models
-                .SelectMany(x => x.Children)
-                .Distinct());
+            var rootModels = models.ToArray().Except(
+                models
+                    .SelectMany(x => x.Children)
+                    .Distinct()
+                );
 
             return new FeatureEditor(models, rootModels, GetFeature, GetFeatureOptions);
         }
