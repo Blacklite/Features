@@ -8,7 +8,7 @@ namespace Blacklite.Framework.Features.EditorModel
 {
     public interface IFeatureEditorFactory
     {
-        FeatureEditor GetFeatureEditor();
+        IFeatureEditor GetFeatureEditor();
     }
 
     public class FeatureEditorFactory : IFeatureEditorFactory
@@ -24,7 +24,12 @@ namespace Blacklite.Framework.Features.EditorModel
             _serviceProvider = serviceProvider;
         }
 
-        public FeatureEditor GetFeatureEditor()
+        private static string GroupId(IFeatureDescriber describer, string group)
+        {
+            return string.Join(":", describer.Groups.TakeWhile(z => z != group).Concat(new[] { group }));
+        }
+
+        public IFeatureEditor GetFeatureEditor()
         {
             var featureDescribers = _describerProvider.Describers.Values;
 
@@ -32,18 +37,66 @@ namespace Blacklite.Framework.Features.EditorModel
             //    .SelectMany(x => x.Children)
             //    .Distinct();
 
-            var models = featureDescribers
-                //.Except(childFeatures)
+            var groups = featureDescribers
                 .OrderBy(x => x.FeatureType.Name)
-                .Select(x => new FeatureModel(x));
+                .SelectMany(x => x.Groups, (Describer, Group) => GroupId(Describer, Group))
+                .Distinct();
 
-            var rootModels = models.ToArray().Except(
-                models
-                    .SelectMany(x => x.Children)
-                    .Distinct()
-                );
+            var groupingContainer = new Dictionary<string, FeatureGroupOrModel>();
+            foreach (var group in groups)
+            {
+                FeatureGroupOrModel result;
+                var subgroups = group.Split(':');
+                string previous = null;
+                FeatureGroup previousContainer = null;
+                foreach (var subgroup in subgroups)
+                {
+                    if (!groupingContainer.TryGetValue(group, out result))
+                    {
+                        var groupName = group.Split(':');
+                        result = new FeatureGroup(groupName[groupName.Length - 1]);
+                        groupingContainer.Add(group, result);
+                    }
 
-            return new FeatureEditor(models, rootModels, GetFeature, GetFeatureOptions);
+                    if (previous != null)
+                    {
+                        previousContainer = (FeatureGroup)groupingContainer[previous];
+                        previousContainer.Items.Add(result);
+                    }
+
+                    if (previous == null)
+                        previous = subgroup;
+                    else
+                        previous += ":" + subgroup;
+                }
+            }
+
+            var rootGroupings = groupingContainer
+                .Where(x => !x.Key.Contains(":"))
+                .Select(x => x.Value)
+                .Cast<FeatureGroup>();
+
+            var groupedModels = featureDescribers
+                .OrderBy(x => x.FeatureType.Name)
+                .GroupBy(x => string.Join(":", x.Groups))
+                .Select(x => new { x.Key, Models = x.Select(z => new FeatureModel(z)) });
+
+            var groupings = new List<FeatureGroupOrModel>();
+            foreach (var group in groupedModels)
+            {
+                if (!string.IsNullOrWhiteSpace(group.Key))
+                {
+                    var grouping = (FeatureGroup)groupingContainer[group.Key];
+                    foreach (var model in group.Models)
+                    {
+                        grouping.Items.Add(model);
+                    }
+                }
+            }
+
+            var models = groupedModels.SelectMany(x => x.Models);
+
+            return new FeatureEditor(models, rootGroupings, GetFeature, GetFeatureOptions);
         }
 
         private IFeature GetFeature(Type type)

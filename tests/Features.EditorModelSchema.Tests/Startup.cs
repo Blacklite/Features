@@ -36,8 +36,10 @@ namespace Features.EditorModelSchema.Tests
             // Uncomment the following line to add Web API servcies which makes it easier to port Web API 2 controllers.
             // You need to add Microsoft.AspNet.Mvc.WebApiCompatShim package to project.json
             // services.AddWebApiConventions();
-            services.AddFeatures();
+            services.AddFeatures().AddFeatureEditorModel();
             FeatureRegistry.Register(services);
+
+            services.AddJsonSchemaEditor();
 
             services.AddTransient<IFeatureEditorFactory, FeatureEditorFactory>();
         }

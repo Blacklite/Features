@@ -21,8 +21,11 @@ namespace Blacklite.Framework.Features
         bool OptionsHasIsEnabled { get; }
         string DisplayName { get; }
         string Description { get; }
+        string OptionsDisplayName { get; }
+        string OptionsDescription { get; }
         IReadOnlyDictionary<IFeatureDescriber, bool> DependsOn { get; }
         IEnumerable<IFeatureDescriber> Children { get; }
+        IEnumerable<string> Groups { get; }
 
         IEnumerable<RequiredFeatureAttribute> Requires { get; }
         TypeInfo Parent { get; }
@@ -64,8 +67,12 @@ namespace Blacklite.Framework.Features
                     isEnabledProperty = property;
                     OptionsHasIsEnabled = true;
                 }
+
+                OptionsDisplayName = OptionsTypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? OptionsType.Name.AsUserFriendly();
+                OptionsDescription = OptionsTypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
             }
-            IsReadOnly = !isEnabledProperty.CanWrite;
+            // If we are not observable, and our lifecycle is a singleton, changes in our value cannot accurately be observed.
+            IsReadOnly = !isEnabledProperty.CanWrite;// || (!IsObservable && Lifecycle == LifecycleKind.Singleton);
 
             _isEnabledProperty = isEnabledProperty;
 
@@ -76,8 +83,14 @@ namespace Blacklite.Framework.Features
             DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(new Dictionary<IFeatureDescriber, bool>());
             Children = Enumerable.Empty<IFeatureDescriber>();
 
-            DisplayName = FeatureTypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? FeatureType.Name;
+            DisplayName = FeatureTypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? FeatureType.Name.AsUserFriendly();
             Description = FeatureTypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
+
+            Groups = FeatureTypeInfo.GetCustomAttributes<FeatureGroupAttribute>()?.SelectMany(x => x.Groups).ToArray();
+            if (Parent == null && !Groups.Any())
+            {
+                Groups = new[] { "( not grouped )" };
+            }
         }
 
         public Type FeatureType { get; }
@@ -87,6 +100,8 @@ namespace Blacklite.Framework.Features
         public LifecycleKind Lifecycle { get; }
         public string DisplayName { get; }
         public string Description { get; }
+        public string OptionsDisplayName { get; }
+        public string OptionsDescription { get; }
         public bool IsObservable { get; }
         public bool HasOptions { get; }
         public bool OptionsHasIsEnabled { get; }
@@ -97,6 +112,8 @@ namespace Blacklite.Framework.Features
 
         public IReadOnlyDictionary<IFeatureDescriber, bool> DependsOn { get; internal set; }
         public IEnumerable<IFeatureDescriber> Children { get; internal set; }
+
+        public IEnumerable<string> Groups { get; }
 
         public T GetIsEnabled<T>(object instance)
         {

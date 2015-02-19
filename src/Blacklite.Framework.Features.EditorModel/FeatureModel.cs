@@ -9,18 +9,44 @@ namespace Blacklite.Framework.Features.EditorModel
     public class FeatureModelGroups
     {
         public IGrouping<string, FeatureModel> Groups { get; }
+        public IEnumerable<FeatureModel> Models { get; }
     }
 
-    public class FeatureModel
+    public abstract class FeatureGroupOrModel
     {
-        public FeatureModel(IFeatureDescriber describer)
+        public FeatureGroupOrModel(string name)
         {
-            Name = describer.FeatureType.Name;
+            Name = name.CamelCase();
+        }
+        public string Name { get; }
+    }
+
+    public class FeatureGroup : FeatureGroupOrModel
+    {
+        public FeatureGroup(string name) : base(name)
+        {
+            Title = name;
+            Items = new List<FeatureGroupOrModel>();
+        }
+
+        public string Title { get; }
+        public IList<FeatureGroupOrModel> Items { get; }
+    }
+
+    public class FeatureModel : FeatureGroupOrModel
+    {
+        public FeatureModel(IFeatureDescriber describer) : base(describer.FeatureType.Name)
+        {
+            Title = describer.DisplayName;
             Description = describer.Description;
             FeatureType = describer.FeatureType;
             OptionsType = describer.OptionsType;
+            OptionsTitle = describer.OptionsDisplayName;
+            OptionsName = describer.OptionsType?.Name?.CamelCase();
+            OptionsHasIsEnabled = describer.OptionsHasIsEnabled;
+            OptionsDescription = describer.OptionsDescription;
             Children = describer.Children.Select(x => new FeatureModel(x)).ToArray();
-            Enabled = new FeatureOptionPropertyModel(typeof(bool), nameof(IFeature.IsEnabled), null, x => describer.GetIsEnabled<bool>(x), describer.IsReadOnly, describer.OptionsHasIsEnabled);
+            Enabled = new FeatureOptionPropertyModel(typeof(bool), nameof(IFeature.IsEnabled), "Enabled", null, x => describer.GetIsEnabled<bool>(x), describer.IsReadOnly, describer.OptionsHasIsEnabled);
             Properties = GetProperties(describer).ToDictionary(x => x.Name);
             Dependencies = describer.DependsOn.Select(x => new FeatureDependencyModel(x.Key, x.Value)).ToArray();
         }
@@ -33,16 +59,21 @@ namespace Blacklite.Framework.Features.EditorModel
 
                 foreach (var property in properties.Where(x => x.Name != nameof(IFeature.IsEnabled)))
                 {
-                    yield return new FeatureOptionPropertyModel(property.PropertyType, property.Name, GetPropertyDescription(property), property.GetValue, !property.CanWrite);
+                    yield return new FeatureOptionPropertyModel(property.PropertyType, property.Name, GetPropertyDisplayName(property), GetPropertyDescription(property), property.GetValue, !property.CanWrite);
                 }
             }
         }
 
         private string GetPropertyDescription(PropertyInfo property) => property.GetCustomAttribute<DisplayAttribute>()?.Description;
-
-        public string Name { get; }
+        private string GetPropertyDisplayName(PropertyInfo property) => property.GetCustomAttribute<DisplayAttribute>()?.Name ?? property.Name.AsUserFriendly();
+        
+        public string Title { get; }
         public Type FeatureType { get; }
         public Type OptionsType { get; }
+        public string OptionsName { get; }
+        public string OptionsTitle { get; }
+        public string OptionsDescription { get; }
+        public bool OptionsHasIsEnabled { get; }
         public string Description { get; }
         public FeatureOptionPropertyModel Enabled { get; }
         public IDictionary<string, FeatureOptionPropertyModel> Properties { get; }

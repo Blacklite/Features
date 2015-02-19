@@ -1,7 +1,8 @@
 ﻿{
     "version": "1.0.0-*",
     "dependencies": {
-		"Blacklite.Framework.Features": "",
+        "Blacklite.Framework.Features": "",
+        "Blacklite.Json.Schema.TagHelpers": "",
 		"Newtonsoft.Temp": ""
     },
 

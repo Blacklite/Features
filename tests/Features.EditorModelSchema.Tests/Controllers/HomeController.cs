@@ -9,7 +9,7 @@ namespace Features.EditorModelSchema.Tests.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly FeatureEditor _editor;
+        private readonly IFeatureEditor _editor;
         public HomeController(IFeatureEditorFactory factory)
         {
             _editor = factory.GetFeatureEditor();

@@ -12,24 +12,40 @@ using System.Reflection;
 
 namespace Blacklite.Framework.Features.EditorModel
 {
-    public class FeatureEditor
+    static class StringExtension
+    {
+        internal static string CamelCase(this string value)
+        {
+            return value.Substring(0, 1).ToLowerInvariant() + value.Substring(1);
+        }
+    }
+
+    public interface IFeatureEditor
+    {
+        JSchema Schema { get; }
+
+        JToken Model { get; }
+    }
+
+    public class FeatureEditor : IFeatureEditor
     {
         private readonly IEnumerable<FeatureModel> _models;
-        private readonly IEnumerable<FeatureModel> _rootModels;
+        private readonly IEnumerable<FeatureGroup> _groups;
         private readonly Func<Type, IFeature> _getFeature;
         private readonly Func<Type, object> _getFeatureOption;
         private readonly JsonSerializer _serializer;
         private readonly ModelSchemaContainer _schemaContainer;
 
-        public FeatureEditor(IEnumerable<FeatureModel> models, IEnumerable<FeatureModel> rootModels, Func<Type, IFeature> feature, Func<Type, object> featureOption)
+        public FeatureEditor(IEnumerable<FeatureModel> models, IEnumerable<FeatureGroup> groups, Func<Type, IFeature> feature, Func<Type, object> featureOption)
         {
             _models = models;
-            _rootModels = rootModels;
+            _groups = groups;
             _getFeature = feature;
             _getFeatureOption = featureOption;
 
             _serializer = new JsonSerializer();
             _serializer.Converters.Add(new StringEnumConverter());
+            _serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
             //_modelSchema = _models.ToDictionary(model => model.Name, model => GetModelSchema(model));
         }
 
@@ -54,15 +70,33 @@ namespace Blacklite.Framework.Features.EditorModel
         private JToken GenerateJObject()
         {
             var json = new JObject();
-            var group = new JObject();
-            json.Add("General", group);
-            foreach (var model in _rootModels)
+            foreach (var model in _groups)
             {
-                group.Add(model.Name, GetModelJObject(model));
+                json.Add(model.Name, GetModelJObject(model));
             }
             return json;
         }
 
+        private JObject GetModelJObject(FeatureGroup group)
+        {
+            var json = new JObject();
+            foreach (var item in group.Items)
+            {
+                var model = item as FeatureModel;
+                if (model != null)
+                {
+                    json.Add(model.Name, GetModelJObject(model));
+                }
+
+                var grouping = item as FeatureGroup;
+                if (grouping != null)
+                {
+                    json.Add(grouping.Name, GetModelJObject(grouping));
+                }
+            }
+
+            return json;
+        }
         private JObject GetModelJObject(FeatureModel model)
         {
             var json = new JObject();
@@ -70,13 +104,13 @@ namespace Blacklite.Framework.Features.EditorModel
             json.Add(model.Name, model.Name);
 
             if (model.Enabled.OptionsHasIsEnabled)
-                json.Add("Enabled", new JValue(model.Enabled.GetValue(_getFeatureOption(model.FeatureType))));
+                json.Add("enabled", new JValue(model.Enabled.GetValue(_getFeatureOption(model.FeatureType))));
             else
-                json.Add("Enabled", new JValue(model.Enabled.GetValue(_getFeature(model.FeatureType))));
+                json.Add("enabled", new JValue(model.Enabled.GetValue(_getFeature(model.FeatureType))));
 
             if (model.OptionsType != null)
             {
-                json.Add("Settings", JObject.FromObject(_getFeatureOption(model.FeatureType), _serializer));
+                json.Add("settings", JObject.FromObject(_getFeatureOption(model.FeatureType), _serializer));
             }
 
             if (model.Children.Any())
@@ -96,22 +130,9 @@ namespace Blacklite.Framework.Features.EditorModel
             schema.Type = JSchemaType.Object;
             schema.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
             schema.Title = "Features";
+            schema.Format = "tabs";
 
-            var schemaContainer = new ModelSchemaContainer(schema, _models, _rootModels);
-
-
-
-            var group = new JSchema();
-            group.Title = "General";
-            group.Type = JSchemaType.Object;
-            //group.Format = "tabs";
-            group.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
-            schema.Properties.Add("General", group);
-
-            foreach (var model in _rootModels.OrderBy(x => x.Name).Select(model => new { model.Name, schema = schemaContainer.GetSchema(model) }))
-            {
-                group.Properties.Add(model.Name, model.schema);
-            }
+            var schemaContainer = new ModelSchemaContainer(schema, _models, _groups);
 
             return schemaContainer.Schema;
         }
