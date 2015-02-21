@@ -4,9 +4,10 @@ using System.Linq;
 
 namespace Blacklite.Framework.Features.OptionModel
 {
-    public interface IFeatureOptions { }
+    public interface IAspectOptions { }
 
-    public interface IFeatureOptions<out TOptions> : IFeatureOptions where TOptions : class, new()
+    public interface IAspectOptions<out TOptions> : IAspectOptions
+        where TOptions : class, new()
     {
         TOptions Options { get; }
     }

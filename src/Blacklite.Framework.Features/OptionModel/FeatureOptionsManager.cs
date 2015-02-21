@@ -5,13 +5,13 @@ using System.Linq;
 namespace Blacklite.Framework.Features.OptionModel
 {
 
-    public class FeatureOptionsManager<TOptions> : IFeatureOptions<TOptions>
+    public class AspectOptionsManager<TOptions> : IAspectOptions<TOptions>
         where TOptions : class, new()
     {
-        private readonly IEnumerable<IFeatureConfigureOptions> _configurators;
+        private readonly IEnumerable<IAspectConfigureOptions> _configurators;
         private object _lock = new object();
 
-        public FeatureOptionsManager(IEnumerable<IFeatureConfigureOptions<TOptions>> configurators, IEnumerable<IFeatureConfigureOptions> globalConfigurators)
+        public AspectOptionsManager(IEnumerable<IAspectConfigureOptions<TOptions>> configurators, IEnumerable<IAspectConfigureOptions> globalConfigurators)
         {
             _configurators = configurators
                 .Select(x => new ObjectConfigurator<TOptions>(x))
@@ -53,11 +53,11 @@ namespace Blacklite.Framework.Features.OptionModel
         }
     }
 
-    class ObjectConfigurator<TOptions> : IFeatureConfigureOptions
+    class ObjectConfigurator<TOptions> : IAspectConfigureOptions
         where TOptions : class, new()
     {
-        private readonly IFeatureConfigureOptions<TOptions> _configurator;
-        public ObjectConfigurator(IFeatureConfigureOptions<TOptions> configurator)
+        private readonly IAspectConfigureOptions<TOptions> _configurator;
+        public ObjectConfigurator(IAspectConfigureOptions<TOptions> configurator)
         {
             _configurator = configurator;
         }

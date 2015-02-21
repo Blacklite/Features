@@ -19,7 +19,7 @@ namespace Blacklite.Framework.Features
         {
             public TOptions Options { get; }
 
-            protected AlwaysOff(IFeatureOptions<TOptions> _optionsContainer)
+            protected AlwaysOff(IAspectOptions<TOptions> _optionsContainer)
             {
                 Options = _optionsContainer.Options;
             }

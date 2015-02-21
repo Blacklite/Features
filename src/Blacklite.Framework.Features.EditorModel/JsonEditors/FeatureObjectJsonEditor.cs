@@ -29,8 +29,12 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
             //container = Context.Decorator.DecorateItemContainer(Context, container);
 
-            var enabledRenderer = GetPropertyTagBuilder("enabled", Context.Schema.Properties["enabled"]);
+            JsonEditorRenderer enabledRenderer = null;
             JsonEditorRenderer settingsRenderer = null;
+            if (Context.Schema.Properties.ContainsKey("enabled"))
+            {
+                enabledRenderer = GetPropertyTagBuilder("enabled", Context.Schema.Properties["enabled"]);
+            }
 
             var propertyTagRenderes = Context.Schema.Properties
                 .Select(property => new { Key = property.Key, Value = GetPropertyTagBuilder(property.Key, property.Value) })
@@ -60,7 +64,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
                 var innerToggle = new TagBuilder("div");
                 innerToggle.MergeAttributes(toggle.Attributes);
-                innerToggle.InnerHtml += enabledRenderer.Render(value?["enabled"]);
+                innerToggle.InnerHtml += enabledRenderer?.Render(value?["enabled"]);
 
                 if (settingsRenderer != null)
                 {

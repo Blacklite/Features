@@ -27,7 +27,7 @@ namespace Blacklite.Framework.Features
         private object GetRequiredFeature(IFeatureDescriber describer)
         {
             if (describer.IsObservable)
-                return _serviceProvider.GetRequiredService(typeof(IObservableFeature<>).MakeGenericType(describer.FeatureType));
+                return _serviceProvider.GetRequiredService(typeof(IObservableAspect<>).MakeGenericType(describer.FeatureType));
 
             return _serviceProvider.GetRequiredService(describer.FeatureType);
         }
@@ -50,6 +50,7 @@ namespace Blacklite.Framework.Features
                     Service = (IFeature)x.Service,
                     x.IsEnabled
                 })
+                .Where(x => x.Service != null)
                 .ToArray();
 
             var observableFeatures = allFeatures
@@ -97,13 +98,13 @@ namespace Blacklite.Framework.Features
         {
             return (Tuple<Func<bool>, IDisposable>)_methods.GetOrAdd(featureType, x =>
             {
-                var observableFeatureType = typeof(IObservableFeature<>).MakeGenericType(featureType);
+                var observableFeatureType = typeof(IObservableAspect<>).MakeGenericType(featureType);
                 return SubscribeToObservableMethod.MakeGenericMethod(observableFeatureType, featureType);
             }).Invoke(null, new object[] { service });
         }
 
         private static Tuple<Func<bool>, IDisposable> SubscribeToObservable<TObservable, TFeature>(TObservable observable)
-            where TObservable : IObservableFeature<TFeature>
+            where TObservable : IObservableAspect<TFeature>
             where TFeature : IObservableFeature
         {
             var enabled = false;

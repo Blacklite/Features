@@ -40,8 +40,6 @@ namespace Features.EditorModelSchema.Tests
             FeatureRegistry.Register(services);
 
             services.AddJsonSchemaEditor();
-
-            services.AddTransient<IFeatureEditorFactory, FeatureEditorFactory>();
         }
 
         // Configure is called after ConfigureServices is called.

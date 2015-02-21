@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -21,7 +22,7 @@ namespace Blacklite.Framework.Features
                     collection.Descriptors
                         .Where(x => x.ServiceType
                             .GetTypeInfo()
-                            .ImplementedInterfaces.Contains(typeof(IFeature))
+                            .ImplementedInterfaces.Contains(typeof(IAspect))
                         ))
                         .ToDictionary(x => x.FeatureType);
 

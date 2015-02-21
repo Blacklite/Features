@@ -7,17 +7,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blacklite.Framework.Features
 {
-    public interface IFeature
-    {
-        [Display(Name ="On")]
-        bool IsEnabled { get; }
-    }
-
-    public interface IFeature<TOptions> : IFeature, IFeatureOptions where TOptions : class, new()
-    {
-        TOptions Options { get; }
-    }
-
     public abstract class PreconfiguredFeature : IFeature, IDisposable
     {
         private readonly IRequiredFeaturesService _requiredFeatures;
@@ -50,7 +39,7 @@ namespace Blacklite.Framework.Features
     {
         public TOptions Options { get; }
 
-        public PreconfiguredFeature(IRequiredFeaturesService requiredFeatures, IFeatureOptions<TOptions> _optionsContainer) : base(requiredFeatures)
+        public PreconfiguredFeature(IRequiredFeaturesService requiredFeatures, IAspectOptions<TOptions> _optionsContainer) : base(requiredFeatures)
         {
             Options = _optionsContainer.Options;
         }

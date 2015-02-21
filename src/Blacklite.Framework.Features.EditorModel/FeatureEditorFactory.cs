@@ -11,15 +11,18 @@ namespace Blacklite.Framework.Features.EditorModel
         IFeatureEditor GetFeatureEditor();
     }
 
-    public class FeatureEditorFactory : IFeatureEditorFactory
+    public class FeatureEditorFactory<T> : IFeatureEditorFactory
+        where T : IFeatureDescriberEnumerable
     {
         private readonly IFeatureDescriberProvider _describerProvider;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ConcurrentDictionary<Type, IFeature> _features;
+        private readonly ConcurrentDictionary<Type, IAspect> _features;
         private readonly ConcurrentDictionary<Type, object> _options;
+        private readonly T _describers;
 
-        public FeatureEditorFactory(IFeatureDescriberProvider describerProvider, IServiceProvider serviceProvider)
+        public FeatureEditorFactory(IFeatureDescriberProvider describerProvider, T describers, IServiceProvider serviceProvider)
         {
+            _describers = describers;
             _describerProvider = describerProvider;
             _serviceProvider = serviceProvider;
         }
@@ -31,13 +34,7 @@ namespace Blacklite.Framework.Features.EditorModel
 
         public IFeatureEditor GetFeatureEditor()
         {
-            var featureDescribers = _describerProvider.Describers.Values;
-
-            //var childFeatures = featureDescribers
-            //    .SelectMany(x => x.Children)
-            //    .Distinct();
-
-            var groups = featureDescribers
+            var groups = _describers
                 .OrderBy(x => x.FeatureType.Name)
                 .SelectMany(x => x.Groups, (Describer, Group) => GroupId(Describer, Group))
                 .Distinct();
@@ -76,7 +73,7 @@ namespace Blacklite.Framework.Features.EditorModel
                 .Select(x => x.Value)
                 .Cast<FeatureGroup>();
 
-            var groupedModels = featureDescribers
+            var groupedModels = _describers
                 .OrderBy(x => x.FeatureType.Name)
                 .GroupBy(x => string.Join(":", x.Groups))
                 .Select(x => new { x.Key, Models = x.Select(z => new FeatureModel(z)) });
@@ -99,9 +96,9 @@ namespace Blacklite.Framework.Features.EditorModel
             return new FeatureEditor(models, rootGroupings, GetFeature, GetFeatureOptions);
         }
 
-        private IFeature GetFeature(Type type)
+        private IAspect GetFeature(Type type)
         {
-            return (IFeature)_serviceProvider.GetService(type);
+            return (IAspect)_serviceProvider.GetService(type);
         }
 
         private object GetFeatureOptions(Type type)
@@ -110,8 +107,16 @@ namespace Blacklite.Framework.Features.EditorModel
             if (!describer.HasOptions)
                 return null;
 
-            var service = _serviceProvider.GetService(typeof(IFeatureOptions<>).MakeGenericType(describer.OptionsType)) as IFeatureOptions<object>;
+            var service = _serviceProvider.GetService(typeof(IAspectOptions<>).MakeGenericType(describer.OptionsType)) as IAspectOptions<object>;
             return service.Options;
+        }
+    }
+
+    public class DefaultFeatureEditorFactory : FeatureEditorFactory<DefaultFeatureDescriberEnumerable>
+    {
+        public DefaultFeatureEditorFactory(IFeatureDescriberProvider describerProvider, DefaultFeatureDescriberEnumerable describers, IServiceProvider serviceProvider)
+            : base(describerProvider, describers, serviceProvider)
+        {
         }
     }
 }

@@ -170,7 +170,10 @@ namespace Blacklite.Framework.Features.EditorModel
 
         private void AddFeatureProperties(FeatureModel model, JSchema schema)
         {
-            schema.Properties.Add("enabled", GetEnabledPropertySchema(model));
+            if (model.HasEnabled)
+            {
+                schema.Properties.Add("enabled", GetEnabledPropertySchema(model));
+            }
         }
 
         private void AddOptions(FeatureModel model, JSchema schema, JSchema options)

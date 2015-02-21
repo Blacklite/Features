@@ -16,6 +16,7 @@ namespace Blacklite.Framework.Features
         TypeInfo OptionsTypeInfo { get; }
         LifecycleKind Lifecycle { get; }
         bool IsObservable { get; }
+        bool HasEnabled { get; }
         bool HasOptions { get; }
         bool IsReadOnly { get; }
         bool OptionsHasIsEnabled { get; }
@@ -46,9 +47,9 @@ namespace Blacklite.Framework.Features
             FeatureType = descriptor.ServiceType;
             FeatureTypeInfo = FeatureType.GetTypeInfo();
             Lifecycle = descriptor.Lifecycle;
-            IsObservable = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IObservableFeature));
+            IsObservable = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IObservableAspect));
 
-            HasOptions = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IFeatureOptions));
+            HasOptions = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IAspectOptions));
 
             var isEnabledProperty = FeatureTypeInfo.FindDeclaredProperty(nameof(IFeature.IsEnabled));
             if (HasOptions)
@@ -71,11 +72,15 @@ namespace Blacklite.Framework.Features
                 OptionsDisplayName = OptionsTypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? OptionsType.Name.AsUserFriendly();
                 OptionsDescription = OptionsTypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
             }
-            // If we are not observable, and our lifecycle is a singleton, changes in our value cannot accurately be observed.
-            IsReadOnly = !isEnabledProperty.CanWrite;// || (!IsObservable && Lifecycle == LifecycleKind.Singleton);
+            HasEnabled = typeof(IFeature).GetTypeInfo().IsAssignableFrom(FeatureTypeInfo);
 
-            _isEnabledProperty = isEnabledProperty;
+            if (HasEnabled)
+            {
+                // If we are not observable, and our lifecycle is a singleton, changes in our value cannot accurately be observed.
+                IsReadOnly = !isEnabledProperty.CanWrite;// || (!IsObservable && Lifecycle == LifecycleKind.Singleton);
 
+                _isEnabledProperty = isEnabledProperty;
+            }
 
             Requires = FeatureTypeInfo.GetCustomAttributes<RequiredFeatureAttribute>();
             Parent = FeatureTypeInfo.GetCustomAttribute<ParentFeatureAttribute>()?.Feature;
@@ -104,6 +109,7 @@ namespace Blacklite.Framework.Features
         public string OptionsDescription { get; }
         public bool IsObservable { get; }
         public bool HasOptions { get; }
+        public bool HasEnabled { get; }
         public bool OptionsHasIsEnabled { get; }
         public bool IsReadOnly { get; }
 
@@ -117,12 +123,14 @@ namespace Blacklite.Framework.Features
 
         public T GetIsEnabled<T>(object instance)
         {
+            if (!HasEnabled)
+                return default(T);
             return (T)_isEnabledProperty.GetValue(instance);
         }
 
         public void SetIsEnabled<T>(object instance, T value)
         {
-            if (!IsReadOnly)
+            if (HasEnabled && !IsReadOnly)
                 _isEnabledProperty.SetValue(instance, value);
         }
 

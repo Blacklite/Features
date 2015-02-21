@@ -43,10 +43,18 @@ namespace Blacklite.Framework.Features.EditorModel
             OptionsType = describer.OptionsType;
             OptionsTitle = describer.OptionsDisplayName;
             OptionsName = describer.OptionsType?.Name?.CamelCase();
+            HasEnabled = describer.HasEnabled;
             OptionsHasIsEnabled = describer.OptionsHasIsEnabled;
             OptionsDescription = describer.OptionsDescription;
             Children = describer.Children.Select(x => new FeatureModel(x)).ToArray();
-            Enabled = new FeatureOptionPropertyModel(typeof(bool), nameof(IFeature.IsEnabled), "Enabled", null, x => describer.GetIsEnabled<bool>(x), describer.IsReadOnly, describer.OptionsHasIsEnabled);
+            if (HasEnabled)
+                Enabled = new FeatureOptionPropertyModel(typeof(bool),
+                    nameof(IFeature.IsEnabled),
+                    "Enabled",
+                    null,
+                    x => describer.GetIsEnabled<bool>(x),
+                    (obj, value) => describer.SetIsEnabled(obj, value),
+                    describer.IsReadOnly, describer.OptionsHasIsEnabled);
             Properties = GetProperties(describer).ToDictionary(x => x.Name);
             Dependencies = describer.DependsOn.Select(x => new FeatureDependencyModel(x.Key, x.Value)).ToArray();
         }
@@ -59,20 +67,21 @@ namespace Blacklite.Framework.Features.EditorModel
 
                 foreach (var property in properties.Where(x => x.Name != nameof(IFeature.IsEnabled)))
                 {
-                    yield return new FeatureOptionPropertyModel(property.PropertyType, property.Name, GetPropertyDisplayName(property), GetPropertyDescription(property), property.GetValue, !property.CanWrite);
+                    yield return new FeatureOptionPropertyModel(property.PropertyType, property.Name, GetPropertyDisplayName(property), GetPropertyDescription(property), property.GetValue, property.SetValue, !property.CanWrite);
                 }
             }
         }
 
         private string GetPropertyDescription(PropertyInfo property) => property.GetCustomAttribute<DisplayAttribute>()?.Description;
         private string GetPropertyDisplayName(PropertyInfo property) => property.GetCustomAttribute<DisplayAttribute>()?.Name ?? property.Name.AsUserFriendly();
-        
+
         public string Title { get; }
         public Type FeatureType { get; }
         public Type OptionsType { get; }
         public string OptionsName { get; }
         public string OptionsTitle { get; }
         public string OptionsDescription { get; }
+        public bool HasEnabled { get; }
         public bool OptionsHasIsEnabled { get; }
         public string Description { get; }
         public FeatureOptionPropertyModel Enabled { get; }

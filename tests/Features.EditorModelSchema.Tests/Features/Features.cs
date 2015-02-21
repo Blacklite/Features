@@ -56,7 +56,7 @@ namespace Features.EditorModelSchema.Tests.Features
 
 
     [FeatureGroup("API", "Development")]
-    public class ApiDevelopmentFeatureA : Feature.AlwaysOn, IObservableFeature { }
+    public class ApiDevelopmentFeatureA : Feature.AlwaysOn, IObservableAspect { }
 
     [FeatureGroup("API", "Development")]
     public class ApiDevelopmentFeatureB : Feature.AlwaysOff { }
@@ -73,7 +73,7 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("API", "Development")]
     public class ApiDevelopmentFeatureC : Feature.AlwaysOn<ApiDevelopmentFeatureCeeOptions>
     {
-        public ApiDevelopmentFeatureC(IFeatureOptions<ApiDevelopmentFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
+        public ApiDevelopmentFeatureC(IAspectOptions<ApiDevelopmentFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
         {
         }
     }
@@ -101,7 +101,7 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("API", "General")]
     public class ApiGeneralFeatureC : Feature.AlwaysOn<ApiGeneralFeatureCeeOptions>
     {
-        public ApiGeneralFeatureC(IFeatureOptions<ApiGeneralFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
+        public ApiGeneralFeatureC(IAspectOptions<ApiGeneralFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
         {
         }
     }
@@ -131,7 +131,7 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("Application", "Development")]
     public class ApplicationDevelopmentFeatureC : Feature.AlwaysOn<ApplicationDevelopmentFeatureCeeOptions>
     {
-        public ApplicationDevelopmentFeatureC(IFeatureOptions<ApplicationDevelopmentFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
+        public ApplicationDevelopmentFeatureC(IAspectOptions<ApplicationDevelopmentFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
         {
         }
     }
@@ -161,15 +161,15 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("Application", "General")]
     public class ApplicationGeneralFeatureC : Feature.AlwaysOn<ApplicationGeneralFeatureCeeOptions>
     {
-        public ApplicationGeneralFeatureC(IFeatureOptions<ApplicationGeneralFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
+        public ApplicationGeneralFeatureC(IAspectOptions<ApplicationGeneralFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
         {
         }
     }
 
     [ParentFeature(typeof(ApplicationGeneralFeatureB))]
-    public class ApplicationGeneralFeatureD : Feature
+    public class ApplicationGeneralFeatureD : Aspect
     {
-        public ApplicationGeneralFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
+        public ApplicationGeneralFeatureD() : base()
         {
         }
     }
@@ -191,7 +191,7 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("Application", "Security")]
     public class ApplicationSecurityFeatureC : Feature.AlwaysOn<ApplicationSecurityFeatureCeeOptions>
     {
-        public ApplicationSecurityFeatureC(IFeatureOptions<ApplicationSecurityFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
+        public ApplicationSecurityFeatureC(IAspectOptions<ApplicationSecurityFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
         {
         }
     }
@@ -221,7 +221,7 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("Application", "User Profile")]
     public class ApplicationUserProfileFeatureC : Feature.AlwaysOn<ApplicationUserProfileFeatureCeeOptions>
     {
-        public ApplicationUserProfileFeatureC(IFeatureOptions<ApplicationUserProfileFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
+        public ApplicationUserProfileFeatureC(IAspectOptions<ApplicationUserProfileFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
         {
         }
     }
@@ -249,9 +249,9 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [FeatureGroup("Application", "User Interface")]
-    public class ApplicationUserInterfaceFeatureC : Feature.AlwaysOn<ApplicationUserInterfaceFeatureCeeOptions>
+    public class ApplicationUserInterfaceFeatureC : Aspect<ApplicationUserInterfaceFeatureCeeOptions>
     {
-        public ApplicationUserInterfaceFeatureC(IFeatureOptions<ApplicationUserInterfaceFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
+        public ApplicationUserInterfaceFeatureC(IAspectOptions<ApplicationUserInterfaceFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
         {
         }
     }

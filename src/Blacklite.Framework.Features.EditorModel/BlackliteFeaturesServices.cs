@@ -19,6 +19,8 @@ namespace Blacklite.Framework.Features.EditorModel
             var describe = new ServiceDescriber(configuration);
 
             yield return describe.Transient<IFeatureJsonEditorDecorator, DefaultFeatureJsonEditorDecorator>();
+            yield return describe.Transient(typeof(FeatureEditorFactory<>), typeof(FeatureEditorFactory<>));
+            yield return describe.Transient<IFeatureEditorFactory, DefaultFeatureEditorFactory>();
         }
 
         internal static IEnumerable<IServiceDescriptor> GetFeatureEditorModelImplementations(IServiceCollection services, IConfiguration configuration = null)

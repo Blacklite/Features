@@ -51,7 +51,7 @@ namespace Blacklite.Framework.Features
         {
             public TOptions Options { get; }
 
-            protected Random(IFeatureOptions<TOptions> _optionsContainer)
+            protected Random(IAspectOptions<TOptions> _optionsContainer)
             {
                 Options = _optionsContainer.Options;
             }

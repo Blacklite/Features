@@ -4,32 +4,27 @@ using System.Reactive.Subjects;
 namespace Blacklite.Framework.Features
 {
     // Create analyzier to identify miss used IObservableFeatures
-    public interface IObservableFeature : IFeature { }
+    public interface IObservableAspect : IAspect { }
+    public interface IObservableFeature : IObservableAspect, IFeature { }
 
-    public abstract class ObservableFeature : Feature, IObservableFeature
+    public abstract class ObservableAspect : Aspect, IObservableAspect { }
+    public abstract class ObservableFeature : Feature, IObservableAspect
     {
         public ObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {
         }
     }
 
-    public abstract class PreconfiguredObservableFeature : PreconfiguredFeature, IObservableFeature
-    {
-        public PreconfiguredObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
-        {
-        }
-    }
-
-    public interface IObservableFeature<T> : IObservable<T>
-        where T : IObservableFeature
+    public interface IObservableAspect<T> : IObservable<T>
+        where T : IObservableAspect
     {
     }
 
-    class ObservableFeature<T> : IObservableFeature<T>
-        where T : IObservableFeature
+    class ObservableAspect<T> : IObservableAspect<T>
+        where T : IObservableAspect
     {
         private readonly ISubject<T> _feature;
-        public ObservableFeature(ISubjectFeature<T> feature)
+        public ObservableAspect(ISubjectAspect<T> feature)
         {
             _feature = feature;
         }
@@ -37,16 +32,17 @@ namespace Blacklite.Framework.Features
         public IDisposable Subscribe(IObserver<T> observer) => _feature.Subscribe(observer);
     }
 
-    interface ISubjectFeature<T> : ISubject<T> where T : IFeature
+    interface ISubjectAspect<T> : ISubject<T>
+        where T : IObservableAspect
     {
 
     }
 
-    class SubjectFeature<T> : ISubjectFeature<T>
-        where T : IObservableFeature
+    class SubjectAspect<T> : ISubjectAspect<T>
+        where T : IObservableAspect
     {
         private readonly ISubject<T> _feature;
-        public SubjectFeature(T feature)
+        public SubjectAspect(T feature)
         {
             _feature = new BehaviorSubject<T>(feature);
         }
