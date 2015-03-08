@@ -8,7 +8,7 @@ namespace Blacklite.Framework.Features
     public interface IObservableFeature : IObservableAspect, IFeature { }
 
     public abstract class ObservableAspect : Aspect, IObservableAspect { }
-    public abstract class ObservableFeature : Feature, IObservableAspect
+    public abstract class ObservableFeature : Feature, IObservableFeature
     {
         public ObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {

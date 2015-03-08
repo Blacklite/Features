@@ -11,19 +11,20 @@ namespace Blacklite.Framework.Features
 
     public class DefaultFeatureDescriberEnumerable : IFeatureDescriberEnumerable
     {
-        public DefaultFeatureDescriberEnumerable()
+        private readonly IFeatureDescriberProvider _describerProvider;
+        public DefaultFeatureDescriberEnumerable(IFeatureDescriberProvider describerProvider)
         {
-
+            _describerProvider = describerProvider;
         }
 
         public IEnumerator<IFeatureDescriber> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return _describerProvider.Describers.Values.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return _describerProvider.Describers.Values.GetEnumerator();
         }
     }
 }

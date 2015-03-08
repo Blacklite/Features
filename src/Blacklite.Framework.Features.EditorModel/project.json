@@ -2,14 +2,22 @@
     "version": "1.0.0-*",
     "dependencies": {
         "Blacklite.Framework.Features": "",
-        "Blacklite.Json.Schema.TagHelpers": "",
-		"Newtonsoft.Temp": ""
+        "Blacklite.Json.Schema": "",
+        "Newtonsoft.Temp": ""
+    },
+
+   "devDependencies": {
+        "NR6Pack": "0.5.0.0"
+    },
+
+    "compilationOptions": {
+        "warningsAsErrors": true
     },
 
     "frameworks": {
         "aspnet50": {
             "frameworkAssemblies": {
-                "System.Runtime": "4.0.20.0",
+                "System.Runtime": "4.0.10.0",
                 "System.ComponentModel.DataAnnotations": "4.0.0.0"
             },
             "dependencies": {

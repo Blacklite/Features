@@ -7,6 +7,14 @@
         "Blacklite.Framework.Multitenancy": "1.0.0-*"
     },
 
+   "devDependencies": {
+        "NR6Pack": "0.5.0.0"
+    },
+
+	"compilationOptions": {
+		"warningsAsErrors": true
+	},
+
     "frameworks": {
         "net45": {
             "dependencies": {
@@ -15,7 +23,7 @@
         },
         "aspnet50": {
             "dependencies": {
-				"System.Runtime": "4.0.20.0"
+				"System.Runtime": "4.0.10.0"
             }
         },
         "aspnetcore50": {

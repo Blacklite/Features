@@ -21,6 +21,7 @@ namespace Blacklite.Framework.Features
             yield return describe.Transient<IRequiredFeaturesService, RequiredFeaturesService>();
             yield return describe.Singleton(typeof(IAspectOptions<>), typeof(AspectOptionsManager<>));
             yield return describe.Instance(new FeatureServicesCollection(services));
+            yield return describe.Transient<DefaultFeatureDescriberEnumerable, DefaultFeatureDescriberEnumerable>();
         }
     }
 }
