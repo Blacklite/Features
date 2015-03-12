@@ -1,4 +1,6 @@
-﻿using Blacklite.Framework.Features.OptionModel;
+﻿using Blacklite.Framework.Features.Aspects;
+using Blacklite.Framework.Features.OptionModel;
+using Blacklite.Framework.Features.Traits;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -23,17 +25,17 @@ namespace Blacklite.Framework.Features
 
             HasOptions = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IAspectOptions));
 
-            var isEnabledProperty = FeatureTypeInfo.FindDeclaredProperty(nameof(IFeature.IsEnabled));
+            var isEnabledProperty = FeatureTypeInfo.FindDeclaredProperty(nameof(ITrait.IsEnabled));
             if (HasOptions)
             {
                 _optionsProperty = FeatureTypeInfo
-                    .FindDeclaredProperty(nameof(IFeature<object>.Options));
+                    .FindDeclaredProperty(nameof(ITrait<object>.Options));
 
                 OptionsType = _optionsProperty.PropertyType;
                 OptionsTypeInfo = _optionsProperty.PropertyType.GetTypeInfo();
 
                 var property = _optionsProperty?.PropertyType?.GetTypeInfo()
-                    ?.FindDeclaredProperty(nameof(IFeature.IsEnabled));
+                    ?.FindDeclaredProperty(nameof(ITrait.IsEnabled));
 
                 if (property != null)
                 {
@@ -44,7 +46,7 @@ namespace Blacklite.Framework.Features
                 OptionsDisplayName = OptionsTypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? OptionsType.Name.AsUserFriendly();
                 OptionsDescription = OptionsTypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
             }
-            HasEnabled = typeof(IFeature).GetTypeInfo().IsAssignableFrom(FeatureTypeInfo);
+            HasEnabled = typeof(ITrait).GetTypeInfo().IsAssignableFrom(FeatureTypeInfo);
 
             if (HasEnabled)
             {

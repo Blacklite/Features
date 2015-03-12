@@ -2,6 +2,8 @@
 using System;
 using Blacklite.Framework.Features.OptionModel;
 using Microsoft.Framework.DependencyInjection;
+using Blacklite.Framework.Features.Aspects;
+using Blacklite.Framework.Features.Traits;
 
 namespace Features.EditorModelSchema.Tests.Features
 {
@@ -79,14 +81,14 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApiDevelopmentFeatureA))]
-    public class ApiDevelopmentFeatureD : Feature
+    public class ApiDevelopmentFeatureD : Trait
     {
         public ApiDevelopmentFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {
         }
     }
     [FeatureGroup("API", "General")]
-    public class ApiGeneralFeatureA : Feature.AlwaysOn, IObservableFeature { }
+    public class ApiGeneralFeatureA : Feature.AlwaysOn, IObservableTrait { }
 
     [FeatureGroup("API", "General")]
     public class ApiGeneralFeatureB : Feature.AlwaysOff { }
@@ -107,14 +109,14 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApiGeneralFeatureA))]
-    public class ApiGeneralFeatureD : Feature
+    public class ApiGeneralFeatureD : Trait
     {
         public ApiGeneralFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {
         }
     }
     [FeatureGroup("Application", "Development")]
-    public class ApplicationDevelopmentFeatureA : Feature.AlwaysOn, IObservableFeature { }
+    public class ApplicationDevelopmentFeatureA : Feature.AlwaysOn, IObservableTrait { }
 
     [FeatureGroup("Application", "Development")]
     public class ApplicationDevelopmentFeatureB : Feature.AlwaysOff { }
@@ -137,14 +139,14 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationDevelopmentFeatureC))]
-    public class ApplicationDevelopmentFeatureD : Feature
+    public class ApplicationDevelopmentFeatureD : Trait
     {
         public ApplicationDevelopmentFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {
         }
     }
     [FeatureGroup("Application", "General")]
-    public class ApplicationGeneralFeatureA : Feature.AlwaysOn, IObservableFeature { }
+    public class ApplicationGeneralFeatureA : Feature.AlwaysOn, IObservableTrait { }
 
     [FeatureGroup("Application", "General")]
     public class ApplicationGeneralFeatureB : Feature.AlwaysOff { }
@@ -174,7 +176,7 @@ namespace Features.EditorModelSchema.Tests.Features
         }
     }
     [FeatureGroup("Application", "Security")]
-    public class ApplicationSecurityFeatureA : Feature.AlwaysOn, IObservableFeature { }
+    public class ApplicationSecurityFeatureA : Feature.AlwaysOn, IObservableTrait { }
 
     [FeatureGroup("Application", "Security")]
     public class ApplicationSecurityFeatureB : Feature.AlwaysOff { }
@@ -197,14 +199,14 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationSecurityFeatureA))]
-    public class ApplicationSecurityFeatureD : Feature
+    public class ApplicationSecurityFeatureD : Trait
     {
         public ApplicationSecurityFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {
         }
     }
     [FeatureGroup("Application", "User Profile")]
-    public class ApplicationUserProfileFeatureA : Feature.AlwaysOn, IObservableFeature { }
+    public class ApplicationUserProfileFeatureA : Feature.AlwaysOn, IObservableTrait { }
 
     [FeatureGroup("Application", "User Profile")]
     public class ApplicationUserProfileFeatureB : Feature.AlwaysOff { }
@@ -227,14 +229,14 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationUserProfileFeatureC))]
-    public class ApplicationUserProfileFeatureD : Feature
+    public class ApplicationUserProfileFeatureD : Trait
     {
         public ApplicationUserProfileFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {
         }
     }
     [FeatureGroup("Application", "User Interface")]
-    public class ApplicationUserInterfaceFeatureA : Feature.AlwaysOn, IObservableFeature { }
+    public class ApplicationUserInterfaceFeatureA : Feature.AlwaysOn, IObservableTrait { }
 
     [FeatureGroup("Application", "User Interface")]
     public class ApplicationUserInterfaceFeatureB : Feature.AlwaysOff { }
@@ -257,7 +259,7 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationUserInterfaceFeatureB))]
-    public class ApplicationUserInterfaceFeatureD : Feature
+    public class ApplicationUserInterfaceFeatureD : Trait
     {
         public ApplicationUserInterfaceFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {

@@ -16,8 +16,8 @@ namespace Blacklite.Framework.Features
 
             yield return describe.Singleton<IFeatureDescriberProvider, FeatureDescriberProvider>();
             yield return describe.Singleton<IFeatureDescriberFactory, FeatureDescriberFactory>();
-            yield return describe.Singleton(typeof(ISubjectAspect<>), typeof(SubjectAspect<>));
-            yield return describe.Singleton(typeof(IObservableAspect<>), typeof(ObservableAspect<>));
+            yield return describe.Singleton(typeof(IFeatureSubject<>), typeof(FeatureSubject<>));
+            yield return describe.Singleton(typeof(IObservableFeature<>), typeof(IObservableFeature<>));
             yield return describe.Transient<IRequiredFeaturesService, RequiredFeaturesService>();
             yield return describe.Singleton(typeof(IAspectOptions<>), typeof(AspectOptionsManager<>));
             yield return describe.Instance(new FeatureServicesCollection(services));

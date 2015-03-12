@@ -1,15 +1,16 @@
 ﻿using Blacklite.Framework.Features.OptionModel;
+using Blacklite.Framework.Features.Traits;
 using System;
 using System.Collections.Generic;
 
 namespace Blacklite.Framework.Features
 {
-    public abstract partial class Feature
+    public sealed partial class Feature
     {
         /// <summary>
         /// Allows a feature to behave randomly
         /// </summary>
-        public class Random : IFeature
+        public class Random : ITrait
         {
             public Random()
             {
@@ -46,7 +47,7 @@ namespace Blacklite.Framework.Features
             }
         }
 
-        public class Random<TOptions> : Random, IFeature<TOptions>
+        public class Random<TOptions> : Random, ITrait<TOptions>
             where TOptions : class, new()
         {
             public TOptions Options { get; }

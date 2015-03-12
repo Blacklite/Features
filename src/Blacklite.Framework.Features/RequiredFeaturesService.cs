@@ -1,4 +1,5 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Blacklite.Framework.Features.Traits;
+using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace Blacklite.Framework.Features
         private object GetRequiredFeature(IFeatureDescriber describer)
         {
             if (describer.IsObservable)
-                return _serviceProvider.GetRequiredService(typeof(IObservableAspect<>).MakeGenericType(describer.FeatureType));
+                return _serviceProvider.GetRequiredService(typeof(IObservableFeature<>).MakeGenericType(describer.FeatureType));
 
             return _serviceProvider.GetRequiredService(describer.FeatureType);
         }
@@ -41,7 +42,7 @@ namespace Blacklite.Framework.Features
                 .Where(x => !x.IsObservable)
                 .Select(x => new
                 {
-                    Service = (IFeature)x.Service,
+                    Service = (ITrait)x.Service,
                     x.IsEnabled
                 })
                 .Where(x => x.Service != null)
@@ -92,14 +93,14 @@ namespace Blacklite.Framework.Features
         {
             return (Tuple<Func<bool>, IDisposable>)_methods.GetOrAdd(featureType, x =>
             {
-                var observableFeatureType = typeof(IObservableAspect<>).MakeGenericType(featureType);
+                var observableFeatureType = typeof(IObservableFeature<>).MakeGenericType(featureType);
                 return SubscribeToObservableMethod.MakeGenericMethod(observableFeatureType, featureType);
             }).Invoke(null, new object[] { service });
         }
 
         private static Tuple<Func<bool>, IDisposable> SubscribeToObservable<TObservable, TFeature>(TObservable observable)
-            where TObservable : IObservableAspect<TFeature>
-            where TFeature : IObservableFeature
+            where TObservable : IObservableFeature<TFeature>
+            where TFeature : IObservableTrait
         {
             var enabled = false;
             var disposable = observable.Subscribe(x => enabled = x.IsEnabled);

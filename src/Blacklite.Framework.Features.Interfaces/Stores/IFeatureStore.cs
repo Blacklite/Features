@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blacklite.Framework.Features.Traits;
+using System;
 
 namespace Blacklite.Framework.Features.Stores
 {
@@ -8,6 +9,6 @@ namespace Blacklite.Framework.Features.Stores
 
         bool CanStore(IFeatureDescriber describer);
 
-        void Store(IFeature feature, IFeatureDescriber describer);
+        void Store(ITrait feature, IFeatureDescriber describer);
     }
 }

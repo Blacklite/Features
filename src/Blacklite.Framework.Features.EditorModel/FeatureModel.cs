@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blacklite.Framework.Features.Traits;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -49,7 +50,7 @@ namespace Blacklite.Framework.Features.EditorModel
             Children = describer.Children.Select(x => new FeatureModel(x)).ToArray();
             if (HasEnabled)
                 Enabled = new FeatureOptionPropertyModel(typeof(bool),
-                    nameof(IFeature.IsEnabled),
+                    nameof(ITrait.IsEnabled),
                     "Enabled",
                     null,
                     x => describer.GetIsEnabled<bool>(x),
@@ -65,7 +66,7 @@ namespace Blacklite.Framework.Features.EditorModel
             {
                 var properties = describer.OptionsType.GetRuntimeProperties();
 
-                foreach (var property in properties.Where(x => x.Name != nameof(IFeature.IsEnabled)))
+                foreach (var property in properties.Where(x => x.Name != nameof(ITrait.IsEnabled)))
                 {
                     yield return new FeatureOptionPropertyModel(property.PropertyType, property.Name, GetPropertyDisplayName(property), GetPropertyDescription(property), property.GetValue, property.SetValue, !property.CanWrite);
                 }

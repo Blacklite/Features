@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Framework.DependencyInjection;
-using System.Linq;
-using Blacklite.Framework.Features.OptionModel;
-using System.ComponentModel.DataAnnotations;
-using Blacklite.Framework.Features.Traits;
+﻿using Blacklite.Framework.Features.OptionModel;
+using System;
 
-namespace Blacklite.Framework.Features
+namespace Blacklite.Framework.Features.Traits
 {
-    public abstract class PreconfiguredFeature : ITrait, IDisposable
+    public abstract partial class Trait : ITrait, IDisposable
     {
         private readonly IRequiredFeaturesService _requiredFeatures;
         private IValidateFeatureService _validateFeatureService;
 
-        public PreconfiguredFeature(IRequiredFeaturesService requiredFeatures)
+        public Trait(IRequiredFeaturesService requiredFeatures)
         {
             _requiredFeatures = requiredFeatures;
         }
 
+        private bool _enabled = true;
         public virtual bool IsEnabled
         {
             get
@@ -25,8 +21,9 @@ namespace Blacklite.Framework.Features
                 if (_validateFeatureService == null)
                     _validateFeatureService = _requiredFeatures.ValidateFeaturesAreInTheCorrectState(this.GetType());
 
-                return _validateFeatureService.Validate();
+                return _enabled && _validateFeatureService.Validate();
             }
+            set { _enabled = value; }
         }
 
         public void Dispose()
@@ -35,12 +32,12 @@ namespace Blacklite.Framework.Features
         }
     }
 
-    public abstract class PreconfiguredFeature<TOptions> : PreconfiguredFeature, ITrait<TOptions>
+    public abstract class Trait<TOptions> : Trait, ITrait<TOptions>
         where TOptions : class, new()
     {
         public TOptions Options { get; }
 
-        public PreconfiguredFeature(IRequiredFeaturesService requiredFeatures, IAspectOptions<TOptions> _optionsContainer) : base(requiredFeatures)
+        public Trait(IRequiredFeaturesService requiredFeatures, IAspectOptions<TOptions> _optionsContainer) : base(requiredFeatures)
         {
             Options = _optionsContainer.Options;
         }

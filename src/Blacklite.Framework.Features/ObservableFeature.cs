@@ -1,21 +1,15 @@
-﻿using System;
+﻿using Blacklite.Framework.Features.Aspects;
+using Blacklite.Framework.Features.Traits;
+using System;
 using System.Reactive.Subjects;
 
 namespace Blacklite.Framework.Features
 {
-    public abstract class ObservableAspect : Aspect, IObservableAspect { }
-    public abstract class ObservableFeature : Feature, IObservableFeature
-    {
-        public ObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
-        {
-        }
-    }
-
-    class ObservableAspect<T> : IObservableAspect<T>
+    class ObservableFeature<T> : IObservableFeature<T>
         where T : IObservableAspect
     {
         private readonly ISubject<T> _feature;
-        public ObservableAspect(ISubjectAspect<T> feature)
+        public ObservableFeature(IFeatureSubject<T> feature)
         {
             _feature = feature;
         }
@@ -23,17 +17,17 @@ namespace Blacklite.Framework.Features
         public IDisposable Subscribe(IObserver<T> observer) => _feature.Subscribe(observer);
     }
 
-    interface ISubjectAspect<T> : ISubject<T>
+    interface IFeatureSubject<T> : ISubject<T>
         where T : IObservableAspect
     {
 
     }
 
-    class SubjectAspect<T> : ISubjectAspect<T>
+    class FeatureSubject<T> : IFeatureSubject<T>
         where T : IObservableAspect
     {
         private readonly ISubject<T> _feature;
-        public SubjectAspect(T feature)
+        public FeatureSubject(T feature)
         {
             _feature = new BehaviorSubject<T>(feature);
         }
