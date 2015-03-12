@@ -7,14 +7,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blacklite.Framework.Features
 {
-    public interface IAspect { }
-
-    public interface IAspect<TOptions> : IAspect, IAspectOptions
-        where TOptions : class, new()
-    {
-        TOptions Options { get; }
-    }
-
     public abstract class Aspect : IAspect
     {
 
@@ -31,17 +23,6 @@ namespace Blacklite.Framework.Features
         }
     }
 
-    public interface IFeature : IAspect
-    {
-        [Display(Name = "On")]
-        bool IsEnabled { get; }
-    }
-
-    public interface IFeature<TOptions> : IFeature, IAspect<TOptions>
-        where TOptions : class, new()
-    {
-    }
-
     public abstract partial class Feature : IFeature, IDisposable
     {
         private readonly IRequiredFeaturesService _requiredFeatures;
@@ -51,7 +32,7 @@ namespace Blacklite.Framework.Features
         {
             _requiredFeatures = requiredFeatures;
         }
-        
+
         private bool _enabled = true;
         public virtual bool IsEnabled
         {

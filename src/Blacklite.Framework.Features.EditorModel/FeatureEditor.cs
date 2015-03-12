@@ -38,7 +38,6 @@ namespace Blacklite.Framework.Features.EditorModel
         private readonly Func<Type, IAspect> _getFeature;
         private readonly Func<Type, object> _getFeatureOption;
         private readonly JsonSerializer _serializer;
-        private readonly ModelSchemaContainer _schemaContainer;
 
         public FeatureEditor(IEnumerable<FeatureModel> models, IEnumerable<FeatureGroup> groups, Func<Type, IAspect> feature, Func<Type, object> featureOption)
         {
@@ -240,7 +239,7 @@ namespace Blacklite.Framework.Features.EditorModel
                 var settings = json["settings"];
 
                 if (!JToken.DeepEquals(currentValue, settings))
-                {                    
+                {
                     _serializer.Populate(settings.CreateReader(), featureOptions);
                     yield return new OptionsSaveContext(feature, featureOptions);
                 }

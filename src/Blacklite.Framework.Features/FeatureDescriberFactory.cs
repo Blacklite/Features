@@ -6,12 +6,7 @@ using System.Linq;
 
 namespace Blacklite.Framework.Features
 {
-    public interface IFeatureDescriberFactory
-    {
-        IEnumerable<IFeatureDescriber> Create(IEnumerable<IServiceDescriptor> descriptors);
-    }
-
-    class FeatureDescriberFactory : IFeatureDescriberFactory
+    public class FeatureDescriberFactory : IFeatureDescriberFactory
     {
         public IEnumerable<IFeatureDescriber> Create(IEnumerable<IServiceDescriptor> descriptors)
         {
@@ -39,7 +34,7 @@ namespace Blacklite.Framework.Features
             }
         }
 
-        internal static void ValidateDescriber<T>(T describer)
+        public static void ValidateDescriber<T>(T describer)
             where T : FeatureDescriber
         {
             var requires = describer.DependsOn.Keys.Cast<T>();

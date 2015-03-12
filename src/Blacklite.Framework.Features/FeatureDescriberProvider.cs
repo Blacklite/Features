@@ -8,11 +8,6 @@ using System.Reflection;
 
 namespace Blacklite.Framework.Features
 {
-    public interface IFeatureDescriberProvider
-    {
-        IReadOnlyDictionary<Type, IFeatureDescriber> Describers { get; }
-    }
-
     class FeatureDescriberProvider : IFeatureDescriberProvider
     {
         //private readonly IEnumerable<IServiceDescriptor> _describers;

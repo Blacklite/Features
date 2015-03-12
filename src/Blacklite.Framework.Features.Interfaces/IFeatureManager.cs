@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Blacklite.Framework.Features
 {
-    public class FeatureManager : IFeatureManager
+    public interface IFeatureManager
     {
 
     }

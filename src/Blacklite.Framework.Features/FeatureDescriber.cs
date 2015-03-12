@@ -8,35 +8,7 @@ using System.Reflection;
 
 namespace Blacklite.Framework.Features
 {
-    public interface IFeatureDescriber
-    {
-        Type FeatureType { get; }
-        TypeInfo FeatureTypeInfo { get; }
-        Type OptionsType { get; }
-        TypeInfo OptionsTypeInfo { get; }
-        LifecycleKind Lifecycle { get; }
-        bool IsObservable { get; }
-        bool HasEnabled { get; }
-        bool HasOptions { get; }
-        bool IsReadOnly { get; }
-        bool OptionsHasIsEnabled { get; }
-        string DisplayName { get; }
-        string Description { get; }
-        string OptionsDisplayName { get; }
-        string OptionsDescription { get; }
-        IReadOnlyDictionary<IFeatureDescriber, bool> DependsOn { get; }
-        IEnumerable<IFeatureDescriber> Children { get; }
-        IEnumerable<string> Groups { get; }
-
-        IEnumerable<RequiredFeatureAttribute> Requires { get; }
-        TypeInfo Parent { get; }
-
-        T GetIsEnabled<T>(object instance);
-        void SetIsEnabled<T>(object instance, T value);
-        T GetOptions<T>(object instance);
-    }
-
-    class FeatureDescriber : IFeatureDescriber
+    public class FeatureDescriber : IFeatureDescriber
     {
         private readonly PropertyInfo _isEnabledProperty;
         private readonly PropertyInfo _optionsProperty;
@@ -116,8 +88,8 @@ namespace Blacklite.Framework.Features
         public IEnumerable<RequiredFeatureAttribute> Requires { get; }
         public TypeInfo Parent { get; }
 
-        public IReadOnlyDictionary<IFeatureDescriber, bool> DependsOn { get; internal set; }
-        public IEnumerable<IFeatureDescriber> Children { get; internal set; }
+        public IReadOnlyDictionary<IFeatureDescriber, bool> DependsOn { get; set; }
+        public IEnumerable<IFeatureDescriber> Children { get; set; }
 
         public IEnumerable<string> Groups { get; }
 

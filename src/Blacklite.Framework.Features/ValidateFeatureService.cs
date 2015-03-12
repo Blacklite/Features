@@ -4,11 +4,6 @@ using System.Linq;
 
 namespace Blacklite.Framework.Features
 {
-    public interface IValidateFeatureService : IDisposable
-    {
-        bool Validate();
-    }
-
     class ValidateFeatureService : IValidateFeatureService
     {
         private readonly IEnumerable<IDisposable> _disposables;

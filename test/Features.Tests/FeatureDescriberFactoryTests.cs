@@ -1,5 +1,4 @@
 ﻿using Blacklite.Framework.Features;
-using Blacklite.Framework.Multitenancy.Features;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Linq;
@@ -204,58 +203,6 @@ namespace Features.Tests
             describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
             Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidScopedRealObservableFeature2)));
-        }
-
-        [RequiredFeature(typeof(SingletonFeature))]
-        class TenantFeature : Feature
-        {
-            public TenantFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
-        }
-
-        [RequiredFeature(typeof(TenantFeature))]
-        class InvalidTenantFeature : Feature
-        {
-            public InvalidTenantFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
-        }
-
-        [RequiredFeature(typeof(SingletonFeature))]
-        class ApplicationFeature : Feature
-        {
-            public ApplicationFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
-        }
-
-        [RequiredFeature(typeof(ApplicationFeature))]
-        class InvalidApplicationFeature : Feature
-        {
-            public InvalidApplicationFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
-        }
-
-        [Fact]
-        public void SingletonTenantThrowsForInvalidDescriptor()
-        {
-            var servicesCollection = new ServiceCollection();
-            servicesCollection.AddSingleton<SingletonFeature>();
-            servicesCollection.AddTenantOnlySingleton<TenantFeature>();
-            servicesCollection.AddSingleton<InvalidTenantFeature>();
-
-            var describers = new MultitenancyFeatureDescriberFactory().Create(servicesCollection).Cast<MultitenancyFeatureDescriber>();
-            var describer = describers.First(x => x.FeatureType == typeof(SingletonFeature));
-
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidTenantFeature)));
-        }
-
-        [Fact]
-        public void SingletonApplicationThrowsForInvalidDescriptor()
-        {
-            var servicesCollection = new ServiceCollection();
-            servicesCollection.AddSingleton<SingletonFeature>();
-            servicesCollection.AddApplicationOnlySingleton<ApplicationFeature>();
-            servicesCollection.AddSingleton<InvalidApplicationFeature>();
-
-            var describers = new MultitenancyFeatureDescriberFactory().Create(servicesCollection).Cast<MultitenancyFeatureDescriber>();
-            var describer = describers.First(x => x.FeatureType == typeof(SingletonFeature));
-
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidApplicationFeature)));
         }
     }
 }

@@ -3,21 +3,12 @@ using System.Reactive.Subjects;
 
 namespace Blacklite.Framework.Features
 {
-    // Create analyzier to identify miss used IObservableFeatures
-    public interface IObservableAspect : IAspect { }
-    public interface IObservableFeature : IObservableAspect, IFeature { }
-
     public abstract class ObservableAspect : Aspect, IObservableAspect { }
     public abstract class ObservableFeature : Feature, IObservableFeature
     {
         public ObservableFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
         {
         }
-    }
-
-    public interface IObservableAspect<T> : IObservable<T>
-        where T : IObservableAspect
-    {
     }
 
     class ObservableAspect<T> : IObservableAspect<T>

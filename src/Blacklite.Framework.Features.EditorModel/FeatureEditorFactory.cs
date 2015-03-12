@@ -16,8 +16,6 @@ namespace Blacklite.Framework.Features.EditorModel
     {
         private readonly IFeatureDescriberProvider _describerProvider;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ConcurrentDictionary<Type, IAspect> _features;
-        private readonly ConcurrentDictionary<Type, object> _options;
         private readonly T _describers;
 
         public FeatureEditorFactory(IFeatureDescriberProvider describerProvider, T describers, IServiceProvider serviceProvider)

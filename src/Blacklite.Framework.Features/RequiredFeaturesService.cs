@@ -7,12 +7,6 @@ using System.Reflection;
 
 namespace Blacklite.Framework.Features
 {
-    public interface IRequiredFeaturesService
-    {
-        IValidateFeatureService ValidateFeaturesAreInTheCorrectState(Type type);
-    }
-
-
     class RequiredFeaturesService : IRequiredFeaturesService
     {
         private readonly IFeatureDescriberProvider _provider;
