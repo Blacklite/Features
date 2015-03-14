@@ -1,5 +1,6 @@
 ﻿using Blacklite.Framework.Features.Composition;
 using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.OptionsModel;
 using Blacklite.Framework.Features.Repositories;
 using Microsoft.Framework.ConfigurationModel;
@@ -22,12 +23,19 @@ namespace Blacklite.Framework.Features
             yield return describe.Singleton(typeof(IFeatureSubject<>), typeof(FeatureSubject<>));
             yield return describe.Singleton<IFeatureAssemblyProvider, FeatureAssemblyProvider>();
             yield return describe.Singleton<IFeatureTypeProvider, FeatureTypeProvider>();
-            yield return describe.Singleton<IFeatureFactory, FeatureFactory>();
+
+            yield return describe.Scoped<IFeatureFactory, CompositeFeatureFactory>();
+            yield return describe.Singleton<ISingletonFeatureFactory, SingletonFeatureFactory>();
+            yield return describe.Scoped<IScopedFeatureFactory, ScopedFeatureFactory>();
+
             yield return describe.Singleton(typeof(Feature<>), typeof(FeatureImpl<>));
             yield return describe.Singleton(typeof(ObservableFeature<>), typeof(ObservableFeatureImpl<>));
+
             yield return describe.Transient<IRequiredFeaturesService, RequiredFeaturesService>();
             yield return describe.Singleton(typeof(IFeatureOptions<>), typeof(FeatureOptionsManager<>));
+
             yield return describe.Transient<DefaultFeatureDescriberEnumerable, DefaultFeatureDescriberEnumerable>();
+
             yield return describe.Transient<IFeatureComposition, OptionsFeatureComposer>();
             yield return describe.Transient<IFeatureComposition, RequiredFeatureComposer>();
         }

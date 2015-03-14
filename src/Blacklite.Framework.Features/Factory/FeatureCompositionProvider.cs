@@ -1,4 +1,5 @@
-﻿using Blacklite.Framework.Features.Describers;
+﻿using Blacklite.Framework.Features.Composition;
+using Blacklite.Framework.Features.Describers;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
@@ -6,53 +7,57 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Blacklite.Framework.Features.Composition
+namespace Blacklite.Framework.Features.Factory
 {
-    public class FeatureFactory : IFeatureFactory
+    public interface IFeatureCompositionProvider
     {
-        private readonly IEnumerable<IFeatureComposition> _configurators;
+        IEnumerable<IFeatureComposition> GetComposers<TFeature>(out IFeatureDescriber describer)
+            where TFeature : class, new();
+    }
+    public class FeatureCompositionProvider : IFeatureCompositionProvider
+    {
+        private readonly IEnumerable<IFeatureComposition> _composers;
         private readonly IServiceProvider _serviceProvider;
         private readonly IFeatureDescriberProvider _describerProvider;
-        private readonly ConcurrentDictionary<Type, IEnumerable<IFeatureComposition>> _featureTypeSetups = new ConcurrentDictionary<Type, IEnumerable<IFeatureComposition>>();
-        public FeatureFactory(IEnumerable<IFeatureComposition> globalConfigurators,
+        private readonly ConcurrentDictionary<Type, IEnumerable<IFeatureComposition>> _featureComposers = new ConcurrentDictionary<Type, IEnumerable<IFeatureComposition>>();
+
+        public FeatureCompositionProvider(
+            IEnumerable<IFeatureComposition> globalComposers,
             IServiceProvider serviceProvider,
             IFeatureDescriberProvider describerProvider)
         {
-            _configurators = globalConfigurators;
+            _composers = globalComposers;
             _serviceProvider = serviceProvider;
             _describerProvider = describerProvider;
         }
 
-        public TFeature GetFeature<TFeature>()
+        public IEnumerable<IFeatureComposition> GetComposers<TFeature>(out IFeatureDescriber describer)
             where TFeature : class, new()
         {
-            IFeatureDescriber describer;
             if (!_describerProvider.Describers.TryGetValue(typeof(TFeature), out describer))
             {
                 throw new KeyNotFoundException($"Could not find feature ${typeof(TFeature).Name}.");
             }
-
-            IEnumerable<IFeatureComposition> configurators;
-            if (!_featureTypeSetups.TryGetValue(typeof(TFeature), out configurators))
+            IEnumerable<IFeatureComposition> composers;
+            var d = describer;
+            if (!_featureComposers.TryGetValue(typeof(TFeature), out composers))
             {
-
-                configurators = _configurators.Union(
+                composers = _composers.Union(
                         _serviceProvider.GetRequiredService<IEnumerable<IFeatureComposition<TFeature>>>()
-                        .Select(x => new ObjectConfigurator<TFeature>(x))
+                        .Select(x => new ObjectComposer<TFeature>(x))
                     )
-                    .Where(x => x.IsApplicableTo(describer))
+                    .Where(x => x.IsApplicableTo(d))
                     .OrderByDescending(x => x.Priority);
             }
 
-            return configurators
-                .Aggregate(new TFeature(), (feature, setup) => setup.Configure(feature, describer));
+            return composers;
         }
 
-        private class ObjectConfigurator<TFeature> : IFeatureComposition
+        public class ObjectComposer<TFeature> : IFeatureComposition
             where TFeature : class, new()
         {
             private readonly IFeatureComposition<TFeature> _configurator;
-            public ObjectConfigurator(IFeatureComposition<TFeature> configurator)
+            public ObjectComposer(IFeatureComposition<TFeature> configurator)
             {
                 _configurator = configurator;
             }

@@ -1,6 +1,7 @@
 ﻿using Blacklite.Framework.Features;
 using Blacklite.Framework.Features.Composition;
 using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 using Microsoft.Framework.DependencyInjection;
 using Moq;
 using System;
