@@ -54,6 +54,12 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Licenses.Tests", "test\Lice
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Interfaces", "src\Blacklite.Framework.Features.Interfaces\Blacklite.Framework.Features.Interfaces.kproj", "{AD0BC872-A551-49AD-8D5F-9AB1221312FD}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Features", "src\Blacklite.Framework.Multitenancy.Features\Blacklite.Framework.Multitenancy.Features.kproj", "{DF91599A-632F-45D2-811D-6C524D01A180}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy", "..\Multitenancy\src\Blacklite.Framework.Multitenancy\Blacklite.Framework.Multitenancy.kproj", "{1628899E-71FF-4D91-8AD3-42E5C8DC384E}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Interfaces", "..\Multitenancy\src\Blacklite.Framework.Multitenancy.Interfaces\Blacklite.Framework.Multitenancy.Interfaces.kproj", "{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +122,18 @@ Global
 		{AD0BC872-A551-49AD-8D5F-9AB1221312FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD0BC872-A551-49AD-8D5F-9AB1221312FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD0BC872-A551-49AD-8D5F-9AB1221312FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF91599A-632F-45D2-811D-6C524D01A180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF91599A-632F-45D2-811D-6C524D01A180}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF91599A-632F-45D2-811D-6C524D01A180}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF91599A-632F-45D2-811D-6C524D01A180}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1628899E-71FF-4D91-8AD3-42E5C8DC384E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1628899E-71FF-4D91-8AD3-42E5C8DC384E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1628899E-71FF-4D91-8AD3-42E5C8DC384E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1628899E-71FF-4D91-8AD3-42E5C8DC384E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,5 +153,8 @@ Global
 		{D34F04B2-1984-4A19-93DA-0E3D577C3291} = {0A5EFDC9-0EF6-4B86-A791-05D5D4C94A33}
 		{F735EB61-14CA-4009-9758-76DF0B20CDD8} = {0A5EFDC9-0EF6-4B86-A791-05D5D4C94A33}
 		{AD0BC872-A551-49AD-8D5F-9AB1221312FD} = {0EF595D5-BBE7-4FC0-A0BB-1D988664DF7E}
+		{DF91599A-632F-45D2-811D-6C524D01A180} = {0EF595D5-BBE7-4FC0-A0BB-1D988664DF7E}
+		{1628899E-71FF-4D91-8AD3-42E5C8DC384E} = {81DDC007-B8E5-41CF-821D-4970D46138B4}
+		{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC} = {81DDC007-B8E5-41CF-821D-4970D46138B4}
 	EndGlobalSection
 EndGlobal

@@ -1,6 +1,7 @@
 ﻿{
 	"dependencies": {
         "Blacklite.Framework.Features": "",
+        "Blacklite.Framework.Multitenancy.Features": "",
         "Moq": "4.2",
         "xunit.runner.kre": "1.0.0-beta3-*"
 	},
