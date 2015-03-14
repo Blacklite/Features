@@ -1,13 +1,13 @@
 ﻿using Microsoft.Framework.DependencyInjection;
-using Blacklite.Framework.Features.Aspects;
-using Blacklite.Framework.Features.Traits;
 using System;
 using System.Reactive.Subjects;
 
 namespace Blacklite.Framework.Features
 {
+    public abstract class ObservableFeature : Feature, IObservableFeature { }
+
     class ObservableFeatureImpl<T> : ObservableFeature<T>
-        where T : class, IObservableAspect
+        where T : class, IObservableFeature
     {
         private readonly ISubject<T> _feature;
         public ObservableFeatureImpl(IFeatureSubject<T> feature)
@@ -19,13 +19,13 @@ namespace Blacklite.Framework.Features
     }
 
     interface IFeatureSubject<T> : ISubject<T>
-        where T : class, IObservableAspect
+        where T : class, IObservableFeature
     {
 
     }
 
     class FeatureSubject<T> : IFeatureSubject<T>
-        where T : class, IObservableAspect
+        where T : class, IObservableFeature
     {
         private readonly ISubject<T> _feature;
         public FeatureSubject(Feature<T> feature, IServiceProvider serviceProvider, IRequiredFeaturesService requiredFeaturesService)

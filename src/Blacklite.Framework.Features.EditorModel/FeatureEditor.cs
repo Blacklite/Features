@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using Blacklite.Framework.Features.Aspects;
 
 namespace Blacklite.Framework.Features.EditorModel
 {
@@ -36,11 +35,11 @@ namespace Blacklite.Framework.Features.EditorModel
     {
         private readonly IEnumerable<FeatureModel> _models;
         private readonly IEnumerable<FeatureGroup> _groups;
-        private readonly Func<Type, IAspect> _getFeature;
+        private readonly Func<Type, IFeature> _getFeature;
         private readonly Func<Type, object> _getFeatureOption;
         private readonly JsonSerializer _serializer;
 
-        public FeatureEditor(IEnumerable<FeatureModel> models, IEnumerable<FeatureGroup> groups, Func<Type, IAspect> feature, Func<Type, object> featureOption)
+        public FeatureEditor(IEnumerable<FeatureModel> models, IEnumerable<FeatureGroup> groups, Func<Type, IFeature> feature, Func<Type, object> featureOption)
         {
             _models = models;
             _groups = groups;
@@ -164,22 +163,22 @@ namespace Blacklite.Framework.Features.EditorModel
         class SaveContext { }
         class FeatureSaveContext : SaveContext
         {
-            public FeatureSaveContext(IAspect feature)
+            public FeatureSaveContext(IFeature feature)
             {
                 Feature = feature;
             }
 
-            public IAspect Feature { get; }
+            public IFeature Feature { get; }
         }
         class OptionsSaveContext : SaveContext
         {
-            public OptionsSaveContext(IAspect feature, object options)
+            public OptionsSaveContext(IFeature feature, object options)
             {
                 Feature = feature;
                 Options = options;
             }
 
-            public IAspect Feature { get; }
+            public IFeature Feature { get; }
             public object Options { get; }
         }
 

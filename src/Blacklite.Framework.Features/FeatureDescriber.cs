@@ -1,6 +1,4 @@
-﻿using Blacklite.Framework.Features.Aspects;
-using Blacklite.Framework.Features.OptionModel;
-using Blacklite.Framework.Features.Traits;
+﻿using Blacklite.Framework.Features.OptionsModel;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -21,21 +19,21 @@ namespace Blacklite.Framework.Features
             FeatureType = descriptor.ServiceType;
             FeatureTypeInfo = FeatureType.GetTypeInfo();
             Lifecycle = descriptor.Lifecycle;
-            IsObservable = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IObservableAspect));
+            IsObservable = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IObservableFeature));
 
-            HasOptions = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IAspectOptions));
+            HasOptions = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IFeatureOptions));
 
-            var isEnabledProperty = FeatureTypeInfo.FindDeclaredProperty(nameof(ITrait.IsEnabled));
+            var isEnabledProperty = FeatureTypeInfo.FindDeclaredProperty(nameof(ISwitch.IsEnabled));
             if (HasOptions)
             {
                 _optionsProperty = FeatureTypeInfo
-                    .FindDeclaredProperty(nameof(ITrait<object>.Options));
+                    .FindDeclaredProperty(nameof(ISwitch<object>.Options));
 
                 OptionsType = _optionsProperty.PropertyType;
                 OptionsTypeInfo = _optionsProperty.PropertyType.GetTypeInfo();
 
                 var property = _optionsProperty?.PropertyType?.GetTypeInfo()
-                    ?.FindDeclaredProperty(nameof(ITrait.IsEnabled));
+                    ?.FindDeclaredProperty(nameof(ISwitch.IsEnabled));
 
                 if (property != null)
                 {
@@ -46,7 +44,7 @@ namespace Blacklite.Framework.Features
                 OptionsDisplayName = OptionsTypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? OptionsType.Name.AsUserFriendly();
                 OptionsDescription = OptionsTypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
             }
-            HasEnabled = typeof(ITrait).GetTypeInfo().IsAssignableFrom(FeatureTypeInfo);
+            HasEnabled = typeof(ISwitch).GetTypeInfo().IsAssignableFrom(FeatureTypeInfo);
 
             if (HasEnabled)
             {

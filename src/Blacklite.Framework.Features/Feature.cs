@@ -1,6 +1,5 @@
 ﻿using Microsoft.Framework.DependencyInjection;
-using Blacklite.Framework.Features.Aspects;
-using Blacklite.Framework.Features.OptionModel;
+using Blacklite.Framework.Features.OptionsModel;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,13 +14,15 @@ namespace Blacklite.Framework.Features
             where TFeature : class, new();
     }
 
+    public abstract partial class Feature : IFeature { }
+
     class FeatureSetupFactory : IFeatureSetupFactory
     {
-        private readonly IEnumerable<IAspectSetup> _configurators;
+        private readonly IEnumerable<IFeatureSetup> _configurators;
         private readonly IServiceProvider _serviceProvider;
         private readonly IFeatureDescriberProvider _describerProvider;
-        private readonly ConcurrentDictionary<Type, IEnumerable<IAspectSetup>> _featureTypeSetups = new ConcurrentDictionary<Type, IEnumerable<IAspectSetup>>();
-        public FeatureSetupFactory(IEnumerable<IAspectSetup> globalConfigurators,
+        private readonly ConcurrentDictionary<Type, IEnumerable<IFeatureSetup>> _featureTypeSetups = new ConcurrentDictionary<Type, IEnumerable<IFeatureSetup>>();
+        public FeatureSetupFactory(IEnumerable<IFeatureSetup> globalConfigurators,
             IServiceProvider serviceProvider,
             IFeatureDescriberProvider describerProvider)
         {
@@ -33,11 +34,11 @@ namespace Blacklite.Framework.Features
         public TFeature GetFeature<TFeature>()
             where TFeature : class, new()
         {
-            IEnumerable<IAspectSetup> configurators;
+            IEnumerable<IFeatureSetup> configurators;
             if (!_featureTypeSetups.TryGetValue(typeof(TFeature), out configurators))
             {
                 configurators = _configurators.Union(
-                    _serviceProvider.GetService<IEnumerable<IAspectSetup<TFeature>>>()
+                    _serviceProvider.GetService<IEnumerable<IFeatureSetup<TFeature>>>()
                     .Select(x => new ObjectConfigurator<TFeature>(x))
                 )
                 .OrderByDescending(x => x.Priority);
@@ -75,11 +76,11 @@ namespace Blacklite.Framework.Features
         }
     }
 
-    class ObjectConfigurator<TAspect> : IAspectSetup
+    class ObjectConfigurator<TAspect> : IFeatureSetup
         where TAspect : class, new()
     {
-        private readonly IAspectSetup<TAspect> _configurator;
-        public ObjectConfigurator(IAspectSetup<TAspect> configurator)
+        private readonly IFeatureSetup<TAspect> _configurator;
+        public ObjectConfigurator(IFeatureSetup<TAspect> configurator)
         {
             _configurator = configurator;
         }

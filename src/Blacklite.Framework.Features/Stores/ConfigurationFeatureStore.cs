@@ -1,5 +1,4 @@
-﻿using Blacklite.Framework.Features.Traits;
-using Microsoft.Framework.ConfigurationModel;
+﻿using Microsoft.Framework.ConfigurationModel;
 using System;
 using System.Linq;
 
@@ -21,7 +20,7 @@ namespace Blacklite.Framework.Features.Stores
             return describer.FeatureTypeInfo.CustomAttributes.OfType<ConfigurationStoreAttribute>().Any();
         }
 
-        public void Store(ITrait feature, IFeatureDescriber describer)
+        public void Store(ISwitch feature, IFeatureDescriber describer)
         {
             _configuration.Set(describer.FeatureType.Name, feature.IsEnabled.ToString());
         }

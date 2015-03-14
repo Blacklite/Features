@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework.Features.OptionModel;
+﻿using Blacklite.Framework.Features.OptionsModel;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;

@@ -1,30 +1,28 @@
-﻿using Blacklite.Framework.Features.Aspects;
-using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Blacklite.Framework.Features.OptionModel
+namespace Blacklite.Framework.Features.OptionsModel
 {
-
-    public class AspectOptionsManager<TOptions> : IAspectOptions<TOptions>
+    public class FeatureOptionsManager<TOptions> : IFeatureOptions<TOptions>
         where TOptions : class, new()
     {
-        private readonly Lazy<IEnumerable<IAspectConfigureOptions>> _configurators;
+        private readonly Lazy<IEnumerable<IConfigureFeatureOptions>> _configurators;
         private object _lock = new object();
 
-        public AspectOptionsManager(Lazy<IEnumerable<IAspectConfigureOptions<TOptions>>> configurators,
-            Lazy<IEnumerable<IAspectConfigureOptions>> globalConfigurators,
+        public FeatureOptionsManager(Lazy<IEnumerable<IConfigureFeatureOptions<TOptions>>> configurators,
+            Lazy<IEnumerable<IConfigureFeatureOptions>> globalConfigurators,
             Lazy<IServiceProvider> serviceProvider)
         {
-            if (typeof(IAspect).GetTypeInfo().IsAssignableFrom(typeof(TOptions).GetTypeInfo()))
+            if (typeof(IFeature).GetTypeInfo().IsAssignableFrom(typeof(TOptions).GetTypeInfo()))
             {
                 _options = serviceProvider.Value.GetService<Feature<TOptions>>().Value;
             }
             else
             {
-                _configurators = new Lazy<IEnumerable<IAspectConfigureOptions>>(() =>
+                _configurators = new Lazy<IEnumerable<IConfigureFeatureOptions>>(() =>
                     configurators.Value
                         .Select(x => new ObjectConfigurator<TOptions>(x))
                         .Union(globalConfigurators.Value)
@@ -66,11 +64,11 @@ namespace Blacklite.Framework.Features.OptionModel
         }
     }
 
-    class ObjectConfigurator<TOptions> : IAspectConfigureOptions
+    class ObjectConfigurator<TOptions> : IConfigureFeatureOptions
         where TOptions : class, new()
     {
-        private readonly IAspectConfigureOptions<TOptions> _configurator;
-        public ObjectConfigurator(IAspectConfigureOptions<TOptions> configurator)
+        private readonly IConfigureFeatureOptions<TOptions> _configurator;
+        public ObjectConfigurator(IConfigureFeatureOptions<TOptions> configurator)
         {
             _configurator = configurator;
         }

@@ -1,14 +1,12 @@
 ﻿using Microsoft.Framework.DependencyInjection;
-using Blacklite.Framework.Features.OptionModel;
-using Blacklite.Framework.Features.Traits;
+using Blacklite.Framework.Features.OptionsModel;
 using System;
 using System.Linq;
 using System.Reflection;
-using Blacklite.Framework.Features.Aspects;
 
 namespace Blacklite.Framework.Features.Setups
 {
-    public class OptionsAspectSetup : IAspectSetup
+    public class OptionsAspectSetup : IFeatureSetup
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IFeatureDescriberProvider _describerProvider;
@@ -22,18 +20,18 @@ namespace Blacklite.Framework.Features.Setups
 
         public T Configure<T>(T aspect)
         {
-            var traitOptions = aspect as ITraitOptions;
+            var traitOptions = aspect as IFeatureOptions;
             if (traitOptions != null)
             {
                 var describer = _describerProvider.Describers[typeof(T)];
                 Type optionsType;
-                if (typeof(IAspect).GetTypeInfo().IsAssignableFrom(describer.OptionsTypeInfo))
+                if (typeof(IFeature).GetTypeInfo().IsAssignableFrom(describer.OptionsTypeInfo))
                 {
                     optionsType = typeof(Feature<>).MakeGenericType(describer.OptionsType);
                 }
                 else
                 {
-                    optionsType = typeof(IAspectOptions<>).MakeGenericType(describer.OptionsType);
+                    optionsType = typeof(IFeatureOptions<>).MakeGenericType(describer.OptionsType);
                 }
                 traitOptions.SetOptions(_serviceProvider.GetService(optionsType));
             }

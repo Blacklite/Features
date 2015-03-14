@@ -1,12 +1,11 @@
-﻿using Blacklite.Framework.Features.OptionModel;
-using Blacklite.Framework.Features.Traits;
+﻿using Blacklite.Framework.Features.OptionsModel;
 using System;
 using System.Linq;
 using System.Reflection;
 
 namespace Blacklite.Framework.Features.Setups
 {
-    public class RequiredAspectSetup : IAspectSetup
+    public class RequiredAspectSetup : IFeatureSetup
     {
         private readonly IRequiredFeaturesService _requiredFeatures;
         private readonly IFeatureDescriberProvider _describerProvider;
@@ -20,7 +19,7 @@ namespace Blacklite.Framework.Features.Setups
 
         public T Configure<T>(T aspect)
         {
-            var trait = aspect as ITrait;
+            var trait = aspect as ISwitch;
             var describer = _describerProvider.Describers[typeof(T)];
 
             var value = _requiredFeatures.ValidateRequiredFeatures(describer.FeatureType);

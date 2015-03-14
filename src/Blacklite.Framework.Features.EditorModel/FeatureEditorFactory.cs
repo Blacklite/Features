@@ -1,5 +1,4 @@
-﻿using Blacklite.Framework.Features.Aspects;
-using Blacklite.Framework.Features.OptionModel;
+﻿using Blacklite.Framework.Features.OptionsModel;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -95,9 +94,9 @@ namespace Blacklite.Framework.Features.EditorModel
             return new FeatureEditor(models, rootGroupings, GetFeature, GetFeatureOptions);
         }
 
-        private IAspect GetFeature(Type type)
+        private IFeature GetFeature(Type type)
         {
-            return (IAspect)_serviceProvider.GetService(type);
+            return (IFeature)_serviceProvider.GetService(type);
         }
 
         private object GetFeatureOptions(Type type)
@@ -106,7 +105,7 @@ namespace Blacklite.Framework.Features.EditorModel
             if (!describer.HasOptions)
                 return null;
 
-            var service = _serviceProvider.GetService(typeof(IAspectOptions<>).MakeGenericType(describer.OptionsType)) as IAspectOptions<object>;
+            var service = _serviceProvider.GetService(typeof(IFeatureOptions<>).MakeGenericType(describer.OptionsType)) as IFeatureOptions<object>;
             return service.Options;
         }
     }

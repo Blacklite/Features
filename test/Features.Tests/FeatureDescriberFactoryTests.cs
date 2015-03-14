@@ -1,5 +1,4 @@
 ﻿using Blacklite.Framework.Features;
-using Blacklite.Framework.Features.Traits;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Linq;
@@ -11,63 +10,63 @@ namespace Features.Tests
     {
         [RequiredFeature(typeof(ScopedFeature))]
         [RequiredFeature(typeof(SingletonFeature))]
-        [RequiredFeature(typeof(RealObservableTrait))]
-        class TransientFeature : Trait
+        [RequiredFeature(typeof(RealObservableSwitch))]
+        class TransientFeature : Switch
         {
         }
 
         [RequiredFeature(typeof(SingletonFeature))]
-        [RequiredFeature(typeof(RealObservableTrait))]
-        class ScopedFeature : Trait
+        [RequiredFeature(typeof(RealObservableSwitch))]
+        class ScopedFeature : Switch
         {
         }
 
-        [RequiredFeature(typeof(RealObservableTrait))]
-        class SingletonFeature : Trait
+        [RequiredFeature(typeof(RealObservableSwitch))]
+        class SingletonFeature : Switch
         {
         }
 
-        class RealObservableTrait : ObservableTrait
+        class RealObservableSwitch : ObservableSwitch
         {
         }
 
         [RequiredFeature(typeof(SingletonFeature))]
-        class RealObservableTrait2 : ObservableTrait
+        class RealObservableSwitch2 : ObservableSwitch
         {
         }
 
         [RequiredFeature(typeof(TransientFeature))]
-        class InvalidScopedFeature : Trait
+        class InvalidScopedFeature : Switch
         {
         }
 
         [RequiredFeature(typeof(ScopedFeature))]
-        class InvalidSingletonFeature : Trait
+        class InvalidSingletonFeature : Switch
         {
         }
 
         [RequiredFeature(typeof(TransientFeature))]
-        class InvalidSingletonFeature2 : Trait
+        class InvalidSingletonFeature2 : Switch
         {
         }
 
         [RequiredFeature(typeof(ScopedFeature))]
-        class InvalidRealObservableTrait : ObservableTrait
+        class InvalidRealObservableSwitch : ObservableSwitch
         {
         }
 
         [RequiredFeature(typeof(TransientFeature))]
-        class InvalidRealObservableTrait2 : ObservableTrait
+        class InvalidRealObservableSwitch2 : ObservableSwitch
         {
         }
 
         [RequiredFeature(typeof(TransientFeature))]
-        class InvalidTransientRealObservableTrait2 : ObservableTrait
+        class InvalidTransientRealObservableSwitch2 : ObservableSwitch
         {
         }
 
         [RequiredFeature(typeof(TransientFeature))]
-        class InvalidScopedRealObservableTrait2 : ObservableTrait
+        class InvalidScopedRealObservableSwitch2 : ObservableSwitch
         {
         }
 
@@ -81,12 +80,12 @@ namespace Features.Tests
             servicesCollection.AddSingleton<SingletonFeature>();
             servicesCollection.AddSingleton<InvalidSingletonFeature>();
             servicesCollection.AddSingleton<InvalidSingletonFeature2>();
-            servicesCollection.AddSingleton<RealObservableTrait>();
-            servicesCollection.AddSingleton<RealObservableTrait2>();
-            servicesCollection.AddSingleton<InvalidRealObservableTrait>();
-            servicesCollection.AddSingleton<InvalidRealObservableTrait2>();
-            servicesCollection.AddTransient<InvalidTransientRealObservableTrait2>();
-            servicesCollection.AddScoped<InvalidScopedRealObservableTrait2>();
+            servicesCollection.AddSingleton<RealObservableSwitch>();
+            servicesCollection.AddSingleton<RealObservableSwitch2>();
+            servicesCollection.AddSingleton<InvalidRealObservableSwitch>();
+            servicesCollection.AddSingleton<InvalidRealObservableSwitch2>();
+            servicesCollection.AddTransient<InvalidTransientRealObservableSwitch2>();
+            servicesCollection.AddScoped<InvalidScopedRealObservableSwitch2>();
 
             var describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
             var describer = describers.First(x => x.FeatureType == typeof(TransientFeature));
@@ -99,8 +98,8 @@ namespace Features.Tests
             servicesCollection.AddTransient<TransientFeature>();
             servicesCollection.AddScoped<ScopedFeature>();
             servicesCollection.AddSingleton<SingletonFeature>();
-            servicesCollection.AddSingleton<RealObservableTrait>();
-            servicesCollection.AddSingleton<RealObservableTrait2>();
+            servicesCollection.AddSingleton<RealObservableSwitch>();
+            servicesCollection.AddSingleton<RealObservableSwitch2>();
             servicesCollection.AddScoped<InvalidScopedFeature>();
             var describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
@@ -116,8 +115,8 @@ namespace Features.Tests
             servicesCollection.AddTransient<TransientFeature>();
             servicesCollection.AddScoped<ScopedFeature>();
             servicesCollection.AddSingleton<SingletonFeature>();
-            servicesCollection.AddSingleton<RealObservableTrait>();
-            servicesCollection.AddSingleton<RealObservableTrait2>();
+            servicesCollection.AddSingleton<RealObservableSwitch>();
+            servicesCollection.AddSingleton<RealObservableSwitch2>();
             servicesCollection.AddSingleton<InvalidSingletonFeature>();
             var describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
@@ -129,8 +128,8 @@ namespace Features.Tests
             servicesCollection.AddTransient<TransientFeature>();
             servicesCollection.AddScoped<ScopedFeature>();
             servicesCollection.AddSingleton<SingletonFeature>();
-            servicesCollection.AddSingleton<RealObservableTrait>();
-            servicesCollection.AddSingleton<RealObservableTrait2>();
+            servicesCollection.AddSingleton<RealObservableSwitch>();
+            servicesCollection.AddSingleton<RealObservableSwitch2>();
             servicesCollection.AddSingleton<InvalidSingletonFeature2>();
             describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
@@ -144,54 +143,54 @@ namespace Features.Tests
             servicesCollection.AddTransient<TransientFeature>();
             servicesCollection.AddScoped<ScopedFeature>();
             servicesCollection.AddSingleton<SingletonFeature>();
-            servicesCollection.AddSingleton<RealObservableTrait>();
-            servicesCollection.AddSingleton<RealObservableTrait2>();
-            servicesCollection.AddSingleton<InvalidRealObservableTrait>();
+            servicesCollection.AddSingleton<RealObservableSwitch>();
+            servicesCollection.AddSingleton<RealObservableSwitch2>();
+            servicesCollection.AddSingleton<InvalidRealObservableSwitch>();
             var describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            var describer = describers.First(x => x.FeatureType == typeof(RealObservableTrait));
+            var describer = describers.First(x => x.FeatureType == typeof(RealObservableSwitch));
             FeatureDescriberFactory.ValidateDescriber(describer);
 
-            describer = describers.First(x => x.FeatureType == typeof(RealObservableTrait2));
+            describer = describers.First(x => x.FeatureType == typeof(RealObservableSwitch2));
             FeatureDescriberFactory.ValidateDescriber(describer);
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidRealObservableTrait)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidRealObservableSwitch)));
 
             servicesCollection = new ServiceCollection();
             servicesCollection.AddTransient<TransientFeature>();
             servicesCollection.AddScoped<ScopedFeature>();
             servicesCollection.AddSingleton<SingletonFeature>();
-            servicesCollection.AddSingleton<RealObservableTrait>();
-            servicesCollection.AddSingleton<RealObservableTrait2>();
+            servicesCollection.AddSingleton<RealObservableSwitch>();
+            servicesCollection.AddSingleton<RealObservableSwitch2>();
             servicesCollection.AddSingleton<InvalidSingletonFeature2>();
-            servicesCollection.AddSingleton<InvalidRealObservableTrait2>();
+            servicesCollection.AddSingleton<InvalidRealObservableSwitch2>();
             describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidRealObservableTrait2)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidRealObservableSwitch2)));
 
             servicesCollection = new ServiceCollection();
             servicesCollection.AddTransient<TransientFeature>();
             servicesCollection.AddScoped<ScopedFeature>();
             servicesCollection.AddSingleton<SingletonFeature>();
-            servicesCollection.AddSingleton<RealObservableTrait>();
-            servicesCollection.AddSingleton<RealObservableTrait2>();
+            servicesCollection.AddSingleton<RealObservableSwitch>();
+            servicesCollection.AddSingleton<RealObservableSwitch2>();
             servicesCollection.AddSingleton<InvalidSingletonFeature2>();
-            servicesCollection.AddTransient<InvalidTransientRealObservableTrait2>();
+            servicesCollection.AddTransient<InvalidTransientRealObservableSwitch2>();
             describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidTransientRealObservableTrait2)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidTransientRealObservableSwitch2)));
 
             servicesCollection = new ServiceCollection();
             servicesCollection.AddTransient<TransientFeature>();
             servicesCollection.AddScoped<ScopedFeature>();
             servicesCollection.AddSingleton<SingletonFeature>();
-            servicesCollection.AddSingleton<RealObservableTrait>();
-            servicesCollection.AddSingleton<RealObservableTrait2>();
+            servicesCollection.AddSingleton<RealObservableSwitch>();
+            servicesCollection.AddSingleton<RealObservableSwitch2>();
             servicesCollection.AddSingleton<InvalidSingletonFeature2>();
-            servicesCollection.AddScoped<InvalidScopedRealObservableTrait2>();
+            servicesCollection.AddScoped<InvalidScopedRealObservableSwitch2>();
             describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidScopedRealObservableTrait2)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidScopedRealObservableSwitch2)));
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Blacklite.Framework.Features.EditorModel.JsonEditors;
 using Blacklite.Framework.Features.EditorModel.JsonEditors.Resolvers;
-using Blacklite.Framework.Features.OptionModel;
+using Blacklite.Framework.Features.OptionsModel;
 using Blacklite.Json.Schema;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;

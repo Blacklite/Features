@@ -1,33 +1,27 @@
-﻿using Blacklite.Framework.Features.OptionModel;
-using Blacklite.Framework.Features.Traits;
+﻿using Blacklite.Framework.Features.OptionsModel;
 using System;
 using System.Collections.Generic;
 
 namespace Blacklite.Framework.Features
 {
-    public sealed partial class Feature
+    public abstract partial class Feature
     {
         /// <summary>
         /// Allows a feature to be always on
         /// </summary>
-        public class AlwaysOn : ITrait
+        public class AlwaysOn : ISwitch
         {
             public bool IsEnabled { get { return true; } }
         }
 
-        public class AlwaysOn<TOptions> : AlwaysOn, ITrait<TOptions>
+        public class AlwaysOn<TOptions> : AlwaysOn, ISwitch<TOptions>
             where TOptions : class, new()
         {
             public TOptions Options { get; private set; }
 
-            void ITraitOptions.SetOptions(object options)
+            void IFeatureOptions.SetOptions(object options)
             {
                 Options = (TOptions)options;
-            }
-
-            void ITrait<TOptions>.SetOptions(TOptions options)
-            {
-                Options = options;
             }
         }
     }

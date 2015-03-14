@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using Microsoft.Framework.DependencyInjection;
 using System.Linq;
-using Blacklite.Framework.Features.OptionModel;
+using Blacklite.Framework.Features.OptionsModel;
 using System.ComponentModel.DataAnnotations;
-using Blacklite.Framework.Features.Aspects;
 
-namespace Blacklite.Framework.Features
+namespace Blacklite.Framework.Features.OptionsModel
 {
-    public interface IAspectOptions { }
-    public interface IAspectOptions<TOptions> : IAspectOptions
+    public interface IFeatureOptions
+    {
+        void SetOptions(object options);
+    }
+
+    public interface IFeatureOptions<TOptions>
         where TOptions : class, new()
     {
         TOptions Options { get; }

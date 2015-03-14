@@ -1,5 +1,4 @@
-﻿using Blacklite.Framework.Features.Traits;
-using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -123,10 +122,10 @@ namespace Blacklite.Framework.Features
                 };
             }
 
-            private static ITrait GetTrait(FeatureDependency dependency)
+            private static ISwitch GetTrait(FeatureDependency dependency)
             {
                 var property = typeof(Feature<object>).GetTypeInfo().GetDeclaredProperty(nameof(Feature<object>.Value));
-                return (ITrait)property.GetValue(dependency.Service, null);
+                return (ISwitch)property.GetValue(dependency.Service, null);
             }
 
             public bool IsEnabled { get; set; }
@@ -163,7 +162,7 @@ namespace Blacklite.Framework.Features
 
             private static Tuple<Func<bool>, IDisposable, IObservable<bool>> SubscribeToObservable<TObservable, TFeature>(TObservable observable)
                 where TObservable : ObservableFeature<TFeature>
-                where TFeature : IObservableTrait
+                where TFeature : IObservableSwitch
             {
                 var enabled = false;
                 // We can do this and be comfortable that our enabled flag will be populated because ObservableFeatures are powered by a behavior subject.
@@ -201,7 +200,7 @@ namespace Blacklite.Framework.Features
 
             private static IObservable<bool> SubscribeToObservable<TObservable, TFeature>(TObservable observable)
                 where TObservable : ObservableFeature<TFeature>
-                where TFeature : IObservableTrait
+                where TFeature : IObservableSwitch
             {
                 var boolObservable = observable.Select(x => x.IsEnabled);
                 return boolObservable;
