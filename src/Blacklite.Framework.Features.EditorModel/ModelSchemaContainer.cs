@@ -126,6 +126,7 @@ namespace Blacklite.Framework.Features.EditorModel
             {
                 JToken bogus;
                 options = _schemaGenerator.Generate(model.OptionsType);
+                options.Title = "Settings";
                 options.Format = FeatureEditor.OptionsKey;
 
                 if (!_definitions.TryGetValue(model.OptionsName, out bogus))
@@ -145,7 +146,6 @@ namespace Blacklite.Framework.Features.EditorModel
 
             if (options != null)
             {
-                options.Title = "Options";
                 options.Description = model.OptionsDescription;
                 options.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
             }
@@ -189,7 +189,7 @@ namespace Blacklite.Framework.Features.EditorModel
             {
                 var propertySchema = _schemaGenerator.Generate(model.FeatureType);
                 //_optionSchemas.Add(model.Name, propertySchema);
-                //propertySchema.Title = "Options";
+                propertySchema.Title = model.Title;
                 propertySchema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
                 propertySchema.Format = FeatureEditor.OptionsKey;
 
@@ -210,6 +210,7 @@ namespace Blacklite.Framework.Features.EditorModel
         {
             if (options != null && !model.OptionsIsFeature)
             {
+                options.Title = "Settings";
                 _optionSchemas.Add(model.OptionsName, options);
                 foreach (var property in options.Properties)
                 {

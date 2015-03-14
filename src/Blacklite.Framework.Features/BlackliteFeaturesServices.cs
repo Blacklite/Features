@@ -23,6 +23,7 @@ namespace Blacklite.Framework.Features
             yield return describe.Singleton(typeof(IFeatureSubject<>), typeof(FeatureSubject<>));
             yield return describe.Singleton<IFeatureAssemblyProvider, FeatureAssemblyProvider>();
             yield return describe.Singleton<IFeatureTypeProvider, FeatureTypeProvider>();
+            yield return describe.Singleton<IFeatureCompositionProvider, FeatureCompositionProvider>();
 
             yield return describe.Scoped<IFeatureFactory, CompositeFeatureFactory>();
             yield return describe.Singleton<ISingletonFeatureFactory, SingletonFeatureFactory>();

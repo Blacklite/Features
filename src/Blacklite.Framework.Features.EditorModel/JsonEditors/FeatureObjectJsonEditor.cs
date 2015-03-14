@@ -53,14 +53,18 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             var toggle = new TagBuilder("div");
             _featureJsonEditorDecorator.DecorateFeatureCheckbox(Context, toggle);
 
-            if (Context.Schema.Properties.ContainsKey(FeatureEditor.OptionsKey))
-            {
-                settingsRenderer = GetOptionsTagBuilder(FeatureEditor.OptionsKey, Context.Schema.Properties[FeatureEditor.OptionsKey]);
-            }
-
+            var modalTitle = "Settings";
             if (Context.Schema.Properties.ContainsKey(FeatureEditor.SettingsKey))
             {
+                modalTitle = "Settings";
                 propertiesRenderer = GetPropertyTagBuilder(Context.Schema.Properties[FeatureEditor.SettingsKey]);
+            }
+
+            if (Context.Schema.Properties.ContainsKey(FeatureEditor.OptionsKey))
+            {
+                modalTitle = Context.Schema.Title;
+                //modalTitle = Context.Schema.Properties[FeatureEditor.OptionsKey].Title;
+                settingsRenderer = GetOptionsTagBuilder(FeatureEditor.OptionsKey, Context.Schema.Properties[FeatureEditor.OptionsKey]);
             }
 
             return new JsonEditorRenderer(Context.Serializer, value =>
@@ -86,7 +90,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                         sb.Append(settingsRenderer.Render(value?[FeatureEditor.OptionsKey]));
                     }
 
-                    innerToggle = _featureJsonEditorDecorator.DecorateSettings(Context, innerToggle, sb.ToString());
+                    innerToggle = _featureJsonEditorDecorator.DecorateSettings(Context, innerToggle, sb.ToString(), modalTitle);
                 }
 
                 result.InnerHtml += innerToggle.ToString();

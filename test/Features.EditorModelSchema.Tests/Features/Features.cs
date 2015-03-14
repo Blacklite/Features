@@ -5,50 +5,6 @@ using Microsoft.Framework.DependencyInjection;
 
 namespace Features.EditorModelSchema.Tests.Features
 {
-    public static class FeatureRegistry
-    {
-        public static void Register(IServiceCollection services)
-        {
-            services.AddSingleton<ApiDevelopmentFeatureA>();
-            services.AddTransient<ApiDevelopmentFeatureB>();
-            services.AddTransient<ApiDevelopmentFeatureC>();
-            services.AddTransient<ApiDevelopmentFeatureD>();
-            services.AddTransient<ApiDevelopmentFeatureCeeOptions>();
-
-            services.AddSingleton<ApiGeneralFeatureA>();
-            services.AddTransient<ApiGeneralFeatureB>();
-            services.AddTransient<ApiGeneralFeatureC>();
-            services.AddTransient<ApiGeneralFeatureD>();
-
-            services.AddSingleton<ApplicationDevelopmentFeatureA>();
-            services.AddTransient<ApplicationDevelopmentFeatureB>();
-            services.AddTransient<ApplicationDevelopmentFeatureC>();
-            services.AddTransient<ApplicationDevelopmentFeatureD>();
-
-            services.AddSingleton<ApplicationGeneralFeatureA>();
-            services.AddTransient<ApplicationGeneralFeatureB>();
-            services.AddTransient<ApplicationGeneralFeatureC>();
-            services.AddTransient<ApplicationGeneralFeatureD>();
-
-            services.AddSingleton<ApplicationSecurityFeatureA>();
-            services.AddTransient<ApplicationSecurityFeatureB>();
-            services.AddTransient<ApplicationSecurityFeatureC>();
-            services.AddTransient<ApplicationSecurityFeatureD>();
-
-            services.AddSingleton<ApplicationUserProfileFeatureA>();
-            services.AddTransient<ApplicationUserProfileFeatureB>();
-            services.AddTransient<ApplicationUserProfileFeatureC>();
-            services.AddTransient<ApplicationUserProfileFeatureD>();
-
-            services.AddSingleton<ApplicationUserInterfaceFeatureA>();
-            services.AddTransient<ApplicationUserInterfaceFeatureB>();
-            services.AddTransient<ApplicationUserInterfaceFeatureC>();
-            services.AddTransient<ApplicationUserInterfaceFeatureD>();
-            services.AddTransient<ApplicationUserInterfaceFeatureCeeOptions>();
-        }
-    }
-
-
     public enum CeeOptions
     {
         Private,
@@ -66,6 +22,7 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("API", "Development")]
     public class ApiDevelopmentFeatureB : Feature.AlwaysOff { }
 
+    [FeatureGroup("API", "Development")]
     public class ApiDevelopmentFeatureCeeOptions : Switch
     {
         public string Database { get; set; }
@@ -127,9 +84,11 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationDevelopmentFeatureC))]
+    [FeatureGroup("Application", "Development")]
     public class ApplicationDevelopmentFeatureD : Switch
     {
     }
+
     [FeatureGroup("Application", "General")]
     public class ApplicationGeneralFeatureA : Feature.AlwaysOn, IObservableSwitch
     {
@@ -153,9 +112,11 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationGeneralFeatureB))]
+    [FeatureGroup("Application", "General")]
     public class ApplicationGeneralFeatureD : Feature
     {
     }
+
     [FeatureGroup("Application", "Security")]
     public class ApplicationSecurityFeatureA : Feature.AlwaysOn, IObservableSwitch
     {
@@ -179,9 +140,11 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationSecurityFeatureA))]
+    [FeatureGroup("Application", "User Profile")]
     public class ApplicationSecurityFeatureD : Switch
     {
     }
+
     [FeatureGroup("Application", "User Profile")]
     public class ApplicationUserProfileFeatureA : Feature.AlwaysOn, IObservableSwitch
     {
@@ -205,9 +168,11 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationUserProfileFeatureC))]
+    [FeatureGroup("Application", "User Profile")]
     public class ApplicationUserProfileFeatureD : Switch
     {
     }
+
     [FeatureGroup("Application", "User Interface")]
     public class ApplicationUserInterfaceFeatureA : Feature.AlwaysOn, IObservableSwitch
     {
@@ -232,6 +197,7 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationUserInterfaceFeatureB))]
+    [FeatureGroup("Application", "User Interface")]
     public class ApplicationUserInterfaceFeatureD : Switch
     {
     }

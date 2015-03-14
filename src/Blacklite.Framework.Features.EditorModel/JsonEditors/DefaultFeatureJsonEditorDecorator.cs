@@ -13,7 +13,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
     {
         bool HasChildProperties(IJsonEditorResolutionContext context);
         TagBuilder DecorateFeatureCheckbox(IJsonEditorResolutionContext context, TagBuilder tagBuilder);
-        TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder tagBuilder, string html);
+        TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder tagBuilder, string html, string title = "Settings");
         TagBuilder DecorateTabHeaderContainer(IJsonEditorResolutionContext context, TagBuilder container, IEnumerable<TagBuilder> tabs);
         TagBuilder DecorateTabHeader(IJsonEditorResolutionContext context, JSchema schema, TagBuilder container);
         TagBuilder DecorateTabContainer(IJsonEditorResolutionContext context, TagBuilder container, IEnumerable<TagBuilder> tabs);
@@ -52,7 +52,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             return toggle;
         }
 
-        public TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder settings, string html)
+        public TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder settings, string html, string title = "Settings")
         {
             var container = new TagBuilder("div");
             container.AddCssClass("pull-right-sm");
@@ -102,7 +102,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             var h4 = new TagBuilder("h4");
             h4.AddCssClass("modal-title");
             h4.Attributes.Add("id", $"{id}_header");
-            h4.InnerHtml = FeatureEditor.OptionsKey;
+            h4.InnerHtml = title;
 
             header.InnerHtml += h4.ToString();
 
