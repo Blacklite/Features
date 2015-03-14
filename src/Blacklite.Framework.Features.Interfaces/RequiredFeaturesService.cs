@@ -9,6 +9,8 @@ namespace Blacklite.Framework.Features
 {
     public interface IRequiredFeaturesService
     {
-        IValidateFeatureService ValidateFeaturesAreInTheCorrectState(Type type);
+        bool ValidateRequiredFeatures(Type type);
+
+        IObservable<bool> GetObservableRequiredFeatures(Type type);
     }
 }

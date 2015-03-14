@@ -73,20 +73,11 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [FeatureGroup("API", "Development")]
-    public class ApiDevelopmentFeatureC : Feature.AlwaysOn<ApiDevelopmentFeatureCeeOptions>
-    {
-        public ApiDevelopmentFeatureC(IAspectOptions<ApiDevelopmentFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
-        {
-        }
-    }
+    public class ApiDevelopmentFeatureC : Feature.AlwaysOn<ApiDevelopmentFeatureCeeOptions>    {    }
 
     [ParentFeature(typeof(ApiDevelopmentFeatureA))]
-    public class ApiDevelopmentFeatureD : Trait
-    {
-        public ApiDevelopmentFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
-        {
-        }
-    }
+    public class ApiDevelopmentFeatureD : Trait { }
+
     [FeatureGroup("API", "General")]
     public class ApiGeneralFeatureA : Feature.AlwaysOn, IObservableTrait { }
 
@@ -103,17 +94,11 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("API", "General")]
     public class ApiGeneralFeatureC : Feature.AlwaysOn<ApiGeneralFeatureCeeOptions>
     {
-        public ApiGeneralFeatureC(IAspectOptions<ApiGeneralFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
-        {
-        }
     }
 
     [ParentFeature(typeof(ApiGeneralFeatureA))]
     public class ApiGeneralFeatureD : Trait
     {
-        public ApiGeneralFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
-        {
-        }
     }
     [FeatureGroup("Application", "Development")]
     public class ApplicationDevelopmentFeatureA : Feature.AlwaysOn, IObservableTrait { }
@@ -133,17 +118,11 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("Application", "Development")]
     public class ApplicationDevelopmentFeatureC : Feature.AlwaysOn<ApplicationDevelopmentFeatureCeeOptions>
     {
-        public ApplicationDevelopmentFeatureC(IAspectOptions<ApplicationDevelopmentFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
-        {
-        }
     }
 
     [ParentFeature(typeof(ApplicationDevelopmentFeatureC))]
     public class ApplicationDevelopmentFeatureD : Trait
     {
-        public ApplicationDevelopmentFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
-        {
-        }
     }
     [FeatureGroup("Application", "General")]
     public class ApplicationGeneralFeatureA : Feature.AlwaysOn, IObservableTrait { }
@@ -163,17 +142,11 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("Application", "General")]
     public class ApplicationGeneralFeatureC : Feature.AlwaysOn<ApplicationGeneralFeatureCeeOptions>
     {
-        public ApplicationGeneralFeatureC(IAspectOptions<ApplicationGeneralFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
-        {
-        }
     }
 
     [ParentFeature(typeof(ApplicationGeneralFeatureB))]
     public class ApplicationGeneralFeatureD : Aspect
     {
-        public ApplicationGeneralFeatureD() : base()
-        {
-        }
     }
     [FeatureGroup("Application", "Security")]
     public class ApplicationSecurityFeatureA : Feature.AlwaysOn, IObservableTrait { }
@@ -193,17 +166,11 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("Application", "Security")]
     public class ApplicationSecurityFeatureC : Feature.AlwaysOn<ApplicationSecurityFeatureCeeOptions>
     {
-        public ApplicationSecurityFeatureC(IAspectOptions<ApplicationSecurityFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
-        {
-        }
     }
 
     [ParentFeature(typeof(ApplicationSecurityFeatureA))]
     public class ApplicationSecurityFeatureD : Trait
     {
-        public ApplicationSecurityFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
-        {
-        }
     }
     [FeatureGroup("Application", "User Profile")]
     public class ApplicationUserProfileFeatureA : Feature.AlwaysOn, IObservableTrait { }
@@ -223,17 +190,11 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("Application", "User Profile")]
     public class ApplicationUserProfileFeatureC : Feature.AlwaysOn<ApplicationUserProfileFeatureCeeOptions>
     {
-        public ApplicationUserProfileFeatureC(IAspectOptions<ApplicationUserProfileFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
-        {
-        }
     }
 
     [ParentFeature(typeof(ApplicationUserProfileFeatureC))]
     public class ApplicationUserProfileFeatureD : Trait
     {
-        public ApplicationUserProfileFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
-        {
-        }
     }
     [FeatureGroup("Application", "User Interface")]
     public class ApplicationUserInterfaceFeatureA : Feature.AlwaysOn, IObservableTrait { }
@@ -241,28 +202,24 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("Application", "User Interface")]
     public class ApplicationUserInterfaceFeatureB : Feature.AlwaysOff { }
 
-    public class ApplicationUserInterfaceFeatureCeeOptions
+    [FeatureGroup("Application", "User Interface")]
+    public class ApplicationUserInterfaceFeatureC/*ApplicationUserInterfaceFeatureCeeOptions*/ : Aspect
     {
         public string Database { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public bool IsEnabled { get; set; }
         public CeeOptions Options { get; }
     }
 
-    [FeatureGroup("Application", "User Interface")]
-    public class ApplicationUserInterfaceFeatureC : Aspect<ApplicationUserInterfaceFeatureCeeOptions>
-    {
-        public ApplicationUserInterfaceFeatureC(IAspectOptions<ApplicationUserInterfaceFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
-        {
-        }
-    }
+    //public class ApplicationUserInterfaceFeatureC : Aspect<ApplicationUserInterfaceFeatureCeeOptions>
+    //{
+    //    public ApplicationUserInterfaceFeatureC(IAspectOptions<ApplicationUserInterfaceFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
+    //    {
+    //    }
+    //}
 
     [ParentFeature(typeof(ApplicationUserInterfaceFeatureB))]
     public class ApplicationUserInterfaceFeatureD : Trait
     {
-        public ApplicationUserInterfaceFeatureD(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
-        {
-        }
     }
 }

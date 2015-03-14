@@ -1,4 +1,5 @@
-﻿using Blacklite.Framework.Features.OptionModel;
+﻿using Blacklite.Framework.Features.Aspects;
+using Blacklite.Framework.Features.OptionModel;
 using Blacklite.Framework.Features.Traits;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,16 @@ namespace Blacklite.Framework.Features
         public class AlwaysOff<TOptions> : AlwaysOff, ITrait<TOptions>
             where TOptions : class, new()
         {
-            public TOptions Options { get; }
+            public TOptions Options { get; private set; }
 
-            protected AlwaysOff(IAspectOptions<TOptions> _optionsContainer)
+            void ITraitOptions.SetOptions(object options)
             {
-                Options = _optionsContainer.Options;
+                Options = (TOptions)options;
+            }
+
+            void ITrait<TOptions>.SetOptions(TOptions options)
+            {
+                Options = options;
             }
         }
     }

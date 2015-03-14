@@ -50,11 +50,16 @@ namespace Blacklite.Framework.Features
         public class Random<TOptions> : Random, ITrait<TOptions>
             where TOptions : class, new()
         {
-            public TOptions Options { get; }
+            public TOptions Options { get; private set; }
 
-            protected Random(IAspectOptions<TOptions> _optionsContainer)
+            void ITraitOptions.SetOptions(object options)
             {
-                Options = _optionsContainer.Options;
+                Options = (TOptions)options;
+            }
+
+            void ITrait<TOptions>.SetOptions(TOptions options)
+            {
+                Options = options;
             }
         }
     }

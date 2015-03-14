@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Blacklite.Framework.Features.Aspects;
+using Microsoft.Framework.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Blacklite.Framework.Features.OptionModel
 {
@@ -8,15 +11,25 @@ namespace Blacklite.Framework.Features.OptionModel
     public class AspectOptionsManager<TOptions> : IAspectOptions<TOptions>
         where TOptions : class, new()
     {
-        private readonly IEnumerable<IAspectConfigureOptions> _configurators;
+        private readonly Lazy<IEnumerable<IAspectConfigureOptions>> _configurators;
         private object _lock = new object();
 
-        public AspectOptionsManager(IEnumerable<IAspectConfigureOptions<TOptions>> configurators, IEnumerable<IAspectConfigureOptions> globalConfigurators)
+        public AspectOptionsManager(Lazy<IEnumerable<IAspectConfigureOptions<TOptions>>> configurators,
+            Lazy<IEnumerable<IAspectConfigureOptions>> globalConfigurators,
+            Lazy<IServiceProvider> serviceProvider)
         {
-            _configurators = configurators
-                .Select(x => new ObjectConfigurator<TOptions>(x))
-                .Union(globalConfigurators)
-                .OrderByDescending(x => x.Priority);
+            if (typeof(IAspect).GetTypeInfo().IsAssignableFrom(typeof(TOptions).GetTypeInfo()))
+            {
+                _options = serviceProvider.Value.GetService<Feature<TOptions>>().Value;
+            }
+            else
+            {
+                _configurators = new Lazy<IEnumerable<IAspectConfigureOptions>>(() =>
+                    configurators.Value
+                        .Select(x => new ObjectConfigurator<TOptions>(x))
+                        .Union(globalConfigurators.Value)
+                        .OrderByDescending(x => x.Priority));
+            }
         }
 
         private TOptions _options;
@@ -41,15 +54,15 @@ namespace Blacklite.Framework.Features.OptionModel
 
         public virtual TOptions Configure()
         {
-            if (_configurators == null || !_configurators.Any())
+            if (_configurators == null || !_configurators.Value.Any())
                 return new TOptions();
 
-            return _configurators
+            return _configurators.Value
                 .Aggregate(new TOptions(), (options, setup) =>
-            {
-                setup.Configure(options);
-                return options;
-            });
+                {
+                    setup.Configure(options);
+                    return options;
+                });
         }
     }
 

@@ -14,8 +14,15 @@ namespace Blacklite.Framework.Features.Traits
         bool IsEnabled { get; }
     }
 
-    public interface ITrait<TOptions> : ITrait, IAspect<TOptions>
+    public interface ITraitOptions
+    {
+        void SetOptions(object options);
+    }
+
+    public interface ITrait<TOptions> : ITrait, ITraitOptions
         where TOptions : class, new()
     {
+        TOptions Options { get; }
+        void SetOptions(TOptions options);
     }
 }

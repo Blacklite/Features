@@ -14,6 +14,8 @@ namespace Blacklite.Framework.Features
         TypeInfo FeatureTypeInfo { get; }
         Type OptionsType { get; }
         TypeInfo OptionsTypeInfo { get; }
+        Type GenericFeatureType { get; }
+        Type GenericObservableFeatureType { get; }
         LifecycleKind Lifecycle { get; }
         bool IsObservable { get; }
         bool HasEnabled { get; }

@@ -3,7 +3,7 @@ using System;
 
 namespace Blacklite.Framework.Features
 {
-    public interface IObservableFeature<T> : IObservable<T>
+    public interface ObservableFeature<T> : IObservable<T>
         where T : IObservableAspect
     {
     }

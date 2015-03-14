@@ -1,15 +1,16 @@
-﻿using Blacklite.Framework.Features.Aspects;
+﻿using Microsoft.Framework.DependencyInjection;
+using Blacklite.Framework.Features.Aspects;
 using Blacklite.Framework.Features.Traits;
 using System;
 using System.Reactive.Subjects;
 
 namespace Blacklite.Framework.Features
 {
-    class ObservableFeature<T> : IObservableFeature<T>
-        where T : IObservableAspect
+    class ObservableFeatureImpl<T> : ObservableFeature<T>
+        where T : class, IObservableAspect
     {
         private readonly ISubject<T> _feature;
-        public ObservableFeature(IFeatureSubject<T> feature)
+        public ObservableFeatureImpl(IFeatureSubject<T> feature)
         {
             _feature = feature;
         }
@@ -18,18 +19,26 @@ namespace Blacklite.Framework.Features
     }
 
     interface IFeatureSubject<T> : ISubject<T>
-        where T : IObservableAspect
+        where T : class, IObservableAspect
     {
 
     }
 
     class FeatureSubject<T> : IFeatureSubject<T>
-        where T : IObservableAspect
+        where T : class, IObservableAspect
     {
         private readonly ISubject<T> _feature;
-        public FeatureSubject(T feature)
+        public FeatureSubject(Feature<T> feature, IServiceProvider serviceProvider, IRequiredFeaturesService requiredFeaturesService)
         {
-            _feature = new BehaviorSubject<T>(feature);
+            _feature = new BehaviorSubject<T>(feature.Value);
+
+            var observable = requiredFeaturesService.GetObservableRequiredFeatures(typeof(T));
+            if (observable != null)
+            {
+                observable.Subscribe((x) =>
+                    _feature.OnNext(serviceProvider.GetService<Feature<T>>().Value)
+                );
+            }
         }
 
         public void OnNext(T value)

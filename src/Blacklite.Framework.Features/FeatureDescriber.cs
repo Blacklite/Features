@@ -70,6 +70,10 @@ namespace Blacklite.Framework.Features
             {
                 Groups = new[] { "( not grouped )" };
             }
+
+            GenericFeatureType = typeof(Feature<>).MakeGenericType(FeatureType);
+            if (IsObservable)
+            GenericObservableFeatureType = typeof(ObservableFeature<>).MakeGenericType(FeatureType);
         }
 
         public Type FeatureType { get; }
@@ -94,6 +98,10 @@ namespace Blacklite.Framework.Features
         public IEnumerable<IFeatureDescriber> Children { get; set; }
 
         public IEnumerable<string> Groups { get; }
+
+        public Type GenericFeatureType { get; }
+
+        public Type GenericObservableFeatureType { get; }
 
         public T GetIsEnabled<T>(object instance)
         {

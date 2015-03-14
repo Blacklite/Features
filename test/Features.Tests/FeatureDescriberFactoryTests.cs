@@ -14,73 +14,61 @@ namespace Features.Tests
         [RequiredFeature(typeof(RealObservableTrait))]
         class TransientFeature : Trait
         {
-            public TransientFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(SingletonFeature))]
         [RequiredFeature(typeof(RealObservableTrait))]
         class ScopedFeature : Trait
         {
-            public ScopedFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(RealObservableTrait))]
         class SingletonFeature : Trait
         {
-            public SingletonFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         class RealObservableTrait : ObservableTrait
         {
-            public RealObservableTrait(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(SingletonFeature))]
         class RealObservableTrait2 : ObservableTrait
         {
-            public RealObservableTrait2(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(TransientFeature))]
         class InvalidScopedFeature : Trait
         {
-            public InvalidScopedFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(ScopedFeature))]
         class InvalidSingletonFeature : Trait
         {
-            public InvalidSingletonFeature(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(TransientFeature))]
         class InvalidSingletonFeature2 : Trait
         {
-            public InvalidSingletonFeature2(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(ScopedFeature))]
         class InvalidRealObservableTrait : ObservableTrait
         {
-            public InvalidRealObservableTrait(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(TransientFeature))]
         class InvalidRealObservableTrait2 : ObservableTrait
         {
-            public InvalidRealObservableTrait2(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(TransientFeature))]
         class InvalidTransientRealObservableTrait2 : ObservableTrait
         {
-            public InvalidTransientRealObservableTrait2(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [RequiredFeature(typeof(TransientFeature))]
         class InvalidScopedRealObservableTrait2 : ObservableTrait
         {
-            public InvalidScopedRealObservableTrait2(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures) { }
         }
 
         [Fact]

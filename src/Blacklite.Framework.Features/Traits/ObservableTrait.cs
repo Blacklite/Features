@@ -7,8 +7,5 @@ namespace Blacklite.Framework.Features.Traits
 {
     public abstract class ObservableTrait : Trait, IObservableTrait
     {
-        public ObservableTrait(IRequiredFeaturesService requiredFeatures) : base(requiredFeatures)
-        {
-        }
     }
 }
