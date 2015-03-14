@@ -12,7 +12,7 @@ namespace Blacklite.Framework.Features.OptionsModel
         void SetOptions(object options);
     }
 
-    public interface IFeatureOptions<TOptions>
+    public interface IFeatureOptions<out TOptions>
         where TOptions : class, new()
     {
         TOptions Options { get; }

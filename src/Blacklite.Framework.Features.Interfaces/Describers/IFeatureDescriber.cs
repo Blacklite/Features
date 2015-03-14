@@ -6,26 +6,23 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
-namespace Blacklite.Framework.Features
+namespace Blacklite.Framework.Features.Describers
 {
     public interface IFeatureDescriber
     {
-        Type FeatureType { get; }
-        TypeInfo FeatureTypeInfo { get; }
-        Type OptionsType { get; }
-        TypeInfo OptionsTypeInfo { get; }
-        Type GenericFeatureType { get; }
-        Type GenericObservableFeatureType { get; }
+        Type Type { get; }
+        TypeInfo TypeInfo { get; }
+        Type InterfaceType { get; }
+        Type ObservableInterfaceType { get; }
         LifecycleKind Lifecycle { get; }
         bool IsObservable { get; }
         bool HasEnabled { get; }
         bool HasOptions { get; }
+        IEnumerable<IFeaturePropertyDescriber> Properties { get; }
+        IFeatureOptionsDescriber Options { get; }
         bool IsReadOnly { get; }
-        bool OptionsHasIsEnabled { get; }
         string DisplayName { get; }
         string Description { get; }
-        string OptionsDisplayName { get; }
-        string OptionsDescription { get; }
         IReadOnlyDictionary<IFeatureDescriber, bool> DependsOn { get; }
         IEnumerable<IFeatureDescriber> Children { get; }
         IEnumerable<string> Groups { get; }

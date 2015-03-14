@@ -4,7 +4,7 @@ namespace Blacklite.Framework.Features.EditorModel
 {
     public class FeatureOptionPropertyModel
     {
-        public FeatureOptionPropertyModel(Type type, string name, string title, string description, Func<object, object> getValue, Action<object, object> setValue, bool isReadOnly = false, bool optionsHasIsEnabled = false)
+        public FeatureOptionPropertyModel(Type type, string name, string title, string description, Func<object, object> getValue, Action<object, object> setValue, bool isReadOnly = false)
         {
             Type = type;
             Name = name.CamelCase();
@@ -13,7 +13,6 @@ namespace Blacklite.Framework.Features.EditorModel
             GetValue = getValue;
             SetValue = setValue;
             IsReadOnly = isReadOnly;
-            OptionsHasIsEnabled = optionsHasIsEnabled;
         }
         public Type Type { get; }
         public string Name { get; }
@@ -22,6 +21,5 @@ namespace Blacklite.Framework.Features.EditorModel
         public Func<object, object> GetValue { get; }
         public Action<object, object> SetValue { get; }
         public bool IsReadOnly { get; }
-        public bool OptionsHasIsEnabled { get; }
     }
 }

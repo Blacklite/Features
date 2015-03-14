@@ -1,4 +1,5 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Blacklite.Framework.Features.Describers;
+using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,9 +23,9 @@ namespace Blacklite.Framework.Features
         private object GetRequiredFeature(IFeatureDescriber describer)
         {
             if (describer.IsObservable)
-                return _serviceProvider.GetRequiredService(describer.GenericObservableFeatureType);
+                return _serviceProvider.GetRequiredService(describer.ObservableInterfaceType);
 
-            return _serviceProvider.GetRequiredService(describer.GenericFeatureType);
+            return _serviceProvider.GetRequiredService(describer.InterfaceType);
         }
 
         private IEnumerable<FeatureDependency> GetFeatureDependencies(IFeatureDescriber describer)
@@ -35,7 +36,7 @@ namespace Blacklite.Framework.Features
                 new FeatureDependency()
                 {
                     Service = GetRequiredFeature(x.Key),
-                    FeatureType = x.Key.FeatureType,
+                    FeatureType = x.Key.Type,
                     IsObservable = x.Key.IsObservable,
                     ShouldBeEnabled = x.Value
                 });

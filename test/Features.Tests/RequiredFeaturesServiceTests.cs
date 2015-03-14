@@ -1,4 +1,6 @@
 ﻿using Blacklite.Framework.Features;
+using Blacklite.Framework.Features.Composition;
+using Blacklite.Framework.Features.Describers;
 using Microsoft.Framework.DependencyInjection;
 using Moq;
 using System;
@@ -79,7 +81,7 @@ namespace Features.Tests
             var serviceProviderMock = new Mock<IServiceProvider>();
             var serviceProvider = serviceProviderMock.Object;
 
-            var featureFactoryMock = new Mock<IFeatureSetupFactory>();
+            var featureFactoryMock = new Mock<IFeatureFactory>();
             featureFactoryMock.Setup(x => x.GetFeature<TransientFeature>()).Returns(() => new TransientFeature());
             featureFactoryMock.Setup(x => x.GetFeature<TransientFeature2>()).Returns(() => new TransientFeature2());
             featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature>()).Returns(new ScopedFeature());
@@ -154,7 +156,7 @@ namespace Features.Tests
             var featureDescriberProvider = new FeatureDescriberProvider(
                 new FeatureServicesCollection(servicesCollection), new FeatureDescriberFactory());
 
-            var featureFactoryMock = new Mock<IFeatureSetupFactory>();
+            var featureFactoryMock = new Mock<IFeatureFactory>();
             featureFactoryMock.Setup(x => x.GetFeature<TransientFeature>()).Returns(() => new TransientFeature());
             featureFactoryMock.Setup(x => x.GetFeature<TransientFeature2>()).Returns(() => new TransientFeature2());
             featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature>()).Returns(new ScopedFeature());
@@ -229,7 +231,7 @@ namespace Features.Tests
             var transientFeature = new TransientFeature();
             transientFeature.IsEnabled = false;
 
-            var featureFactoryMock = new Mock<IFeatureSetupFactory>();
+            var featureFactoryMock = new Mock<IFeatureFactory>();
             featureFactoryMock.Setup(x => x.GetFeature<TransientFeature>()).Returns(() => transientFeature);
             featureFactoryMock.Setup(x => x.GetFeature<TransientFeature2>()).Returns(() => new TransientFeature2());
             featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature>()).Returns(new ScopedFeature());
@@ -315,7 +317,7 @@ namespace Features.Tests
             var transientFeature = new TransientFeature();
             var scopedFeature = new ScopedFeature();
             var singletonFeature = new SingletonFeature();
-            var featureFactoryMock = new Mock<IFeatureSetupFactory>();
+            var featureFactoryMock = new Mock<IFeatureFactory>();
             featureFactoryMock.Setup(x => x.GetFeature<TransientFeature>()).Returns(() => transientFeature);
             featureFactoryMock.Setup(x => x.GetFeature<TransientFeature3>()).Returns(() => new TransientFeature3());
             featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature>()).Returns(scopedFeature);

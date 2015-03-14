@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Blacklite.Framework.Features
+namespace Blacklite.Framework.Features.Describers
 {
     public class FeatureDescriberFactory : IFeatureDescriberFactory
     {
@@ -17,12 +17,12 @@ namespace Blacklite.Framework.Features
         {
             foreach (var describer in describers)
             {
-                describer.Children = describers.Where(x => x.Parent == describer.FeatureTypeInfo).ToArray();
+                describer.Children = describers.Where(x => x.Parent == describer.TypeInfo).ToArray();
 
                 var requires = describers
-                    .Join(describer.Requires, x => x.FeatureTypeInfo, x => x.FeatureType, (z, x) => z);
+                    .Join(describer.Requires, x => x.TypeInfo, x => x.FeatureType, (z, x) => z);
 
-                var requiresDictionary = requires.Join(describer.Requires, x => x.FeatureTypeInfo,
+                var requiresDictionary = requires.Join(describer.Requires, x => x.TypeInfo,
                     x => x.FeatureType, (d, x) => new { d, x.IsEnabled }).ToDictionary(x => (IFeatureDescriber)x.d, x => x.IsEnabled);
 
                 describer.DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(requiresDictionary);

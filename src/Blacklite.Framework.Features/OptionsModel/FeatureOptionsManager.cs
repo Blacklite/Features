@@ -12,21 +12,24 @@ namespace Blacklite.Framework.Features.OptionsModel
         private readonly Lazy<IEnumerable<IConfigureFeatureOptions>> _configurators;
         private object _lock = new object();
 
-        public FeatureOptionsManager(Lazy<IEnumerable<IConfigureFeatureOptions<TOptions>>> configurators,
-            Lazy<IEnumerable<IConfigureFeatureOptions>> globalConfigurators,
-            Lazy<IServiceProvider> serviceProvider)
+        public FeatureOptionsManager(
+            IEnumerable<IConfigureFeatureOptions<TOptions>> configurators,
+            IEnumerable<IConfigureFeatureOptions> globalConfigurators,
+            IServiceProvider serviceProvider)
         {
             if (typeof(IFeature).GetTypeInfo().IsAssignableFrom(typeof(TOptions).GetTypeInfo()))
             {
-                _options = serviceProvider.Value.GetService<Feature<TOptions>>().Value;
+                _options = serviceProvider.GetService<Feature<TOptions>>().Value;
             }
             else
             {
-                _configurators = new Lazy<IEnumerable<IConfigureFeatureOptions>>(() =>
-                    configurators.Value
-                        .Select(x => new ObjectConfigurator<TOptions>(x))
-                        .Union(globalConfigurators.Value)
-                        .OrderByDescending(x => x.Priority));
+                //var configurators = serviceProvider.GetService<IEnumerable<IConfigureFeatureOptions<TOptions>>>() ?? Enumerable.Empty<IConfigureFeatureOptions<TOptions>>();
+                //Lazy <IEnumerable<IConfigureFeatureOptions<TOptions>>> configurators,
+                   _configurators = new Lazy<IEnumerable<IConfigureFeatureOptions>>(() =>
+                        configurators
+                            .Select(x => new ObjectConfigurator<TOptions>(x))
+                            .Union(globalConfigurators)
+                            .OrderByDescending(x => x.Priority));
             }
         }
 

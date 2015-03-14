@@ -122,22 +122,32 @@ namespace Blacklite.Framework.Features.EditorModel
         private JSchema GetOptions(FeatureModel model)
         {
             JSchema options = null;
-            if (model.OptionsType != null)
+            if (model.HasOptions && !model.OptionsIsFeature)
             {
                 JToken bogus;
                 options = _schemaGenerator.Generate(model.OptionsType);
-                options.Title = "Settings";
-                options.Description = model.OptionsDescription;
-                options.ExtensionData["options"] = JObject.FromObject(new { showHeader = false });
-                options.Format = "options";
-
-                if (model.OptionsHasIsEnabled)
-                {
-                    options.Properties.Remove("isEnabled");
-                }
+                options.Format = FeatureEditor.OptionsKey;
 
                 if (!_definitions.TryGetValue(model.OptionsName, out bogus))
                     _definitions.Add(model.OptionsName, options);
+            }
+            else if (model.HasOptions && model.OptionsIsFeature)
+            {
+                // Produce editor for feature options....
+                options = GetSchema(model.OptionsFeature);
+                options.Format = "feature-inline";
+                if (options.Properties.ContainsKey("enabled"))
+                {
+                    options.Properties["enabled"].Format = "inline";
+                    //options.Properties["enabled"].Title = options.Title;
+                }
+            }
+
+            if (options != null)
+            {
+                options.Title = "Options";
+                options.Description = model.OptionsDescription;
+                options.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
             }
 
             return options;
@@ -154,12 +164,12 @@ namespace Blacklite.Framework.Features.EditorModel
             schema.Type = JSchemaType.Object;
             schema.Title = model.Title;
             schema.Description = model.Description;
-            //schema.ExtensionData["options"] = JObject.FromObject(new { showHeader = false });
+            //schema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
             schema.Format = "feature";
 
             var hidden = new JSchema();
             hidden.Type = JSchemaType.String;
-            hidden.ExtensionData["options"] = JObject.FromObject(new { hidden = true }, _serializer);
+            hidden.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { hidden = true }, _serializer);
             schema.Properties.Add(model.Name, hidden);
 
             schema.AllowAdditionalProperties = false;
@@ -174,18 +184,43 @@ namespace Blacklite.Framework.Features.EditorModel
             {
                 schema.Properties.Add("enabled", GetEnabledPropertySchema(model));
             }
+
+            if (model.HasProperties)
+            {
+                var propertySchema = _schemaGenerator.Generate(model.FeatureType);
+                //_optionSchemas.Add(model.Name, propertySchema);
+                //propertySchema.Title = "Options";
+                propertySchema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
+                propertySchema.Format = FeatureEditor.OptionsKey;
+
+                if (model.HasEnabled && propertySchema.Properties.ContainsKey("isEnabled"))
+                    propertySchema.Properties.Remove("isEnabled");
+                if (model.HasOptions && propertySchema.Properties.ContainsKey("options"))
+                    propertySchema.Properties.Remove("options");
+
+                foreach (var property in propertySchema.Properties)
+                {
+                    GetOrUpdatePropertySchema(model.Properties[property.Key], property.Value);
+                }
+                schema.Properties.Add(FeatureEditor.SettingsKey, propertySchema);
+            }
         }
 
         private void AddOptions(FeatureModel model, JSchema schema, JSchema options)
         {
-            if (options != null)
+            if (options != null && !model.OptionsIsFeature)
             {
                 _optionSchemas.Add(model.OptionsName, options);
                 foreach (var property in options.Properties)
                 {
-                    GetOrUpdatePropertySchema(model.Properties[property.Key], property.Value);
+                    GetOrUpdatePropertySchema(model.Options[property.Key], property.Value);
                 }
-                schema.Properties.Add("settings", options);
+                schema.Properties.Add(FeatureEditor.OptionsKey, options);
+            }
+            else if (options != null && model.OptionsIsFeature)
+            {
+                _optionSchemas.Add(model.OptionsName, options);
+                schema.Properties.Add(FeatureEditor.OptionsKey, options);
             }
         }
 
@@ -212,7 +247,7 @@ namespace Blacklite.Framework.Features.EditorModel
             else
             {
                 schema.Format = "rows";
-                schema.ExtensionData["options"] = JObject.FromObject(new { showHeader = false });
+                schema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
             }
 
             foreach (var item in group.Items)

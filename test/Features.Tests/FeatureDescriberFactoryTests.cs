@@ -1,4 +1,5 @@
 ﻿using Blacklite.Framework.Features;
+using Blacklite.Framework.Features.Describers;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Linq;
@@ -88,7 +89,7 @@ namespace Features.Tests
             servicesCollection.AddScoped<InvalidScopedRealObservableSwitch2>();
 
             var describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
-            var describer = describers.First(x => x.FeatureType == typeof(TransientFeature));
+            var describer = describers.First(x => x.Type == typeof(TransientFeature));
         }
 
         [Fact]
@@ -103,9 +104,9 @@ namespace Features.Tests
             servicesCollection.AddScoped<InvalidScopedFeature>();
             var describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            var describer = describers.First(x => x.FeatureType == typeof(ScopedFeature));
+            var describer = describers.First(x => x.Type == typeof(ScopedFeature));
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidScopedFeature)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.Type == typeof(InvalidScopedFeature)));
         }
 
         [Fact]
@@ -120,9 +121,9 @@ namespace Features.Tests
             servicesCollection.AddSingleton<InvalidSingletonFeature>();
             var describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            var describer = describers.First(x => x.FeatureType == typeof(SingletonFeature));
+            var describer = describers.First(x => x.Type == typeof(SingletonFeature));
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidSingletonFeature)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.Type == typeof(InvalidSingletonFeature)));
 
             servicesCollection = new ServiceCollection();
             servicesCollection.AddTransient<TransientFeature>();
@@ -133,7 +134,7 @@ namespace Features.Tests
             servicesCollection.AddSingleton<InvalidSingletonFeature2>();
             describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidSingletonFeature2)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.Type == typeof(InvalidSingletonFeature2)));
         }
 
         [Fact]
@@ -148,13 +149,13 @@ namespace Features.Tests
             servicesCollection.AddSingleton<InvalidRealObservableSwitch>();
             var describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            var describer = describers.First(x => x.FeatureType == typeof(RealObservableSwitch));
+            var describer = describers.First(x => x.Type == typeof(RealObservableSwitch));
             FeatureDescriberFactory.ValidateDescriber(describer);
 
-            describer = describers.First(x => x.FeatureType == typeof(RealObservableSwitch2));
+            describer = describers.First(x => x.Type == typeof(RealObservableSwitch2));
             FeatureDescriberFactory.ValidateDescriber(describer);
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidRealObservableSwitch)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.Type == typeof(InvalidRealObservableSwitch)));
 
             servicesCollection = new ServiceCollection();
             servicesCollection.AddTransient<TransientFeature>();
@@ -166,7 +167,7 @@ namespace Features.Tests
             servicesCollection.AddSingleton<InvalidRealObservableSwitch2>();
             describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidRealObservableSwitch2)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.Type == typeof(InvalidRealObservableSwitch2)));
 
             servicesCollection = new ServiceCollection();
             servicesCollection.AddTransient<TransientFeature>();
@@ -178,7 +179,7 @@ namespace Features.Tests
             servicesCollection.AddTransient<InvalidTransientRealObservableSwitch2>();
             describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidTransientRealObservableSwitch2)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.Type == typeof(InvalidTransientRealObservableSwitch2)));
 
             servicesCollection = new ServiceCollection();
             servicesCollection.AddTransient<TransientFeature>();
@@ -190,7 +191,7 @@ namespace Features.Tests
             servicesCollection.AddScoped<InvalidScopedRealObservableSwitch2>();
             describers = new FeatureDescriberFactory().Create(servicesCollection).Cast<FeatureDescriber>();
 
-            Assert.Throws<NotSupportedException>(() => describers.First(x => x.FeatureType == typeof(InvalidScopedRealObservableSwitch2)));
+            Assert.Throws<NotSupportedException>(() => describers.First(x => x.Type == typeof(InvalidScopedRealObservableSwitch2)));
         }
     }
 }

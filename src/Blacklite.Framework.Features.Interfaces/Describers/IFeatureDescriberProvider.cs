@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace Blacklite.Framework.Features
+namespace Blacklite.Framework.Features.Describers
 {
     public interface IFeatureDescriberProvider
     {

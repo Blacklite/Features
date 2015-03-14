@@ -6,6 +6,7 @@ using Microsoft.AspNet.Mvc.Rendering;
 using System.Linq;
 using Temp.Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 {
@@ -30,15 +31,16 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             //container = Context.Decorator.DecorateItemContainer(Context, container);
 
             JsonEditorRenderer enabledRenderer = null;
+            JsonEditorRenderer propertiesRenderer = null;
             JsonEditorRenderer settingsRenderer = null;
             if (Context.Schema.Properties.ContainsKey("enabled"))
             {
-                enabledRenderer = GetPropertyTagBuilder("enabled", Context.Schema.Properties["enabled"]);
+                enabledRenderer = GetOptionsTagBuilder("enabled", Context.Schema.Properties["enabled"]);
             }
 
             var propertyTagRenderes = Context.Schema.Properties
-                .Select(property => new { Key = property.Key, Value = GetPropertyTagBuilder(property.Key, property.Value) })
-                .Where(x => x.Key != "settings" && x.Key != "enabled")
+                .Where(x => x.Key != FeatureEditor.SettingsKey && x.Key != FeatureEditor.OptionsKey && x.Key != "enabled")
+                .Select(property => new { Key = property.Key, Value = GetOptionsTagBuilder(property.Key, property.Value) })
                 .Where(x => x.Value != null)
                 .ToArray();
 
@@ -51,9 +53,14 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             var toggle = new TagBuilder("div");
             _featureJsonEditorDecorator.DecorateFeatureCheckbox(Context, toggle);
 
-            if (Context.Schema.Properties.ContainsKey("settings"))
+            if (Context.Schema.Properties.ContainsKey(FeatureEditor.OptionsKey))
             {
-                settingsRenderer = GetPropertyTagBuilder("settings", Context.Schema.Properties["settings"]);
+                settingsRenderer = GetOptionsTagBuilder(FeatureEditor.OptionsKey, Context.Schema.Properties[FeatureEditor.OptionsKey]);
+            }
+
+            if (Context.Schema.Properties.ContainsKey(FeatureEditor.SettingsKey))
+            {
+                propertiesRenderer = GetPropertyTagBuilder(Context.Schema.Properties[FeatureEditor.SettingsKey]);
             }
 
             return new JsonEditorRenderer(Context.Serializer, value =>
@@ -66,9 +73,20 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                 innerToggle.MergeAttributes(toggle.Attributes);
                 innerToggle.InnerHtml += enabledRenderer?.Render(value?["enabled"]);
 
-                if (settingsRenderer != null)
+                if (settingsRenderer != null || propertiesRenderer != null)
                 {
-                    innerToggle = _featureJsonEditorDecorator.DecorateSettings(Context, innerToggle, settingsRenderer, value?["settings"]);
+                    var sb = new StringBuilder();
+                    if (propertiesRenderer != null)
+                    {
+                        sb.Append(propertiesRenderer.Render(value));
+                    }
+
+                    if (settingsRenderer != null)
+                    {
+                        sb.Append(settingsRenderer.Render(value?[FeatureEditor.OptionsKey]));
+                    }
+
+                    innerToggle = _featureJsonEditorDecorator.DecorateSettings(Context, innerToggle, sb.ToString());
                 }
 
                 result.InnerHtml += innerToggle.ToString();
@@ -89,9 +107,20 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             });
         }
 
-        private JsonEditorRenderer GetPropertyTagBuilder(string key, JSchema schema)
+        private JsonEditorRenderer GetOptionsTagBuilder(string key, JSchema schema)
         {
             var editor = _editorProvider.GetJsonEditor(schema, key, Context.Path);
+
+            if (editor.Context.Options.Hidden)
+                return null;
+
+            var builder = editor?.Build();
+            return builder;
+        }
+
+        private JsonEditorRenderer GetPropertyTagBuilder(JSchema schema)
+        {
+            var editor = _editorProvider.GetJsonEditor(schema, Context.Path);
 
             if (editor.Context.Options.Hidden)
                 return null;

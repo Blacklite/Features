@@ -1,4 +1,5 @@
-﻿using Blacklite.Framework.Features.OptionsModel;
+﻿using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.OptionsModel;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Blacklite.Framework.Features.EditorModel
         public IFeatureEditor GetFeatureEditor()
         {
             var groups = _describers
-                .OrderBy(x => x.FeatureType.Name)
+                .OrderBy(x => x.Type.Name)
                 .SelectMany(x => x.Groups, (Describer, Group) => GroupId(Describer, Group))
                 .Distinct();
 
@@ -71,10 +72,24 @@ namespace Blacklite.Framework.Features.EditorModel
                 .Select(x => x.Value)
                 .Cast<FeatureGroup>();
 
+            var optionFeatureModels = new List<FeatureModel>();
+
+            var models = _describers.Select(z => new FeatureModel(z)).ToArray();
+            var optionFeatures = models.Join(models, x => x.FeatureType, x => x.OptionsType, (a, b) => new { Option = a, Feature = b });
+            foreach (var item in models.Join(models, x => x.FeatureType, x => x.OptionsType, (a, b) => new { Option = a, Feature = b }))
+            {
+                item.Feature.OptionsFeature = item.Option;
+            }
+            var modelsDictionary = models.Except(optionFeatures.Select(z => z.Option)).ToDictionary(x => x.FeatureType.Name);
+
             var groupedModels = _describers
-                .OrderBy(x => x.FeatureType.Name)
+                .OrderBy(x => x.Type.Name)
                 .GroupBy(x => string.Join(":", x.Groups))
-                .Select(x => new { x.Key, Models = x.Select(z => new FeatureModel(z)) });
+                .Select(x => new {
+                    x.Key,
+                    Models = x
+                        .Where(z => modelsDictionary.ContainsKey(z.Type.Name))
+                        .Select(z => modelsDictionary[z.Type.Name]) });
 
             var groupings = new List<FeatureGroupOrModel>();
             foreach (var group in groupedModels)
@@ -89,14 +104,13 @@ namespace Blacklite.Framework.Features.EditorModel
                 }
             }
 
-            var models = groupedModels.SelectMany(x => x.Models);
-
             return new FeatureEditor(models, rootGroupings, GetFeature, GetFeatureOptions);
         }
 
         private IFeature GetFeature(Type type)
         {
-            return (IFeature)_serviceProvider.GetService(type);
+            var featureType = typeof(Feature<>).MakeGenericType(type);
+            return ((Feature<IFeature>)_serviceProvider.GetService(featureType)).Value;
         }
 
         private object GetFeatureOptions(Type type)
@@ -105,7 +119,7 @@ namespace Blacklite.Framework.Features.EditorModel
             if (!describer.HasOptions)
                 return null;
 
-            var service = _serviceProvider.GetService(typeof(IFeatureOptions<>).MakeGenericType(describer.OptionsType)) as IFeatureOptions<object>;
+            var service = _serviceProvider.GetService(typeof(IFeatureOptions<>).MakeGenericType(describer.Options.Type)) as IFeatureOptions<object>;
             return service.Options;
         }
     }

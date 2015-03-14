@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace Blacklite.Framework.Features
+namespace Blacklite.Framework.Features.Describers
 {
     class FeatureDescriberProvider : IFeatureDescriberProvider
     {
@@ -19,7 +19,7 @@ namespace Blacklite.Framework.Features
                             .GetTypeInfo()
                             .ImplementedInterfaces.Contains(typeof(IFeature))
                         ))
-                        .ToDictionary(x => x.FeatureType);
+                        .ToDictionary(x => x.Type);
 
             Describers = new ReadOnlyDictionary<Type, IFeatureDescriber>(dictionary);
         }

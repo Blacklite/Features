@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blacklite.Framework.Features.Describers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -35,17 +36,19 @@ namespace Blacklite.Framework.Features.EditorModel
 
     public class FeatureModel : FeatureGroupOrModel
     {
-        public FeatureModel(IFeatureDescriber describer) : base(describer.FeatureType.Name)
+        public FeatureModel(IFeatureDescriber describer) : base(describer.Type.Name)
         {
             Title = describer.DisplayName;
             Description = describer.Description;
-            FeatureType = describer.FeatureType;
-            OptionsType = describer.OptionsType;
-            OptionsTitle = describer.OptionsDisplayName;
-            OptionsName = describer.OptionsType?.Name?.CamelCase();
+            FeatureType = describer.Type;
+            OptionsType = describer?.Options?.Type;
+            OptionsTitle = describer?.Options?.DisplayName;
+            OptionsName = describer?.Options?.Type?.Name?.CamelCase();
             HasEnabled = describer.HasEnabled;
-            OptionsHasIsEnabled = describer.OptionsHasIsEnabled;
-            OptionsDescription = describer.OptionsDescription;
+            HasOptions = describer.HasOptions;
+            HasProperties = describer.Properties.Any();
+            OptionsIsFeature = describer?.Options?.IsFeature ?? false;
+            OptionsDescription = describer?.Options?.Description;
             Children = describer.Children.Select(x => new FeatureModel(x)).ToArray();
             if (HasEnabled)
                 Enabled = new FeatureOptionPropertyModel(typeof(bool),
@@ -54,21 +57,30 @@ namespace Blacklite.Framework.Features.EditorModel
                     null,
                     x => describer.GetIsEnabled<bool>(x),
                     (obj, value) => describer.SetIsEnabled(obj, value),
-                    describer.IsReadOnly, describer.OptionsHasIsEnabled);
+                    describer.IsReadOnly);
+            Options = GetOptions(describer).ToDictionary(x => x.Name);
             Properties = GetProperties(describer).ToDictionary(x => x.Name);
             Dependencies = describer.DependsOn.Select(x => new FeatureDependencyModel(x.Key, x.Value)).ToArray();
         }
 
-        private IEnumerable<FeatureOptionPropertyModel> GetProperties(IFeatureDescriber describer)
+        private IEnumerable<FeatureOptionPropertyModel> GetOptions(IFeatureDescriber describer)
         {
-            if (describer.HasOptions)
+            if (describer.HasOptions && !describer.Options.IsFeature)
             {
-                var properties = describer.OptionsType.GetRuntimeProperties();
+                var properties = describer.Options.Type.GetRuntimeProperties();
 
                 foreach (var property in properties.Where(x => x.Name != nameof(ISwitch.IsEnabled)))
                 {
                     yield return new FeatureOptionPropertyModel(property.PropertyType, property.Name, GetPropertyDisplayName(property), GetPropertyDescription(property), property.GetValue, property.SetValue, !property.CanWrite);
                 }
+            }
+        }
+
+        private IEnumerable<FeatureOptionPropertyModel> GetProperties(IFeatureDescriber describer)
+        {
+            foreach (var property in describer.Properties)
+            {
+                yield return new FeatureOptionPropertyModel(property.Type, property.Name, property.DisplayName, property.Description, (x) => property.GetProperty<object>(x), property.SetProperty, property.IsReadOnly);
             }
         }
 
@@ -82,12 +94,16 @@ namespace Blacklite.Framework.Features.EditorModel
         public string OptionsTitle { get; }
         public string OptionsDescription { get; }
         public bool HasEnabled { get; }
-        public bool OptionsHasIsEnabled { get; }
+        public bool HasOptions { get; }
+        public bool HasProperties { get; }
+        public bool OptionsIsFeature { get; }
         public string Description { get; }
         public FeatureOptionPropertyModel Enabled { get; }
+        public IDictionary<string, FeatureOptionPropertyModel> Options { get; }
         public IDictionary<string, FeatureOptionPropertyModel> Properties { get; }
         public IEnumerable<FeatureModel> Children { get; }
         public IEnumerable<FeatureDependencyModel> Dependencies { get; }
+        public FeatureModel OptionsFeature { get; set; }
 
 
         public override int GetHashCode()

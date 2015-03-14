@@ -13,7 +13,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
     {
         bool HasChildProperties(IJsonEditorResolutionContext context);
         TagBuilder DecorateFeatureCheckbox(IJsonEditorResolutionContext context, TagBuilder tagBuilder);
-        TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder tagBuilder, JsonEditorRenderer renderer, object value);
+        TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder tagBuilder, string html);
         TagBuilder DecorateTabHeaderContainer(IJsonEditorResolutionContext context, TagBuilder container, IEnumerable<TagBuilder> tabs);
         TagBuilder DecorateTabHeader(IJsonEditorResolutionContext context, JSchema schema, TagBuilder container);
         TagBuilder DecorateTabContainer(IJsonEditorResolutionContext context, TagBuilder container, IEnumerable<TagBuilder> tabs);
@@ -52,7 +52,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             return toggle;
         }
 
-        public TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder settings, JsonEditorRenderer renderer, object value)
+        public TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder settings, string html)
         {
             var container = new TagBuilder("div");
             container.AddCssClass("pull-right-sm");
@@ -102,7 +102,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             var h4 = new TagBuilder("h4");
             h4.AddCssClass("modal-title");
             h4.Attributes.Add("id", $"{id}_header");
-            h4.InnerHtml = "Settings";
+            h4.InnerHtml = FeatureEditor.OptionsKey;
 
             header.InnerHtml += h4.ToString();
 
@@ -110,7 +110,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
             var body = new TagBuilder("div");
             body.AddCssClass("modal-body");
-            body.InnerHtml = renderer.Render(value);
+            body.InnerHtml = html;
             content.InnerHtml += body.ToString();
 
             var footer = new TagBuilder("div");
@@ -149,31 +149,37 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
         public TagBuilder DecorateTabContainer(IJsonEditorResolutionContext context, TagBuilder container, IEnumerable<TagBuilder> tabs)
         {
-            var content = new TagBuilder("div");
-            content.AddCssClass("tab-content");
+            if (tabs.Any())
+            {
+                var content = new TagBuilder("div");
+                content.AddCssClass("tab-content");
 
-            // TODO: find active tab
-            tabs.First().AddCssClass("active");
+                // TODO: find active tab
+                tabs.First().AddCssClass("active");
 
-            content.InnerHtml += string.Join("", tabs);
-            container.InnerHtml += content.ToString();
+                content.InnerHtml += string.Join("", tabs);
+                container.InnerHtml += content.ToString();
+            }
 
             return container;
         }
 
         public TagBuilder DecorateTabHeaderContainer(IJsonEditorResolutionContext context, TagBuilder container, IEnumerable<TagBuilder> tabs)
         {
-            // TODO: find active tab
-            tabs.First().AddCssClass("active");
-
-            container.InnerHtml = string.Join("", tabs.Select(x => x.ToString()));
-
-            container = new TagBuilder("div")
+            if (tabs.Any())
             {
-                InnerHtml = container.ToString()
-            };
+                // TODO: find active tab
+                tabs.First().AddCssClass("active");
 
-            container.Attributes.Add("role", "tabpanel");
+                container.InnerHtml = string.Join("", tabs.Select(x => x.ToString()));
+
+                container = new TagBuilder("div")
+                {
+                    InnerHtml = container.ToString()
+                };
+
+                container.Attributes.Add("role", "tabpanel");
+            }
 
             return container;
         }
@@ -181,7 +187,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
         public bool HasChildProperties(IJsonEditorResolutionContext context)
         {
             return context.Schema.Properties
-                .Where(x => x.Key != "settings" && x.Key != "enabled")
+                .Where(x => x.Key != FeatureEditor.OptionsKey && x.Key != FeatureEditor.SettingsKey && x.Key != "enabled")
                 .Where(x => Visible(x.Key, x.Value, context))
                 .Any();
         }

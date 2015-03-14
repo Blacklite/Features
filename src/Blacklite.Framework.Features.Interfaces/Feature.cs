@@ -7,9 +7,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blacklite.Framework.Features
 {
-    public interface Feature<out TAspect>
-        where TAspect : class
+    public interface Feature<out TFeature>
+        where TFeature : class
     {
-        TAspect Value { get; }
+        TFeature Value { get; }
     }
 }

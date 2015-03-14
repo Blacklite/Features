@@ -23,13 +23,13 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             {
                 var names = input.Attributes["name"].Split('.');
                 var field = names[names.Length - 1];
-                if (field.Equals("enabled", StringComparison.OrdinalIgnoreCase))
+                if (field.Equals("enabled", StringComparison.OrdinalIgnoreCase) && context.Schema.Format != "inline")
                 {
                     control.AddCssClass("pull-right-sm");
                     control.AddCssClass("pull-left-xs");
                     label = null;
+                    return base.DecorateContainer(context, control, label, input, description);
                 }
-                return base.DecorateContainer(context, control, label, input, description);
             }
 
             if (input.TagName == "input")
@@ -60,6 +60,16 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                 };
                 input.AddCssClass("col-sm-9");
                 input.AddCssClass("col-xs-12");
+            }
+
+            if (context.Schema.Format == "inline")
+            {
+                control = new TagBuilder(control.TagName)
+                {
+                    InnerHtml = base.DecorateContainer(context, control, label, input, description).ToString()
+                };
+                control.AddCssClass("form-horizontal");
+                return control;
             }
 
             return base.DecorateContainer(context, control, label, input, description);
@@ -111,7 +121,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                 }
             }
 
-            if (context.Schema.Format == "options" && context.Schema.Type == JSchemaType.Object)
+            if (context.Schema.Format == FeatureEditor.OptionsKey && context.Schema.Type == JSchemaType.Object)
             {
                 container.AddCssClass("form-horizontal");
             }

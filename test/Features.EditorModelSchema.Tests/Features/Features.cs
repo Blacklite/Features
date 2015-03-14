@@ -13,6 +13,7 @@ namespace Features.EditorModelSchema.Tests.Features
             services.AddTransient<ApiDevelopmentFeatureB>();
             services.AddTransient<ApiDevelopmentFeatureC>();
             services.AddTransient<ApiDevelopmentFeatureD>();
+            services.AddTransient<ApiDevelopmentFeatureCeeOptions>();
 
             services.AddSingleton<ApiGeneralFeatureA>();
             services.AddTransient<ApiGeneralFeatureB>();
@@ -43,6 +44,7 @@ namespace Features.EditorModelSchema.Tests.Features
             services.AddTransient<ApplicationUserInterfaceFeatureB>();
             services.AddTransient<ApplicationUserInterfaceFeatureC>();
             services.AddTransient<ApplicationUserInterfaceFeatureD>();
+            services.AddTransient<ApplicationUserInterfaceFeatureCeeOptions>();
         }
     }
 
@@ -56,28 +58,33 @@ namespace Features.EditorModelSchema.Tests.Features
 
 
     [FeatureGroup("API", "Development")]
-    public class ApiDevelopmentFeatureA : Feature.AlwaysOn, IObservableFeature { }
+    public class ApiDevelopmentFeatureA : Feature.AlwaysOn, IObservableFeature
+    {
+        public string CustomProperty { get; set; }
+    }
 
     [FeatureGroup("API", "Development")]
     public class ApiDevelopmentFeatureB : Feature.AlwaysOff { }
 
-    public class ApiDevelopmentFeatureCeeOptions
+    public class ApiDevelopmentFeatureCeeOptions : Switch
     {
         public string Database { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public bool IsEnabled { get; set; }
         public CeeOptions Options { get; }
     }
 
     [FeatureGroup("API", "Development")]
-    public class ApiDevelopmentFeatureC : Feature.AlwaysOn<ApiDevelopmentFeatureCeeOptions>    {    }
+    public class ApiDevelopmentFeatureC : Feature.AlwaysOn<ApiDevelopmentFeatureCeeOptions> { }
 
     [ParentFeature(typeof(ApiDevelopmentFeatureA))]
     public class ApiDevelopmentFeatureD : Switch { }
 
     [FeatureGroup("API", "General")]
-    public class ApiGeneralFeatureA : Feature.AlwaysOn, IObservableSwitch { }
+    public class ApiGeneralFeatureA : Feature.AlwaysOn, IObservableSwitch
+    {
+        public string CustomProperty { get; set; }
+    }
 
     [FeatureGroup("API", "General")]
     public class ApiGeneralFeatureB : Feature.AlwaysOff { }
@@ -85,7 +92,6 @@ namespace Features.EditorModelSchema.Tests.Features
     public class ApiGeneralFeatureCeeOptions
     {
         public string SomeCustomOptionHere { get; set; }
-        public bool IsEnabled { get; set; }
         public CeeOptions Options { get; set; }
     }
 
@@ -99,7 +105,10 @@ namespace Features.EditorModelSchema.Tests.Features
     {
     }
     [FeatureGroup("Application", "Development")]
-    public class ApplicationDevelopmentFeatureA : Feature.AlwaysOn, IObservableSwitch { }
+    public class ApplicationDevelopmentFeatureA : Feature.AlwaysOn, IObservableSwitch
+    {
+        public string CustomProperty { get; set; }
+    }
 
     [FeatureGroup("Application", "Development")]
     public class ApplicationDevelopmentFeatureB : Feature.AlwaysOff { }
@@ -109,7 +118,6 @@ namespace Features.EditorModelSchema.Tests.Features
         public string Database { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public bool IsEnabled { get; set; }
         public CeeOptions Options { get; }
     }
 
@@ -123,7 +131,10 @@ namespace Features.EditorModelSchema.Tests.Features
     {
     }
     [FeatureGroup("Application", "General")]
-    public class ApplicationGeneralFeatureA : Feature.AlwaysOn, IObservableSwitch { }
+    public class ApplicationGeneralFeatureA : Feature.AlwaysOn, IObservableSwitch
+    {
+        public string CustomProperty { get; set; }
+    }
 
     [FeatureGroup("Application", "General")]
     public class ApplicationGeneralFeatureB : Feature.AlwaysOff { }
@@ -133,7 +144,6 @@ namespace Features.EditorModelSchema.Tests.Features
         public string Database { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public bool IsEnabled { get; set; }
         public CeeOptions Options { get; }
     }
 
@@ -147,7 +157,10 @@ namespace Features.EditorModelSchema.Tests.Features
     {
     }
     [FeatureGroup("Application", "Security")]
-    public class ApplicationSecurityFeatureA : Feature.AlwaysOn, IObservableSwitch { }
+    public class ApplicationSecurityFeatureA : Feature.AlwaysOn, IObservableSwitch
+    {
+        public string CustomProperty { get; set; }
+    }
 
     [FeatureGroup("Application", "Security")]
     public class ApplicationSecurityFeatureB : Feature.AlwaysOff { }
@@ -157,7 +170,6 @@ namespace Features.EditorModelSchema.Tests.Features
         public string Database { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public bool IsEnabled { get; set; }
         public CeeOptions Options { get; }
     }
 
@@ -171,7 +183,10 @@ namespace Features.EditorModelSchema.Tests.Features
     {
     }
     [FeatureGroup("Application", "User Profile")]
-    public class ApplicationUserProfileFeatureA : Feature.AlwaysOn, IObservableSwitch { }
+    public class ApplicationUserProfileFeatureA : Feature.AlwaysOn, IObservableSwitch
+    {
+        public string CustomProperty { get; set; }
+    }
 
     [FeatureGroup("Application", "User Profile")]
     public class ApplicationUserProfileFeatureB : Feature.AlwaysOff { }
@@ -181,7 +196,6 @@ namespace Features.EditorModelSchema.Tests.Features
         public string Database { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public bool IsEnabled { get; set; }
         public CeeOptions Options { get; }
     }
 
@@ -195,13 +209,16 @@ namespace Features.EditorModelSchema.Tests.Features
     {
     }
     [FeatureGroup("Application", "User Interface")]
-    public class ApplicationUserInterfaceFeatureA : Feature.AlwaysOn, IObservableSwitch { }
+    public class ApplicationUserInterfaceFeatureA : Feature.AlwaysOn, IObservableSwitch
+    {
+        public string CustomProperty { get; set; }
+    }
 
     [FeatureGroup("Application", "User Interface")]
     public class ApplicationUserInterfaceFeatureB : Feature.AlwaysOff { }
 
     [FeatureGroup("Application", "User Interface")]
-    public class ApplicationUserInterfaceFeatureC/*ApplicationUserInterfaceFeatureCeeOptions*/ : Feature
+    public class ApplicationUserInterfaceFeatureCeeOptions : Feature
     {
         public string Database { get; set; }
         public string Username { get; set; }
@@ -209,12 +226,10 @@ namespace Features.EditorModelSchema.Tests.Features
         public CeeOptions Options { get; }
     }
 
-    //public class ApplicationUserInterfaceFeatureC : Feature<ApplicationUserInterfaceFeatureCeeOptions>
-    //{
-    //    public ApplicationUserInterfaceFeatureC(IFeatureOptions<ApplicationUserInterfaceFeatureCeeOptions> _optionsContainer) : base(_optionsContainer)
-    //    {
-    //    }
-    //}
+    [FeatureGroup("Application", "User Interface")]
+    public class ApplicationUserInterfaceFeatureC : Switch//<ApplicationUserInterfaceFeatureCeeOptions>
+    {
+    }
 
     [ParentFeature(typeof(ApplicationUserInterfaceFeatureB))]
     public class ApplicationUserInterfaceFeatureD : Switch

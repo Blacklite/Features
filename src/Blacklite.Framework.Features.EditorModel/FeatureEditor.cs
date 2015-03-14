@@ -39,6 +39,9 @@ namespace Blacklite.Framework.Features.EditorModel
         private readonly Func<Type, object> _getFeatureOption;
         private readonly JsonSerializer _serializer;
 
+        public const string SettingsKey = "settings";
+        public const string OptionsKey = "options";
+
         public FeatureEditor(IEnumerable<FeatureModel> models, IEnumerable<FeatureGroup> groups, Func<Type, IFeature> feature, Func<Type, object> featureOption)
         {
             _models = models;
@@ -116,16 +119,27 @@ namespace Blacklite.Framework.Features.EditorModel
 
             if (model.HasEnabled)
             {
-                if (model.Enabled.OptionsHasIsEnabled)
-                    json.Add("enabled", new JValue(model.Enabled.GetValue(featureOptions)));
-                else
-                    json.Add("enabled", new JValue(model.Enabled.GetValue(feature)));
+                json.Add("enabled", new JValue(model.Enabled.GetValue(feature)));
             }
 
-            if (model.OptionsType != null)
+            if (model.HasProperties)
             {
-                json.Add("settings", JObject.FromObject(featureOptions, _serializer));
+                var settings = new JObject();
+                foreach (var property in model.Properties)
+                {
+                    json.Add(property.Key.CamelCase(), new JValue(property.Value.GetValue(feature)));
+                }
+                json.Add(FeatureEditor.SettingsKey, settings);
             }
+
+            if (model.HasOptions && !model.OptionsIsFeature)
+            {
+                json.Add(FeatureEditor.OptionsKey, JObject.FromObject(featureOptions, _serializer));
+            }
+            //else if (model.HasOptions && model.OptionsIsFeature)
+            //{
+            //    json.Add(FeatureEditor.OptionsKey, JObject.FromObject(GetModelJObject(model.OptionsFeature), _serializer));
+            //}
 
             if (model.Children.Any())
             {
@@ -142,7 +156,7 @@ namespace Blacklite.Framework.Features.EditorModel
         {
             var schema = new JSchema();
             schema.Type = JSchemaType.Object;
-            schema.ExtensionData["options"] = JObject.FromObject(new { disable_collapse = true });
+            schema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { disable_collapse = true });
             schema.Title = "Features";
             schema.Format = "tabs";
 
@@ -214,29 +228,35 @@ namespace Blacklite.Framework.Features.EditorModel
             if (model.HasEnabled && !model.Enabled.IsReadOnly)
             {
                 var enabled = json["enabled"].ToObject<bool>(_serializer);
-                if (model.Enabled.OptionsHasIsEnabled)
+                var currentEnabled = (bool)model.Enabled.GetValue(feature);
+                if (currentEnabled != enabled)
                 {
-                    var currentEnabled = (bool)model.Enabled.GetValue(featureOptions);
-                    if (currentEnabled != enabled)
-                    {
-                        model.Enabled.SetValue(featureOptions, enabled);
-                    }
-                }
-                else
-                {
-                    var currentEnabled = (bool)model.Enabled.GetValue(feature);
-                    if (currentEnabled != enabled)
-                    {
-                        model.Enabled.SetValue(feature, enabled);
-                        yield return new FeatureSaveContext(feature);
-                    }
+                    model.Enabled.SetValue(feature, enabled);
+                    yield return new FeatureSaveContext(feature);
                 }
             }
 
-            if (model.OptionsType != null)
+            if (model.Properties.Any())
+            {
+                var currentValue = JObject.FromObject(feature, _serializer);
+                currentValue.Remove(FeatureEditor.OptionsKey);
+                currentValue.Remove("enabled");
+
+                var jobj = json.DeepClone() as JObject;
+                jobj.Remove(FeatureEditor.OptionsKey);
+                jobj.Remove("enabled");
+
+                if (!JToken.DeepEquals(currentValue, jobj))
+                {
+                    _serializer.Populate(jobj.CreateReader(), feature);
+                    yield return new FeatureSaveContext(feature);
+                }
+            }
+
+            if (model.HasOptions)
             {
                 var currentValue = JObject.FromObject(featureOptions, _serializer);
-                var settings = json["settings"];
+                var settings = json[FeatureEditor.OptionsKey];
 
                 if (!JToken.DeepEquals(currentValue, settings))
                 {
@@ -249,7 +269,8 @@ namespace Blacklite.Framework.Features.EditorModel
             {
                 foreach (var child in model.Children)
                 {
-                    SaveModel(child, json[child.Name]);
+                    foreach (var item in SaveModel(child, json[child.Name]))
+                        yield return item;
                 }
             }
         }

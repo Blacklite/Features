@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
-namespace Blacklite.Framework.Features
+namespace Blacklite.Framework.Features.Describers
 {
     public class FeatureDescriber : IFeatureDescriber
     {
@@ -16,78 +16,68 @@ namespace Blacklite.Framework.Features
         public FeatureDescriber(IServiceDescriptor descriptor)
         {
             _descriptor = descriptor;
-            FeatureType = descriptor.ServiceType;
-            FeatureTypeInfo = FeatureType.GetTypeInfo();
+            Type = descriptor.ServiceType;
+            TypeInfo = Type.GetTypeInfo();
             Lifecycle = descriptor.Lifecycle;
-            IsObservable = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IObservableFeature));
+            IsObservable = TypeInfo.ImplementedInterfaces.Contains(typeof(IObservableFeature));
+            HasOptions = TypeInfo.ImplementedInterfaces.Contains(typeof(IFeatureOptions));
 
-            HasOptions = FeatureTypeInfo.ImplementedInterfaces.Contains(typeof(IFeatureOptions));
-
-            var isEnabledProperty = FeatureTypeInfo.FindDeclaredProperty(nameof(ISwitch.IsEnabled));
             if (HasOptions)
             {
-                _optionsProperty = FeatureTypeInfo
+                _optionsProperty = TypeInfo
                     .FindDeclaredProperty(nameof(ISwitch<object>.Options));
 
-                OptionsType = _optionsProperty.PropertyType;
-                OptionsTypeInfo = _optionsProperty.PropertyType.GetTypeInfo();
-
-                var property = _optionsProperty?.PropertyType?.GetTypeInfo()
-                    ?.FindDeclaredProperty(nameof(ISwitch.IsEnabled));
-
-                if (property != null)
-                {
-                    isEnabledProperty = property;
-                    OptionsHasIsEnabled = true;
-                }
-
-                OptionsDisplayName = OptionsTypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? OptionsType.Name.AsUserFriendly();
-                OptionsDescription = OptionsTypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
+                Options = new FeatureOptionsDescriber(_optionsProperty.PropertyType);
             }
-            HasEnabled = typeof(ISwitch).GetTypeInfo().IsAssignableFrom(FeatureTypeInfo);
+            HasEnabled = typeof(ISwitch).GetTypeInfo().IsAssignableFrom(TypeInfo);
 
             if (HasEnabled)
             {
+                var isEnabledProperty = TypeInfo.FindDeclaredProperty(nameof(ISwitch.IsEnabled));
                 // If we are not observable, and our lifecycle is a singleton, changes in our value cannot accurately be observed.
                 IsReadOnly = !isEnabledProperty.CanWrite;// || (!IsObservable && Lifecycle == LifecycleKind.Singleton);
-
                 _isEnabledProperty = isEnabledProperty;
             }
 
-            Requires = FeatureTypeInfo.GetCustomAttributes<RequiredFeatureAttribute>();
-            Parent = FeatureTypeInfo.GetCustomAttribute<ParentFeatureAttribute>()?.Feature;
+            var properties = TypeInfo.GetDeclaredProperties();
+
+            if (HasEnabled)
+                properties = properties.Where(x => x.Name != nameof(ISwitch.IsEnabled));
+            if (HasOptions)
+                properties = properties.Where(x => x.Name != nameof(ISwitch<object>.Options));
+
+            Properties = properties.Select(x => new FeaturePropertyDescriber(x));
+
+            Requires = TypeInfo.GetCustomAttributes<RequiredFeatureAttribute>();
+            Parent = TypeInfo.GetCustomAttribute<ParentFeatureAttribute>()?.Feature;
 
             DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(new Dictionary<IFeatureDescriber, bool>());
             Children = Enumerable.Empty<IFeatureDescriber>();
 
-            DisplayName = FeatureTypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? FeatureType.Name.AsUserFriendly();
-            Description = FeatureTypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
+            DisplayName = TypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? Type.Name.AsUserFriendly();
+            Description = TypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
 
-            Groups = FeatureTypeInfo.GetCustomAttributes<FeatureGroupAttribute>()?.SelectMany(x => x.Groups).ToArray();
+            Groups = TypeInfo.GetCustomAttributes<FeatureGroupAttribute>()?.SelectMany(x => x.Groups).ToArray();
             if (Parent == null && !Groups.Any())
             {
                 Groups = new[] { "( not grouped )" };
             }
 
-            GenericFeatureType = typeof(Feature<>).MakeGenericType(FeatureType);
+            InterfaceType = typeof(Feature<>).MakeGenericType(Type);
             if (IsObservable)
-            GenericObservableFeatureType = typeof(ObservableFeature<>).MakeGenericType(FeatureType);
+                ObservableInterfaceType = typeof(ObservableFeature<>).MakeGenericType(Type);
         }
 
-        public Type FeatureType { get; }
-        public TypeInfo FeatureTypeInfo { get; }
-        public Type OptionsType { get; }
-        public TypeInfo OptionsTypeInfo { get; }
+        public Type Type { get; }
+        public TypeInfo TypeInfo { get; }
         public LifecycleKind Lifecycle { get; }
         public string DisplayName { get; }
         public string Description { get; }
-        public string OptionsDisplayName { get; }
-        public string OptionsDescription { get; }
         public bool IsObservable { get; }
         public bool HasOptions { get; }
         public bool HasEnabled { get; }
-        public bool OptionsHasIsEnabled { get; }
         public bool IsReadOnly { get; }
+        public IFeatureOptionsDescriber Options { get; }
 
         public IEnumerable<RequiredFeatureAttribute> Requires { get; }
         public TypeInfo Parent { get; }
@@ -97,9 +87,11 @@ namespace Blacklite.Framework.Features
 
         public IEnumerable<string> Groups { get; }
 
-        public Type GenericFeatureType { get; }
+        public Type InterfaceType { get; }
 
-        public Type GenericObservableFeatureType { get; }
+        public Type ObservableInterfaceType { get; }
+
+        public IEnumerable<IFeaturePropertyDescriber> Properties { get; }
 
         public T GetIsEnabled<T>(object instance)
         {
