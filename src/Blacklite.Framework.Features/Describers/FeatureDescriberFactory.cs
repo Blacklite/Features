@@ -3,12 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 
 namespace Blacklite.Framework.Features.Describers
 {
     public class FeatureDescriberFactory : IFeatureDescriberFactory
     {
-        public IEnumerable<IFeatureDescriber> Create(IEnumerable<IServiceDescriptor> descriptors)
+        public IEnumerable<IFeatureDescriber> Create(IEnumerable<TypeInfo> descriptors)
         {
             return Fixup(descriptors.Select(x => new FeatureDescriber(x)));
         }
@@ -43,12 +44,7 @@ namespace Blacklite.Framework.Features.Describers
                 throw new NotSupportedException($"Lifecycle '{LifecycleKind.Scoped}' cannot be required by features with a lifecycle of '{describer.Lifecycle}'.");
             }
 
-            if ((describer.Lifecycle == LifecycleKind.Singleton || describer.Lifecycle == LifecycleKind.Scoped) && requires.Any(z => z.Lifecycle == LifecycleKind.Transient))
-            {
-                throw new NotSupportedException($"Lifecycle '{LifecycleKind.Transient}' cannot be required by features with a lifecycle of '{describer.Lifecycle}'.");
-            }
-
-            if (describer.IsObservable && (describer.Lifecycle == LifecycleKind.Scoped || describer.Lifecycle == LifecycleKind.Transient))
+            if (describer.IsObservable && describer.Lifecycle == LifecycleKind.Scoped)
             {
                 throw new NotSupportedException($"Lifecycle '{describer.Lifecycle}' is not supported by observable features'.");
             }

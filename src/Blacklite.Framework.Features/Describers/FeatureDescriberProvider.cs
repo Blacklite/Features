@@ -5,26 +5,26 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+#if ASPNET50 || ASPNETCORE50
+using Microsoft.Framework.Runtime;
+#endif
 
 namespace Blacklite.Framework.Features.Describers
 {
     class FeatureDescriberProvider : IFeatureDescriberProvider
     {
-        //private readonly IEnumerable<IServiceDescriptor> _describers;
-        public FeatureDescriberProvider(FeatureServicesCollection collection, IFeatureDescriberFactory factory)
+        public FeatureDescriberProvider(
+            IFeatureTypeProvider featureTypeProvider,
+            IFeatureDescriberFactory factory)
         {
-            var dictionary = factory.Create(
-                    collection.Descriptors
-                        .Where(x => x.ServiceType
-                            .GetTypeInfo()
-                            .ImplementedInterfaces.Contains(typeof(IFeature))
-                        ))
-                        .ToDictionary(x => x.Type);
+            var featureTypeInfo = typeof(IFeature).GetTypeInfo();
+
+            var dictionary = factory.Create(featureTypeProvider.FeatureTypes)
+                .ToDictionary(x => x.Type);
 
             Describers = new ReadOnlyDictionary<Type, IFeatureDescriber>(dictionary);
         }
 
-        /// <inheritdoc />
         public IReadOnlyDictionary<Type, IFeatureDescriber> Describers { get; }
     }
 }

@@ -12,13 +12,12 @@ namespace Blacklite.Framework.Features.Describers
     {
         private readonly PropertyInfo _isEnabledProperty;
         private readonly PropertyInfo _optionsProperty;
-        private readonly IServiceDescriptor _descriptor;
-        public FeatureDescriber(IServiceDescriptor descriptor)
+
+        public FeatureDescriber(TypeInfo typeInfo)
         {
-            _descriptor = descriptor;
-            Type = descriptor.ServiceType;
-            TypeInfo = Type.GetTypeInfo();
-            Lifecycle = descriptor.Lifecycle;
+            Type = typeInfo.AsType();
+            TypeInfo = typeInfo;
+            Lifecycle = TypeInfo.GetCustomAttributes<ScopedFeatureAttribute>().Any() ? LifecycleKind.Scoped : LifecycleKind.Singleton;
             IsObservable = TypeInfo.ImplementedInterfaces.Contains(typeof(IObservableFeature));
             HasOptions = TypeInfo.ImplementedInterfaces.Contains(typeof(IFeatureOptions));
 
@@ -63,9 +62,10 @@ namespace Blacklite.Framework.Features.Describers
                 Groups = new[] { "( not grouped )" };
             }
 
-            InterfaceType = typeof(Feature<>).MakeGenericType(Type);
             if (IsObservable)
                 ObservableInterfaceType = typeof(ObservableFeature<>).MakeGenericType(Type);
+            else
+                InterfaceType = typeof(Feature<>).MakeGenericType(Type);
         }
 
         public Type Type { get; }
@@ -115,14 +115,14 @@ namespace Blacklite.Framework.Features.Describers
 
         public override int GetHashCode()
         {
-            return _descriptor.GetHashCode();
+            return TypeInfo.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
             var item = obj as FeatureDescriber;
             if (item != null)
-                return _descriptor.Equals(item._descriptor);
+                return TypeInfo.Equals(item.TypeInfo);
             return false;
         }
     }

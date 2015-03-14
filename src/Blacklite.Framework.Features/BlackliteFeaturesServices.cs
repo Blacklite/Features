@@ -20,12 +20,13 @@ namespace Blacklite.Framework.Features
             yield return describe.Singleton<IFeatureDescriberProvider, FeatureDescriberProvider>();
             yield return describe.Singleton<IFeatureDescriberFactory, FeatureDescriberFactory>();
             yield return describe.Singleton(typeof(IFeatureSubject<>), typeof(FeatureSubject<>));
+            yield return describe.Singleton<IFeatureAssemblyProvider, FeatureAssemblyProvider>();
+            yield return describe.Singleton<IFeatureTypeProvider, FeatureTypeProvider>();
             yield return describe.Singleton<IFeatureFactory, FeatureFactory>();
             yield return describe.Singleton(typeof(Feature<>), typeof(FeatureImpl<>));
             yield return describe.Singleton(typeof(ObservableFeature<>), typeof(ObservableFeatureImpl<>));
             yield return describe.Transient<IRequiredFeaturesService, RequiredFeaturesService>();
             yield return describe.Singleton(typeof(IFeatureOptions<>), typeof(FeatureOptionsManager<>));
-            yield return describe.Instance(new FeatureServicesCollection(services));
             yield return describe.Transient<DefaultFeatureDescriberEnumerable, DefaultFeatureDescriberEnumerable>();
             yield return describe.Transient<IFeatureComposition, OptionsFeatureComposer>();
             yield return describe.Transient<IFeatureComposition, RequiredFeatureComposer>();
