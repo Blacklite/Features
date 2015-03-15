@@ -3,7 +3,8 @@
     "dependencies": {
         "Blacklite.Framework.Features": "",
         "Blacklite.Json.Schema": "",
-        "Newtonsoft.Temp": ""
+        "Temp.Newtonsoft.Json": "",
+        "Temp.Newtonsoft.Json.Schema": ""
     },
 
    "devDependencies": {
