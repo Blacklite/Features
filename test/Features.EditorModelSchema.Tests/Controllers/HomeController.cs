@@ -38,9 +38,10 @@ namespace Features.EditorModelSchema.Tests.Controllers
             var request = bindingContext.OperationBindingContext.HttpContext.Request;
             if (request.HasFormContentType)
             {
-                var form = await request.ReadFormAsync();
+                var form = request.ReadFormAsync();
+                form.Wait();
 
-                foreach (var item in form)
+                foreach (var item in form.Result)
                 {
                     if (item.Key.StartsWith(_editor.Prefix))
                     {
@@ -62,7 +63,7 @@ namespace Features.EditorModelSchema.Tests.Controllers
 
                             var value = parent[valueKey];
 
-                        if (!resolutionContext.Options.ReadOnly && value.ToString() != formValue)
+                        if (!resolutionContext.Options.ReadOnly && value?.ToString() != formValue)
                         {
                             switch (value.Type)
                             {
@@ -135,7 +136,7 @@ namespace Features.EditorModelSchema.Tests.Controllers
         {
             if (Request.Method.Equals("post", StringComparison.OrdinalIgnoreCase))
             {
-
+                editor.Save(ModelState);
             }
             return View(editor);
         }

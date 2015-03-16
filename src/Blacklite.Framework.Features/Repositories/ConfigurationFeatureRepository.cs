@@ -12,7 +12,7 @@ namespace Blacklite.Framework.Features.Repositories
         private readonly Func<IFeatureDescriber, bool> _predicate;
 
         public ConfigurationFeatureRepository(IConfiguration configuration)
-            : this(configuration, describer => describer.TypeInfo.CustomAttributes.OfType<ConfigurationStoreAttribute>().Any())
+            : this(configuration, describer => describer.TypeInfo.CustomAttributes.OfType<ConfigurationFeatureAttribute>().Any())
         {
         }
 

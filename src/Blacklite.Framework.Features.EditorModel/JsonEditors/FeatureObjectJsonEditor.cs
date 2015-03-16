@@ -57,7 +57,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             if (Context.Schema.Properties.ContainsKey(FeatureEditor.SettingsKey))
             {
                 modalTitle = "Settings";
-                propertiesRenderer = GetPropertyTagBuilder(Context.Schema.Properties[FeatureEditor.SettingsKey]);
+                propertiesRenderer = GetPropertyTagBuilder(FeatureEditor.SettingsKey, Context.Schema.Properties[FeatureEditor.SettingsKey]);
             }
 
             if (Context.Schema.Properties.ContainsKey(FeatureEditor.OptionsKey))
@@ -122,9 +122,9 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             return builder;
         }
 
-        private JsonEditorRenderer GetPropertyTagBuilder(JSchema schema)
+        private JsonEditorRenderer GetPropertyTagBuilder(string key, JSchema schema)
         {
-            var editor = _editorProvider.GetJsonEditor(schema, Context.Path);
+            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Path);
 
             if (editor.Context.Options.Hidden)
                 return null;

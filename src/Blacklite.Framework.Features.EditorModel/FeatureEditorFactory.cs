@@ -18,12 +18,14 @@ namespace Blacklite.Framework.Features.EditorModel
         private readonly IFeatureDescriberProvider _describerProvider;
         private readonly IServiceProvider _serviceProvider;
         private readonly T _describers;
+        private readonly IFeatureManager _featureManager;
 
-        public FeatureEditorFactory(IFeatureDescriberProvider describerProvider, T describers, IServiceProvider serviceProvider)
+        public FeatureEditorFactory(IFeatureDescriberProvider describerProvider, T describers, IServiceProvider serviceProvider, IFeatureManager featureManager)
         {
             _describers = describers;
             _describerProvider = describerProvider;
             _serviceProvider = serviceProvider;
+            _featureManager = featureManager;
         }
 
         private static string GroupId(IFeatureDescriber describer, string group)
@@ -104,7 +106,7 @@ namespace Blacklite.Framework.Features.EditorModel
                 }
             }
 
-            return new FeatureEditor(models, rootGroupings, GetFeature, GetFeatureOptions);
+            return new FeatureEditor(_featureManager, models, rootGroupings, GetFeature, GetFeatureOptions);
         }
 
         private IFeature GetFeature(Type type)
@@ -126,8 +128,8 @@ namespace Blacklite.Framework.Features.EditorModel
 
     public class DefaultFeatureEditorFactory : FeatureEditorFactory<DefaultFeatureDescriberEnumerable>
     {
-        public DefaultFeatureEditorFactory(IFeatureDescriberProvider describerProvider, DefaultFeatureDescriberEnumerable describers, IServiceProvider serviceProvider)
-            : base(describerProvider, describers, serviceProvider)
+        public DefaultFeatureEditorFactory(IFeatureDescriberProvider describerProvider, DefaultFeatureDescriberEnumerable describers, IServiceProvider serviceProvider, IFeatureManager featureManager)
+            : base(describerProvider, describers, serviceProvider, featureManager)
         {
         }
     }

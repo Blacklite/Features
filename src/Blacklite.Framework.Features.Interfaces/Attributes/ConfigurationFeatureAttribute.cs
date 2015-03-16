@@ -3,7 +3,7 @@
 namespace Blacklite.Framework.Features
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class ConfigurationStoreAttribute : FeatureStoreAttribute
+    public sealed class ConfigurationFeatureAttribute : FeatureStoreAttribute
     {
     }
 }
