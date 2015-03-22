@@ -21,6 +21,7 @@ namespace Features.EditorModelSchema.Tests.Features
     [FeatureGroup("API", "Development"), ConfigurationFeature]
     public class ApiDevelopmentFeatureB : Feature.AlwaysOff { }
 
+    [RequiredFeature(typeof(ApiDevelopmentFeatureD))]
     [FeatureGroup("API", "Development"), ConfigurationFeature]
     public class ApiDevelopmentFeatureCeeOptions : Switch
     {
@@ -139,7 +140,7 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [ParentFeature(typeof(ApplicationSecurityFeatureA))]
-    [FeatureGroup("Application", "User Profile"), ConfigurationFeature]
+    [FeatureGroup("Application", "Security"), ConfigurationFeature]
     public class ApplicationSecurityFeatureD : Switch
     {
     }
@@ -190,6 +191,7 @@ namespace Features.EditorModelSchema.Tests.Features
         public CeeOptions Options { get; }
     }
 
+    [RequiredFeature(typeof(ApplicationUserInterfaceFeatureD), false)]
     [FeatureGroup("Application", "User Interface"), ConfigurationFeature]
     public class ApplicationUserInterfaceFeatureC : Switch//<ApplicationUserInterfaceFeatureCeeOptions>
     {

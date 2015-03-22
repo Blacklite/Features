@@ -9,52 +9,44 @@ using System.Reflection;
 
 namespace Blacklite.Framework.Features.Factory
 {
-    public class FeatureFactory : IFeatureFactory
+    public static class FeatureFactoryExtensions
     {
-        private readonly IFeatureCompositionProvider _featureCompositionProvider;
-        private readonly ConcurrentDictionary<Type, object> _features = new ConcurrentDictionary<Type, object>();
-
-        public FeatureFactory(
-            IFeatureCompositionProvider featureCompositionProvider)
-        {
-            _featureCompositionProvider = featureCompositionProvider;
-        }
-
-        public TFeature GetFeature<TFeature>()
+        public static TFeature GetFeature<TFeature>(this IFeatureFactory factory)
             where TFeature : class, new()
         {
-            IFeatureDescriber describer;
-            var composers = _featureCompositionProvider.GetComposers<TFeature>(out describer);
-
-            return (TFeature)_features.GetOrAdd(typeof(TFeature), z => _featureCompositionProvider.GetComposers<TFeature>(out describer)
-                .Aggregate(new TFeature(), (feature, setup) => setup.Configure(feature, describer)));
+            return (TFeature)factory.GetFeature(typeof(TFeature));
         }
     }
 
-    public class CompositeFeatureFactory : IFeatureFactory
+    public class FeatureFactory : IFeatureFactory
     {
-        private readonly ISingletonFeatureFactory _singletonFeatureFactory;
-        private readonly IScopedFeatureFactory _scopedFeatureFactory;
-        private readonly IFeatureDescriberProvider _describerProvider;
+        protected readonly IFeatureCompositionProvider _featureCompositionProvider;
+        private readonly IFeatureDescriberProvider _featureDescriberProvider;
+        private readonly ConcurrentDictionary<Type, IFeature> _features = new ConcurrentDictionary<Type, IFeature>();
 
-        public CompositeFeatureFactory(
-            ISingletonFeatureFactory singletonFeatureFactory,
-            IScopedFeatureFactory scopedFeatureFactory,
-            IFeatureDescriberProvider describerProvider)
+        public FeatureFactory(
+            IFeatureCompositionProvider featureCompositionProvider,
+            IFeatureDescriberProvider featureDescriberProvider)
         {
-            _singletonFeatureFactory = singletonFeatureFactory;
-            _scopedFeatureFactory = scopedFeatureFactory;
-            _describerProvider = describerProvider;
+            _featureCompositionProvider = featureCompositionProvider;
+            _featureDescriberProvider = featureDescriberProvider;
         }
 
-        public virtual TFeature GetFeature<TFeature>() where TFeature : class, new()
+        public IFeature GetFeature(Type featureType)
         {
-            var describer = _describerProvider.Describers[typeof(TFeature)];
+            IFeatureDescriber describer = _featureDescriberProvider.Describers[featureType];
+            return _features.GetOrAdd(featureType, x => Compose(featureType, describer));
+        }
 
-            if (describer.Lifecycle == LifecycleKind.Scoped)
-                return _scopedFeatureFactory.GetFeature<TFeature>();
+        private IFeature Compose(Type featureType, IFeatureDescriber describer)
+        {
+            return (IFeature)GetComposers(featureType)
+                .Aggregate(Activator.CreateInstance(featureType), (feature, setup) => setup.Configure(feature, describer));
+        }
 
-            return _singletonFeatureFactory.GetFeature<TFeature>();
+        protected virtual IEnumerable<IFeatureComposition> GetComposers(Type featureType)
+        {
+            return _featureCompositionProvider.GetComposers(featureType);
         }
     }
 }

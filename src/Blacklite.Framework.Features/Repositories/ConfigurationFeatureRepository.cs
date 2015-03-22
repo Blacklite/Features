@@ -12,7 +12,7 @@ namespace Blacklite.Framework.Features.Repositories
         private readonly Func<IFeatureDescriber, bool> _predicate;
 
         public ConfigurationFeatureRepository(IConfiguration configuration)
-            : this(configuration, describer => describer.TypeInfo.CustomAttributes.OfType<ConfigurationFeatureAttribute>().Any())
+            : this(configuration, describer => describer.TypeInfo.GetCustomAttributes<ConfigurationFeatureAttribute>().Any())
         {
         }
 
@@ -30,22 +30,23 @@ namespace Blacklite.Framework.Features.Repositories
         {
             if (describer.HasEnabled)
             {
-                _configuration.Set($"{describer.Type.Name}:IsEnabled", describer.GetIsEnabled<bool>(feature).ToString());
+                _configuration.Set($"{describer.Type.Name}:IsEnabled", describer.GetIsEnabled<bool>(feature).ToString() ?? string.Empty);
             }
 
             if (describer.Properties.Any())
             {
                 foreach (var property in describer.Properties)
                 {
-                    _configuration.Set($"{describer.Type.Name}:{property.Name}", property.GetProperty<object>(feature).ToString());
+                    _configuration.Set($"{describer.Type.Name}:{property.Name}", property.GetProperty<object>(feature)?.ToString() ?? string.Empty);
                 }
             }
 
             if (describer.HasOptions && !describer.Options.IsFeature)
             {
+                var options = describer.GetOptions<object>(feature);
                 foreach (var property in describer.Options.TypeInfo.GetDeclaredProperties())
                 {
-                    _configuration.Set($"{describer.Type.Name}:Options:{property.Name}", property.GetValue(property).ToString());
+                    _configuration.Set($"{describer.Type.Name}:Options:{property.Name}", property.GetValue(options)?.ToString() ?? string.Empty);
                 }
             }
         }

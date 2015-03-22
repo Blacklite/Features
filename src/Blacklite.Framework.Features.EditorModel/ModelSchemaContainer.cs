@@ -6,6 +6,7 @@ using Temp.Newtonsoft.Json.Linq;
 using Temp.Newtonsoft.Json.Schema;
 using Temp.Newtonsoft.Json.Schema.Generation;
 using Temp.Newtonsoft.Json.Serialization;
+using Blacklite.Framework.Shared;
 
 namespace Blacklite.Framework.Features.EditorModel
 {
@@ -137,17 +138,20 @@ namespace Blacklite.Framework.Features.EditorModel
                 // Produce editor for feature options....
                 options = GetSchema(model.OptionsFeature);
                 options.Format = "feature-inline";
-                if (options.Properties.ContainsKey("enabled"))
+                if (options.Properties.ContainsKey("isEnabled"))
                 {
-                    options.Properties["enabled"].Format = "inline";
-                    //options.Properties["enabled"].Title = options.Title;
+                    options.Properties["isEnabled"].Format = "inline";
+                    //options.Properties["isEnabled"].Title = options.Title;
                 }
             }
 
             if (options != null)
             {
                 options.Description = model.OptionsDescription;
-                options.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
+                if (options.ExtensionData.ContainsKey(FeatureEditor.OptionsKey))
+                    options.ExtensionData[FeatureEditor.OptionsKey]["showHeader"] = new JValue(false);
+                else
+                    options.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
             }
 
             return options;
@@ -166,11 +170,21 @@ namespace Blacklite.Framework.Features.EditorModel
             schema.Description = model.Description;
             //schema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
             schema.Format = "feature";
+            schema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { key = model.Name }, _serializer);
+            schema.ExtensionData["requires"] = JObject.FromObject(
+                model.Describer.DependsOn.ToDictionary(
+                    x => $"{x.Key.Type.Name.CamelCase()}.isEnabled", 
+                    x => new
+                    {
+                        requiredValue = x.Value,
+                        title = x.Key.DisplayName
+                    })
+            );
 
-            var hidden = new JSchema();
-            hidden.Type = JSchemaType.String;
-            hidden.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { hidden = true }, _serializer);
-            schema.Properties.Add(model.Name, hidden);
+            //var hidden = new JSchema();
+            //hidden.Type = JSchemaType.String;
+            //hidden.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { hidden = true }, _serializer);
+            //schema.Properties.Add(model.Name, hidden);
 
             schema.AllowAdditionalProperties = false;
             schema.AllowAdditionalItems = false;
@@ -182,7 +196,7 @@ namespace Blacklite.Framework.Features.EditorModel
         {
             if (model.HasEnabled)
             {
-                schema.Properties.Add("enabled", GetEnabledPropertySchema(model));
+                schema.Properties.Add("isEnabled", GetEnabledPropertySchema(model));
             }
 
             if (model.HasProperties)
@@ -190,7 +204,10 @@ namespace Blacklite.Framework.Features.EditorModel
                 var propertySchema = _schemaGenerator.Generate(model.FeatureType);
                 //_optionSchemas.Add(model.Name, propertySchema);
                 propertySchema.Title = model.Title;
-                propertySchema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
+                if (propertySchema.ExtensionData.ContainsKey(FeatureEditor.OptionsKey))
+                    propertySchema.ExtensionData[FeatureEditor.OptionsKey]["showHeader"] = new JValue(false);
+                else
+                    propertySchema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { showHeader = false });
                 propertySchema.Format = FeatureEditor.OptionsKey;
 
                 if (model.HasEnabled && propertySchema.Properties.ContainsKey("isEnabled"))

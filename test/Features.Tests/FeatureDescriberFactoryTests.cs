@@ -41,7 +41,7 @@ namespace Features.Tests
         class InvalidRealObservableSwitch : ObservableSwitch
         {
         }
-        
+
         [Fact]
         public void SingletonThrowsForInvalidDescriptor()
         {

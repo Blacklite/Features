@@ -38,6 +38,7 @@ namespace Features.EditorModelSchema.Tests
             // services.AddWebApiConventions();
             services.AddFeatures()
                 .AddFeatureEditorModel()
+                .AddFeaturesMvc()
                 .AddFeaturesConfiguration(Configuration);
         }
 

@@ -4,8 +4,7 @@ namespace Blacklite.Framework.Features.Factory
 {
     public interface IFeatureFactory
     {
-        TFeature GetFeature<TFeature>()
-            where TFeature : class, new();
+        IFeature GetFeature(Type featureType);
     }
 
     public interface IScopedFeatureFactory : IFeatureFactory { }

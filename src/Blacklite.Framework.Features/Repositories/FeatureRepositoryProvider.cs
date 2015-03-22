@@ -13,6 +13,7 @@ namespace Blacklite.Framework.Features.Repositories
         {
             _repositories = repositories.OrderByDescending(x => x.Priority).ToArray();
         }
+
         public IFeatureRepository GetFeatureRepository(IFeatureDescriber describer)
         {
             return _repositories.FirstOrDefault(x => x.CanStore(describer));

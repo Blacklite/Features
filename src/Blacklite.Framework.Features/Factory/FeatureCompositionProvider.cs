@@ -9,11 +9,21 @@ using System.Reflection;
 
 namespace Blacklite.Framework.Features.Factory
 {
+    public static class FeatureCompositionProviderExtensions
+    {
+        public static MethodInfo GetComposersGenericMethod = typeof(IFeatureCompositionProvider).GetTypeInfo().GetDeclaredMethod(nameof(IFeatureCompositionProvider.GetComposers));
+        public static IEnumerable<IFeatureComposition> GetComposers(this IFeatureCompositionProvider provider, Type featureType)
+        {
+            return (IEnumerable<IFeatureComposition>)GetComposersGenericMethod.MakeGenericMethod(featureType).Invoke(provider, null);
+        }
+    }
+
     public interface IFeatureCompositionProvider
     {
-        IEnumerable<IFeatureComposition> GetComposers<TFeature>(out IFeatureDescriber describer)
+        IEnumerable<IFeatureComposition> GetComposers<TFeature>()
             where TFeature : class, new();
     }
+
     public class FeatureCompositionProvider : IFeatureCompositionProvider
     {
         private readonly IEnumerable<IFeatureComposition> _composers;
@@ -31,22 +41,22 @@ namespace Blacklite.Framework.Features.Factory
             _describerProvider = describerProvider;
         }
 
-        public IEnumerable<IFeatureComposition> GetComposers<TFeature>(out IFeatureDescriber describer)
+        public IEnumerable<IFeatureComposition> GetComposers<TFeature>()
             where TFeature : class, new()
         {
+            IFeatureDescriber describer = null;
             if (!_describerProvider.Describers.TryGetValue(typeof(TFeature), out describer))
             {
                 throw new KeyNotFoundException($"Could not find feature ${typeof(TFeature).Name}.");
             }
             IEnumerable<IFeatureComposition> composers;
-            var d = describer;
             if (!_featureComposers.TryGetValue(typeof(TFeature), out composers))
             {
                 composers = _composers.Union(
                         _serviceProvider.GetRequiredService<IEnumerable<IFeatureComposition<TFeature>>>()
                         .Select(x => new ObjectComposer<TFeature>(x))
                     )
-                    .Where(x => x.IsApplicableTo(d))
+                    .Where(x => x.IsApplicableTo(describer))
                     .OrderByDescending(x => x.Priority);
             }
 

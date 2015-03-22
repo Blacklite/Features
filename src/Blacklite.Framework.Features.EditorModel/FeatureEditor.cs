@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNet.Mvc.ModelBinding;
+using Blacklite.Framework.Features.Describers;
 
 namespace Blacklite.Framework.Features.EditorModel
 {
@@ -17,7 +18,7 @@ namespace Blacklite.Framework.Features.EditorModel
     {
         internal static string CamelCase(this string value)
         {
-            return value.Substring(0, 1).ToLowerInvariant() + value.Substring(1);
+            return value.Substring(0, 1).ToLowerInvariant() + value.Substring(1).Replace(" ", "");
         }
     }
 
@@ -81,33 +82,13 @@ namespace Blacklite.Framework.Features.EditorModel
         private JToken GenerateJObject()
         {
             var json = new JObject();
-            foreach (var model in _groups)
+            foreach (var model in _models)
             {
                 json.Add(model.Name, GetModelJObject(model));
             }
             return json;
         }
 
-        private JObject GetModelJObject(FeatureGroup group)
-        {
-            var json = new JObject();
-            foreach (var item in group.Items)
-            {
-                var model = item as FeatureModel;
-                if (model != null)
-                {
-                    json.Add(model.Name, GetModelJObject(model));
-                }
-
-                var grouping = item as FeatureGroup;
-                if (grouping != null)
-                {
-                    json.Add(grouping.Name, GetModelJObject(grouping));
-                }
-            }
-
-            return json;
-        }
         private JObject GetModelJObject(FeatureModel model)
         {
             var feature = _getFeature(model.FeatureType);
@@ -118,11 +99,11 @@ namespace Blacklite.Framework.Features.EditorModel
 
             var json = new JObject();
 
-            json.Add(model.Name, model.Name);
+            //json.Add(model.Name, model.Name);
 
             if (model.HasEnabled)
             {
-                json.Add("enabled", new JValue(model.Enabled.GetValue(feature)));
+                json.Add("isEnabled", new JValue(model.Enabled.GetValue(feature)));
             }
 
             if (model.HasProperties)
@@ -139,10 +120,10 @@ namespace Blacklite.Framework.Features.EditorModel
             {
                 json.Add(FeatureEditor.OptionsKey, JObject.FromObject(featureOptions, _serializer));
             }
-            else if (model.HasOptions && model.OptionsIsFeature)
-            {
-                json.Add(FeatureEditor.OptionsKey, JObject.FromObject(GetModelJObject(model.OptionsFeature), _serializer));
-            }
+            //else if (model.HasOptions && model.OptionsIsFeature)
+            //{
+            //    json.Add(FeatureEditor.OptionsKey, JObject.FromObject(GetModelJObject(model.OptionsFeature), _serializer));
+            //}
 
             if (model.Children.Any())
             {
@@ -170,33 +151,28 @@ namespace Blacklite.Framework.Features.EditorModel
 
         public void Save(ModelStateDictionary modelState)
         {
-            var changedItems = _groups.SelectMany(x => SaveModel(modelState, x, Model[x.Name])).ToArray();
-            var changedFeatures = changedItems.OfType<FeatureSaveContext>();
-            var changedOptions = changedItems.OfType<OptionsSaveContext>();
+            var changedItems = _models.SelectMany(x => SaveModel(modelState, x, Model[x.Name])).ToArray();
 
-            // Save with feature manager?
+            foreach (var item in changedItems)
+            {
+                // Save with feature manager?
+                if (!_featureManager.TrySaveFeature(item.Describer, item.Feature))
+                {
+                    // logging? exception? error?
+                }
+            }
         }
 
-        class SaveContext { }
-        class FeatureSaveContext : SaveContext
+        class SaveContext
         {
-            public FeatureSaveContext(IFeature feature)
+            public SaveContext(IFeature feature, IFeatureDescriber describer)
             {
                 Feature = feature;
+                Describer = describer;
             }
 
             public IFeature Feature { get; }
-        }
-        class OptionsSaveContext : SaveContext
-        {
-            public OptionsSaveContext(IFeature feature, object options)
-            {
-                Feature = feature;
-                Options = options;
-            }
-
-            public IFeature Feature { get; }
-            public object Options { get; }
+            public IFeatureDescriber Describer { get; }
         }
 
         private IEnumerable<SaveContext> SaveModel(ModelStateDictionary modelState, FeatureGroup group, JToken json)
@@ -219,6 +195,20 @@ namespace Blacklite.Framework.Features.EditorModel
             }
         }
 
+        private bool JValueEqual(JValue left, JValue right)
+        {
+            if (left?.Value == null && right?.Value == null)
+                return true;
+
+            if (left?.Value == null && right?.Value != null)
+                return false;
+
+            if (left?.Value != null && right?.Value == null)
+                return false;
+
+            return left.Value.Equals(right.Value);
+        }
+
         private IEnumerable<SaveContext> SaveModel(ModelStateDictionary modelState, FeatureModel model, JToken json)
         {
             //json.Add(model.Name, model.Name);
@@ -227,9 +217,9 @@ namespace Blacklite.Framework.Features.EditorModel
 
             if (model.HasEnabled && !model.Enabled.IsReadOnly)
             {
-                var enabled = json["enabled"].ToObject<bool>(_serializer);
+                var enabled = json["isEnabled"].ToObject<bool>(_serializer);
                 var currentEnabled = (bool)model.Enabled.GetValue(feature);
-                if (currentEnabled != enabled)
+                if (!currentEnabled.Equals(enabled))
                 {
                     model.Enabled.SetValue(feature, enabled);
                     featureChanged = true;
@@ -243,60 +233,118 @@ namespace Blacklite.Framework.Features.EditorModel
                 if (model.HasOptions && currentValue.ContainsKey(FeatureEditor.OptionsKey))
                     currentValue.Remove(FeatureEditor.OptionsKey);
 
-                if (model.HasEnabled && currentValue.ContainsKey("enabled"))
-                    currentValue.Remove("enabled");
+                if (model.HasEnabled && currentValue.ContainsKey("isEnabled"))
+                    currentValue.Remove("isEnabled");
 
                 var settings = json[FeatureEditor.SettingsKey] as IDictionary<string, JToken>;
 
                 foreach (var item in currentValue
                     .Join(settings, x => x.Key, x => x.Key, (current, setting) => new { current, setting })
-                    .Join(model.Properties, x => x.current.Key, x => x.Key.CamelCase(), (anon, property) => new { key = anon.current.Key, current = anon.current.Value, setting = anon.setting.Value, property = property.Value })
-                    .Where(x => !x.property.IsReadOnly))
+                    .Join(model.Properties, x => x.current.Key, x => x.Key.CamelCase(), (anon, property) => new { key = anon.current.Key, current = anon.current.Value as JValue, setting = anon.setting.Value as JValue, property = property.Value })
+                    .Where(x => !x.property.IsReadOnly)
+                    .Where(x => !JValueEqual(x.current, x.setting)))
                 {
-                    if (item.current != item.setting)
-                    {
-                        if (item.setting.Type == JTokenType.Null)
-                            item.property.SetValue(feature, null);
-                        else
-                            item.property.SetValue(feature, item.setting.ToObject(item.property.Type));
-                        featureChanged = true;
-                    }
+                    if (item.setting.Type == JTokenType.Null)
+                        item.property.SetValue(feature, null);
+                    else
+                        item.property.SetValue(feature, item.setting.ToObject(item.property.Type));
+                    featureChanged = true;
                 }
             }
+
+            IFeature optionFeature = null;
 
             if (model.HasOptions)
             {
                 var featureOptions = _getFeatureOption(model.FeatureType);
                 var currentValue = JObject.FromObject(featureOptions, _serializer) as IDictionary<string, JToken>;
-                var settings = json[FeatureEditor.OptionsKey] as IDictionary<string, JToken>;
+                IDictionary<string, JToken> settings;
+                if (model.OptionsIsFeature)
+                    settings = Model[model.OptionsFeature.Name] as IDictionary<string, JToken>;
+                else
+                    settings = json[FeatureEditor.OptionsKey] as IDictionary<string, JToken>;
 
                 foreach (var item in currentValue
                     .Join(settings, x => x.Key, x => x.Key, (current, setting) => new { current, setting })
-                    .Join(model.Options, x => x.current.Key, x => x.Key.CamelCase(), (anon, property) => new { key = anon.current.Key, current = currentValue[anon.current.Key], setting = settings[anon.setting.Key], property = property.Value })
-                    .Where(x => !x.property.IsReadOnly))
+                    .Join(model.Options, x => x.current.Key, x => x.Key.CamelCase(), (anon, property) => new { key = anon.current.Key, current = currentValue[anon.current.Key] as JValue, setting = settings[anon.setting.Key] as JValue, property = property.Value })
+                    .Where(x => !x.property.IsReadOnly)
+                    .Where(x => !JValueEqual(x.current, x.setting)))
                 {
-                    if (item.current != item.setting)
+                    if (item.setting.Type == JTokenType.Null)
+                        item.property.SetValue(featureOptions, null);
+                    else
+                        item.property.SetValue(featureOptions, item.setting.ToObject(item.property.Type));
+
+                    if (!model.OptionsIsFeature)
                     {
-                        if (item.setting.Type == JTokenType.Null)
-                            item.property.SetValue(featureOptions, null);
-                        else
-                            item.property.SetValue(featureOptions, item.setting.ToObject(item.property.Type));
                         featureChanged = true;
+                    }
+                    else
+                    {
+                        optionFeature = (IFeature)featureOptions;
                     }
                 }
             }
 
             if (featureChanged)
-                yield return new FeatureSaveContext(feature);
+                yield return new SaveContext(feature, model.Describer);
 
-            if (model.Children.Any())
+            if (optionFeature != null)
+                yield return new SaveContext(optionFeature, model.OptionsFeature.Describer);
+
+            //if (model.Children.Any())
+            //{
+            //    foreach (var child in model.Children)
+            //    {
+            //        foreach (var item in SaveModel(modelState, child, json[child.Name]))
+            //            yield return item;
+            //    }
+            //}
+        }
+    }
+
+    public interface IFeatureEditor<TFactory> : IFeatureEditor
+        where TFactory : IFeatureEditorFactory
+    {
+    }
+
+    public class FeatureEditor<TFactory> : IFeatureEditor, IFeatureEditor<TFactory>
+        where TFactory : IFeatureEditorFactory
+    {
+        private readonly IFeatureEditor _editor;
+
+        public FeatureEditor(TFactory factory)
+        {
+            _editor = factory.GetFeatureEditor();
+        }
+
+        public JToken Model
+        {
+            get
             {
-                foreach (var child in model.Children)
-                {
-                    foreach (var item in SaveModel(modelState, child, json[child.Name]))
-                        yield return item;
-                }
+                return _editor.Model;
             }
+        }
+
+        public string Prefix
+        {
+            get
+            {
+                return _editor.Prefix;
+            }
+        }
+
+        public JSchema Schema
+        {
+            get
+            {
+                return _editor.Schema;
+            }
+        }
+
+        public void Save(ModelStateDictionary modelState)
+        {
+            _editor.Save(modelState);
         }
     }
 }

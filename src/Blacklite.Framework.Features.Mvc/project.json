@@ -1,0 +1,18 @@
+﻿{
+    "version": "1.0.0-*",
+    "dependencies": {
+        "Blacklite.Framework.Features": "1.0.0-*",
+        "Blacklite.Framework.Features.EditorModel": "1.0.0-*",
+        "Microsoft.AspNet.Mvc": "6.0.0-beta3"
+    },
+
+    "frameworks": {
+        "aspnet50": {
+            "frameworkAssemblies": {
+                "System.Runtime": "4.0.10.0"
+            },
+            "dependencies": {
+            }
+        }
+    }
+}

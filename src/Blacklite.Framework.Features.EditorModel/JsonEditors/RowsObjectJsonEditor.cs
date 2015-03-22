@@ -37,11 +37,11 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
                 foreach (var property in propertyTagRenderes)
                 {
-                    result.InnerHtml += property.Value.Render(value?[property.Key]);
+                    result.InnerHtml += property.Value.Render(value);
                 }
 
                 return result.ToString();
-            });
+            }, value => string.Join("", propertyTagRenderes.Select(property => property.Value.JavaScript(value))));
         }
 
         private JsonEditorRenderer GetPropertyTagBuilder(string key, JSchema schema)

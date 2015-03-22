@@ -23,7 +23,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             {
                 var names = input.Attributes["name"].Split('.');
                 var field = names[names.Length - 1];
-                if (field.Equals("enabled", StringComparison.OrdinalIgnoreCase) && context.Schema.Format != "inline")
+                if (field.Equals("isEnabled", StringComparison.OrdinalIgnoreCase) && context.Schema.Format != "inline")
                 {
                     control.AddCssClass("pull-right-sm");
                     control.AddCssClass("pull-left-xs");
@@ -81,7 +81,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             {
                 var names = tagBuilder.Attributes["name"].Split('.');
                 var field = names[names.Length - 1];
-                if (field.Equals("enabled", StringComparison.OrdinalIgnoreCase))
+                if (field.Equals("isEnabled", StringComparison.OrdinalIgnoreCase))
                 {
                     tagBuilder.Attributes.Add("data-off-color", "danger");
                     tagBuilder.Attributes.Add("data-on-color", "info");

@@ -1,4 +1,6 @@
-﻿using Blacklite.Framework.Features.Factory;
+﻿using Blacklite.Framework.Features;
+using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 using System;
 
 namespace Blacklite.Framework.Multitenancy.Features.Factory
@@ -9,14 +11,15 @@ namespace Blacklite.Framework.Multitenancy.Features.Factory
         private readonly IFeatureFactory _factory;
 
         public ApplicationOnlyFeatureFactory(
-            IFeatureCompositionProvider featureCompositionProvider)
+            IFeatureCompositionProvider featureCompositionProvider,
+            IFeatureDescriberProvider featureDescriberProvider)
         {
-            _factory = new FeatureFactory(featureCompositionProvider);
+            _factory = new FeatureFactory(featureCompositionProvider, featureDescriberProvider);
         }
 
-        public TFeature GetFeature<TFeature>() where TFeature : class, new()
+        public IFeature GetFeature(Type featureType)
         {
-            return _factory.GetFeature<TFeature>();
+            return _factory.GetFeature(featureType);
         }
     }
 }

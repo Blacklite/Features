@@ -1,4 +1,5 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Blacklite.Framework.Features.Observables;
+using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Reactive.Subjects;
 
@@ -10,9 +11,9 @@ namespace Blacklite.Framework.Features
         where T : class, IObservableFeature
     {
         private readonly ISubject<T> _feature;
-        public ObservableFeatureImpl(IFeatureSubject<T> feature)
+        public ObservableFeatureImpl(IFeatureSubjectFactory factory)
         {
-            _feature = feature;
+            _feature = (ISubject<T>)factory.GetSubject(typeof(T));
         }
 
         public IDisposable Subscribe(IObserver<T> observer) => _feature.Subscribe(observer);
@@ -24,21 +25,26 @@ namespace Blacklite.Framework.Features
 
     }
 
-    class FeatureSubject<T> : IFeatureSubject<T>
+    class FeatureSubject<T> : IFeatureSubject<T>, IFeatureSubject
         where T : class, IObservableFeature
     {
         private readonly ISubject<T> _feature;
+        private readonly IServiceProvider _serviceProvider;
         public FeatureSubject(Feature<T> feature, IServiceProvider serviceProvider, IRequiredFeaturesService requiredFeaturesService)
         {
             _feature = new BehaviorSubject<T>(feature.Value);
+            _serviceProvider = serviceProvider;
 
             var observable = requiredFeaturesService.GetObservableRequiredFeatures(typeof(T));
             if (observable != null)
             {
-                observable.Subscribe((x) =>
-                    _feature.OnNext(serviceProvider.GetService<Feature<T>>().Value)
-                );
+                observable.Subscribe(x => Update());
             }
+        }
+
+        public void Update()
+        {
+            _feature.OnNext(_serviceProvider.GetService<Feature<T>>().Value);
         }
 
         public void OnNext(T value)

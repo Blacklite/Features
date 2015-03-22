@@ -48,7 +48,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                 foreach (var property in propertyTagRenderes)
                 {
                     var tab = new TagBuilder("div");
-                    tab.InnerHtml += property.Value.Render(value?[property.Key]);
+                    tab.InnerHtml += property.Value.Render(value);
                     tab = _featureJsonEditorDecorator.DecorateTab(Context, property.Schema, tab);
                     tabBuilders.Add(tab);
                 }
@@ -56,7 +56,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                 result = _featureJsonEditorDecorator.DecorateTabContainer(Context, result, tabBuilders);
 
                 return result.ToString();
-            });
+            }, value => string.Join("", propertyTagRenderes.Select(property => property.Value.JavaScript(value))));
         }
 
         private JsonEditorRenderer GetPropertyTagBuilder(string key, JSchema schema)

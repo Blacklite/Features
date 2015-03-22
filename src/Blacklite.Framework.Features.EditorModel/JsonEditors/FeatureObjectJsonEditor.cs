@@ -14,7 +14,8 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
     {
         private readonly IJsonEditorProvider _editorProvider;
         private readonly IFeatureJsonEditorDecorator _featureJsonEditorDecorator;
-        public FeatureObjectJsonEditor(IJsonEditorResolutionContext context,
+        public FeatureObjectJsonEditor(
+            IJsonEditorResolutionContext context,
             IJsonEditorProvider editorProvider,
             IFeatureJsonEditorDecorator featureJsonEditorDecorator,
             EditorOptions options = null) : base(context, options)
@@ -33,49 +34,129 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             JsonEditorRenderer enabledRenderer = null;
             JsonEditorRenderer propertiesRenderer = null;
             JsonEditorRenderer settingsRenderer = null;
-            if (Context.Schema.Properties.ContainsKey("enabled"))
+            if (Context.Schema.Properties.ContainsKey("isEnabled"))
             {
-                enabledRenderer = GetOptionsTagBuilder("enabled", Context.Schema.Properties["enabled"]);
+                enabledRenderer = GetPropertyTagBuilder("isEnabled", Context.Schema.Properties["isEnabled"]);
+            }
+
+            string javaScript = string.Empty;
+            var requires = Context.Schema.ExtensionData["requires"] as IDictionary<string, JToken>;
+            var requireObjects = requires?.Select(item => new { id = TagBuilder.CreateSanitizedId($"{Context.Prefix.Split('.')[0]}.{item.Key}", "_"), value = item.Value["requiredValue"].ToString().ToLowerInvariant() })?.ToArray();
+            if (requireObjects != null && requireObjects.Any())
+            {
+                var elementId = TagBuilder.CreateSanitizedId($"{Context.Prefix.Split('.')[0]}.{Context.Options.Key}.isEnabled", "_");
+                if (requireObjects.Any())
+                {
+                    var constraintObjects = string.Join(";\n", requireObjects.Select(item => $" elements['{item.id}']=elements['{item.id}'] || (elements['{item.id}'] = $('#{item.id}'))"));
+                    var constraint = string.Join(" && ", requireObjects.Select(item => $"elements['{item.id}'][0].checked == {item.value}"));
+                    var constraintSwitch = string.Join(";\n", requireObjects.Select(item => $@"(function() {{
+            var s = elements['{item.id}'].data('bootstrapSwitch');
+            var current = s.onSwitchChange();
+            if (!current)
+                s.onSwitchChange(checkConstraints);
+            else
+                s.onSwitchChange(function() {{ current(); checkConstraints(); }});
+        }})();"));
+
+                    javaScript = $@"
+    (function() {{
+        var key = '{elementId}';
+        elements[key]=elements[key] || (elements[key] = $('#'+key));
+        {constraintObjects};
+        var ele = elements[key];
+        var dom = ele[0];
+        var sw = ele.data('bootstrapSwitch');
+        var valueWhenNotDisabled = {{0}};
+        var checkConstraints = function() {{
+            var disable = !({constraint});
+            if (disable) {{
+                valueWhenNotDisabled = dom.checked;
+                sw.indeterminate(true);
+                sw.disabled(disable);
+                dom.disabled = disable;
+            }} else {{
+                dom.checked = valueWhenNotDisabled;
+                dom.disabled = disable;
+                sw.disabled(disable);
+                sw.state(valueWhenNotDisabled);
+            }}
+        }};
+        {constraintSwitch}
+        callbacks.push(checkConstraints);
+    }})();
+";
+                }
             }
 
             var propertyTagRenderes = Context.Schema.Properties
-                .Where(x => x.Key != FeatureEditor.SettingsKey && x.Key != FeatureEditor.OptionsKey && x.Key != "enabled")
-                .Select(property => new { Key = property.Key, Value = GetOptionsTagBuilder(property.Key, property.Value) })
+                .Where(x => x.Key != FeatureEditor.SettingsKey && x.Key != FeatureEditor.OptionsKey && x.Key != "isEnabled")
+                .Select(property => new { Key = property.Key, Value = GetChildFeatureTagBuilder(property.Key, property.Value) })
                 .Where(x => x.Value != null)
                 .ToArray();
+
+            string helpTitle = null;
+            string helpContent = null;
+            if (Context.Schema.ExtensionData.ContainsKey("requires"))
+            {
+                if (requires != null && requires.Any())
+                {
+                    helpTitle = "Requires";
+                    helpContent = string.Join("<br />\n", requires.Select(x => $"{x.Value["title"]} to be {(x.Value["requiredValue"].ToString() == "True" ? "ON" : "OFF")}"));
+                }
+            }
 
             var title = new TagBuilder("div");
             title.InnerHtml = this.GetTitle();
             title = Context.Decorator.DecorateTitle(Context, title);
 
             container.InnerHtml += title.ToString();
+            //ExtensionData["requires"]
 
             var toggle = new TagBuilder("div");
-            _featureJsonEditorDecorator.DecorateFeatureCheckbox(Context, toggle);
+            _featureJsonEditorDecorator.DecorateFeatureCheckbox(Context, toggle,
+                helpTitle: helpTitle,
+                helpContent: helpContent);
 
             var modalTitle = "Settings";
             if (Context.Schema.Properties.ContainsKey(FeatureEditor.SettingsKey))
             {
                 modalTitle = "Settings";
-                propertiesRenderer = GetPropertyTagBuilder(FeatureEditor.SettingsKey, Context.Schema.Properties[FeatureEditor.SettingsKey]);
+                propertiesRenderer = GetSettingsTagBuilder(FeatureEditor.SettingsKey, Context.Schema.Properties[FeatureEditor.SettingsKey]);
             }
+
+            string key = null;
+            string childHelpTitle = null;
+            string childHelpContent = null;
 
             if (Context.Schema.Properties.ContainsKey(FeatureEditor.OptionsKey))
             {
-                modalTitle = Context.Schema.Title;
-                //modalTitle = Context.Schema.Properties[FeatureEditor.OptionsKey].Title;
-                settingsRenderer = GetOptionsTagBuilder(FeatureEditor.OptionsKey, Context.Schema.Properties[FeatureEditor.OptionsKey]);
+                var childSchema = Context.Schema.Properties[FeatureEditor.OptionsKey];
+                key = (childSchema.ExtensionData["options"]?["key"]?.ToString() ?? $"{Context.Options.Key}.{FeatureEditor.OptionsKey}");
+                //modalTitle = Context.Schema.Title;
+                modalTitle = Context.Schema.Properties[FeatureEditor.OptionsKey].Title;
+                settingsRenderer = GetFeatureOptionsTagBuilder(key, childSchema);
+
+                if (childSchema.ExtensionData.ContainsKey("requires"))
+                {
+                    var childRequires = childSchema.ExtensionData["requires"] as IDictionary<string, JToken>;
+                    if (childRequires != null && childRequires.Any())
+                    {
+                        childHelpTitle = "Requires";
+                        childHelpContent = string.Join("<br />\n", childRequires.Select(x => $"{x.Value["title"]} to be {(x.Value["requiredValue"].ToString() == "True" ? "ON" : "OFF")}"));
+                    }
+                }
             }
 
-            return new JsonEditorRenderer(Context.Serializer, value =>
+            return new JsonEditorRenderer(Context.Serializer, v =>
             {
+                var value = v[Context.Options.Key];
                 var result = new TagBuilder("div");
                 result.MergeAttributes(container.Attributes);
                 result.InnerHtml = container.InnerHtml;
 
                 var innerToggle = new TagBuilder("div");
                 innerToggle.MergeAttributes(toggle.Attributes);
-                innerToggle.InnerHtml += enabledRenderer?.Render(value?["enabled"]);
+                innerToggle.InnerHtml = enabledRenderer?.Render(value?["isEnabled"]) + toggle.InnerHtml;
 
                 if (settingsRenderer != null || propertiesRenderer != null)
                 {
@@ -87,10 +168,20 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
                     if (settingsRenderer != null)
                     {
-                        sb.Append(settingsRenderer.Render(value?[FeatureEditor.OptionsKey]));
+                        if (key == FeatureEditor.OptionsKey)
+                        {
+                            sb.Append(settingsRenderer.Render(value[key]));
+                        }
+                        else
+                        {
+                            sb.Append(settingsRenderer.Render(v[key]));
+                        }
                     }
 
-                    innerToggle = _featureJsonEditorDecorator.DecorateSettings(Context, innerToggle, sb.ToString(), modalTitle);
+                    innerToggle = _featureJsonEditorDecorator.DecorateSettings(Context, innerToggle, sb.ToString(),
+                        title: modalTitle,
+                        helpTitle: childHelpTitle,
+                        helpContent: childHelpContent);
                 }
 
                 result.InnerHtml += innerToggle.ToString();
@@ -103,17 +194,47 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                     propertyContainer.AddCssClass("row");
 
                     foreach (var property in propertyTagRenderes)
-                        propertyContainer.InnerHtml += property.Value.Render(value?[property.Key]);
+                        propertyContainer.InnerHtml += property.Value.Render(v);
 
                     result.InnerHtml += propertyContainer.ToString();
                 }
                 return result.ToString();
+            }, v =>
+            {
+                var value = v[Context.Options.Key];
+                var sb = new StringBuilder();
+                if (enabledRenderer != null)
+                    sb.Append(enabledRenderer.JavaScript(value?["isEnabled"]));
+
+                if (propertiesRenderer != null)
+                    sb.Append(propertiesRenderer.JavaScript(value));
+
+                if (settingsRenderer != null)
+                {
+                    if (key == FeatureEditor.OptionsKey)
+                    {
+                        sb.Append(settingsRenderer.JavaScript(value[key]));
+                    }
+                    else
+                    {
+                        sb.Append(settingsRenderer.JavaScript(v[key]));
+                    }
+                }
+
+                foreach (var renderer in propertyTagRenderes)
+                {
+                    sb.Append(renderer.Value.JavaScript(v));
+                }
+
+                sb.Append(javaScript.Replace("{0}", value?["isEnabled"]?.ToString()?.ToLower()));
+
+                return sb.ToString();
             });
         }
 
-        private JsonEditorRenderer GetOptionsTagBuilder(string key, JSchema schema)
+        private JsonEditorRenderer GetPropertyTagBuilder(string key, JSchema schema)
         {
-            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Path);
+            var editor = _editorProvider.GetJsonEditor(schema, $"{Context.Options.Key}.{key}", Context.Prefix.Split('.')[0]);
 
             if (editor.Context.Options.Hidden)
                 return null;
@@ -122,9 +243,31 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             return builder;
         }
 
-        private JsonEditorRenderer GetPropertyTagBuilder(string key, JSchema schema)
+        private JsonEditorRenderer GetChildFeatureTagBuilder(string key, JSchema schema)
         {
-            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Path);
+            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Prefix.Split('.')[0]);
+
+            if (editor.Context.Options.Hidden)
+                return null;
+
+            var builder = editor?.Build();
+            return builder;
+        }
+
+        private JsonEditorRenderer GetSettingsTagBuilder(string key, JSchema schema)
+        {
+            var editor = _editorProvider.GetJsonEditor(schema, $"{Context.Options.Key}.{key}", Context.Prefix.Split('.')[0]);
+
+            if (editor.Context.Options.Hidden)
+                return null;
+
+            var builder = editor?.Build();
+            return builder;
+        }
+
+        private JsonEditorRenderer GetFeatureOptionsTagBuilder(string key, JSchema schema)
+        {
+            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Prefix.Split('.')[0]);
 
             if (editor.Context.Options.Hidden)
                 return null;
@@ -164,7 +307,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                     result.InnerHtml += property.Value.Render(value?[property.Key]);
 
                 return result.ToString();
-            });
+            }, value => string.Join("", propertyTagRenderes.Select(property => property.Value.JavaScript(value?[property.Key]))));
         }
 
         private JsonEditorRenderer GetPropertyTagBuilder(string key, JSchema schema)

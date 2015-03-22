@@ -38,6 +38,7 @@ namespace Blacklite.Framework.Features.EditorModel
     {
         public FeatureModel(IFeatureDescriber describer) : base(describer.Type.Name)
         {
+            Describer = describer;
             Title = describer.DisplayName;
             Description = describer.Description;
             FeatureType = describer.Type;
@@ -53,7 +54,7 @@ namespace Blacklite.Framework.Features.EditorModel
             if (HasEnabled)
                 Enabled = new FeatureOptionPropertyModel(typeof(bool),
                     nameof(ISwitch.IsEnabled),
-                    "Enabled",
+                    "IsEnabled",
                     null,
                     x => describer.GetIsEnabled<bool>(x),
                     (obj, value) => describer.SetIsEnabled(obj, value),
@@ -104,6 +105,7 @@ namespace Blacklite.Framework.Features.EditorModel
         public IEnumerable<FeatureModel> Children { get; }
         public IEnumerable<FeatureDependencyModel> Dependencies { get; }
         public FeatureModel OptionsFeature { get; set; }
+        public IFeatureDescriber Describer { get; }
 
 
         public override int GetHashCode()

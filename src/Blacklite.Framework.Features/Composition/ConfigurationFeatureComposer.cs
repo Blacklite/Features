@@ -13,7 +13,7 @@ namespace Blacklite.Framework.Features.Composition
         private readonly Func<IFeatureDescriber, bool> _predicate;
 
         public ConfigurationFeatureComposer(IConfiguration configuration)
-            : this(configuration, describer => describer.TypeInfo.CustomAttributes.OfType<ConfigurationFeatureAttribute>().Any())
+            : this(configuration, describer => describer.TypeInfo.GetCustomAttributes<ConfigurationFeatureAttribute>().Any())
         {
         }
 

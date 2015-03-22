@@ -12,8 +12,8 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
     public interface IFeatureJsonEditorDecorator
     {
         bool HasChildProperties(IJsonEditorResolutionContext context);
-        TagBuilder DecorateFeatureCheckbox(IJsonEditorResolutionContext context, TagBuilder tagBuilder);
-        TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder tagBuilder, string html, string title = "Settings");
+        TagBuilder DecorateFeatureCheckbox(IJsonEditorResolutionContext context, TagBuilder tagBuilder, string helpTitle = null, string helpContent = null);
+        TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder tagBuilder, string html, string title = "Settings", string helpTitle = null, string helpContent = null);
         TagBuilder DecorateTabHeaderContainer(IJsonEditorResolutionContext context, TagBuilder container, IEnumerable<TagBuilder> tabs);
         TagBuilder DecorateTabHeader(IJsonEditorResolutionContext context, JSchema schema, TagBuilder container);
         TagBuilder DecorateTabContainer(IJsonEditorResolutionContext context, TagBuilder container, IEnumerable<TagBuilder> tabs);
@@ -28,7 +28,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             _editorProvider = new Lazy<IJsonEditorProvider>(() => (IJsonEditorProvider)serviceProvider.GetService(typeof(IJsonEditorProvider)));
         }
 
-        public virtual TagBuilder DecorateFeatureCheckbox(IJsonEditorResolutionContext context, TagBuilder toggle)
+        public virtual TagBuilder DecorateFeatureCheckbox(IJsonEditorResolutionContext context, TagBuilder toggle, string helpTitle = null, string helpContent = null)
         {
             toggle.AddCssClass("feature");
             toggle.AddCssClass("col-sm-3");
@@ -49,16 +49,39 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                 toggle.AddCssClass("col-md-2");
             }
 
+            if (helpContent != null)
+            {
+                var help = new TagBuilder("a");
+                var helpIcon = new TagBuilder("span");
+                helpIcon.AddCssClass("glyphicon glyphicon-info-sign");
+                helpIcon.Attributes.Add("aria-hidden", "true");
+                help.AddCssClass("btn");
+                help.AddCssClass("btn-info");
+                help.AddCssClass("btn-sm");
+                help.Attributes.Add("data-toggle", "popover");
+                help.Attributes.Add("data-placement", "bottom");
+                help.Attributes.Add("data-html", "true");
+                if (helpTitle != null)
+                    help.Attributes.Add("title", helpTitle);
+                help.Attributes.Add("data-content", $"<h6>{helpContent}</h6>");
+
+                help.InnerHtml = helpIcon.ToString();
+                help.AddCssClass("pull-right-sm");
+                help.AddCssClass("pull-left-xs");
+
+                toggle.InnerHtml += help.ToString();
+            }
+
             return toggle;
         }
 
-        public TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder settings, string html, string title = "Settings")
+        public TagBuilder DecorateSettings(IJsonEditorResolutionContext context, TagBuilder settings, string html, string title = "Settings", string helpTitle = null, string helpContent = null)
         {
             var container = new TagBuilder("div");
             container.AddCssClass("pull-right-sm");
             container.AddCssClass("pull-left-xs");
 
-            var id = TagBuilder.CreateSanitizedId($"{context.Path}_settings", "_");
+            var id = TagBuilder.CreateSanitizedId($"{context.Prefix}_{context.Options.Key}_settings", "_");
 
             var button = new TagBuilder("button");
             button.AddCssClass("btn");
@@ -103,6 +126,25 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             h4.AddCssClass("modal-title");
             h4.Attributes.Add("id", $"{id}_header");
             h4.InnerHtml = title;
+
+            if (helpContent != null)
+            {
+                var help = new TagBuilder("a");
+                var helpIcon = new TagBuilder("span");
+                helpIcon.AddCssClass("glyphicon glyphicon-info-sign");
+                helpIcon.Attributes.Add("aria-hidden", "true");
+                help.AddCssClass("badge");
+                help.Attributes.Add("data-toggle", "popover");
+                help.Attributes.Add("data-placement", "bottom");
+                help.Attributes.Add("data-html", "true");
+                if (helpTitle != null)
+                    help.Attributes.Add("title", helpTitle);
+                help.Attributes.Add("data-content", $"<h6>{helpContent}</h6>");
+
+                help.InnerHtml = helpIcon.ToString();
+
+                h4.InnerHtml += "&nbsp;&nbsp;" + help.ToString();
+            }
 
             header.InnerHtml += h4.ToString();
 
@@ -187,14 +229,14 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
         public bool HasChildProperties(IJsonEditorResolutionContext context)
         {
             return context.Schema.Properties
-                .Where(x => x.Key != FeatureEditor.OptionsKey && x.Key != FeatureEditor.SettingsKey && x.Key != "enabled")
+                .Where(x => x.Key != FeatureEditor.OptionsKey && x.Key != FeatureEditor.SettingsKey && x.Key != "isEnabled")
                 .Where(x => Visible(x.Key, x.Value, context))
                 .Any();
         }
 
         private bool Visible(string key, JSchema schema, IJsonEditorResolutionContext context)
         {
-            var editor = _editorProvider.Value.GetJsonEditor(schema, key, context.Path);
+            var editor = _editorProvider.Value.GetJsonEditor(schema, context.Path);
 
             if (editor.Context.Options.Hidden)
                 return false;

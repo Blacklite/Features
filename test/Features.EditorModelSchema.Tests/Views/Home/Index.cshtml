@@ -1,5 +1,5 @@
 ﻿@model Blacklite.Framework.Features.EditorModel.IFeatureEditor
-@addtaghelper "Blacklite.Json.Schema.TagHelpers"
+@addtaghelper "Blacklite.Framework.Features.Mvc"
 @addtaghelper "Microsoft.AspNet.Mvc.TagHelpers.FormTagHelper, Microsoft.AspNet.Mvc.TagHelpers"
 @{
     ViewBag.Title = "Home Page";
@@ -14,7 +14,7 @@
 <form asp-action="Index" asp-controller="Home" method="post">
     <div class="row">
         <div class="col-md-12">
-            <json-editor-schema model="Model.Model" schema="Model.Schema" />
+            <feature-editor editor="Model" />
         </div>
     </div>
 

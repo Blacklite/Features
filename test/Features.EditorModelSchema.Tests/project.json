@@ -12,8 +12,7 @@
         "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta3",
         "Microsoft.Framework.Logging": "1.0.0-beta3",
         "Microsoft.Framework.Logging.Console": "1.0.0-beta3",
-        "Blacklite.Framework.Features": "",
-        "Blacklite.Framework.Features.EditorModel": "",
+        "Blacklite.Framework.Features.Mvc": "",
         "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-beta3",
         "Blacklite.Json.Schema.TagHelpers": ""
     },

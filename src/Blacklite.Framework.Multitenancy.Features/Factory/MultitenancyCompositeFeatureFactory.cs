@@ -3,6 +3,7 @@ using System;
 using Blacklite.Framework.Features.Describers;
 using Microsoft.Framework.DependencyInjection;
 using Blacklite.Framework.Multitenancy.Features.Describers;
+using Blacklite.Framework.Features;
 
 namespace Blacklite.Framework.Multitenancy.Features.Factory
 {
@@ -28,20 +29,20 @@ namespace Blacklite.Framework.Multitenancy.Features.Factory
                 serviceProvider.GetRequiredService<IApplicationOnlyFeatureFactory>());
         }
 
-        public override TFeature GetFeature<TFeature>()
+        public override IFeature GetFeature(Type featureType)
         {
-            var describer = (MultitenancyFeatureDescriber)_describerProvider.Describers[typeof(TFeature)];
+            var describer = (MultitenancyFeatureDescriber)_describerProvider.Describers[featureType];
             if (describer.IsTenantScoped)
             {
-                return _tenantOnlyFeatureFactory.Value.GetFeature<TFeature>();
+                return _tenantOnlyFeatureFactory.Value.GetFeature(featureType);
             }
 
             if (describer.IsApplicationScoped)
             {
-                return _applicationOnlyFeatureFactory.Value.GetFeature<TFeature>();
+                return _applicationOnlyFeatureFactory.Value.GetFeature(featureType);
             }
 
-            return base.GetFeature<TFeature>();
+            return base.GetFeature(featureType);
         }
     }
 }
