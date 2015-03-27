@@ -4,7 +4,7 @@ using Blacklite.Framework.Features.Describers;
 using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.Observables;
 using Microsoft.Framework.DependencyInjection;
-using Moq;
+using NSubstitute;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -64,46 +64,47 @@ namespace Features.Tests
             typeof(RealObservableSwitch2),
             }.Select(x => x.GetTypeInfo());
 
-            var featureTypeProviderMock = new Mock<IFeatureTypeProvider>();
-            featureTypeProviderMock.Setup(x => x.FeatureTypes).Returns(servicesCollection);
-            var featureTypeProvider = featureTypeProviderMock.Object;
+            Substitute.For<IFeatureTypeProvider>();
+
+            var featureTypeProvider = Substitute.For<IFeatureTypeProvider>();
+            featureTypeProvider.FeatureTypes.Returns(x => servicesCollection);
 
             var featureDescriberProvider = new FeatureDescriberProvider(featureTypeProvider, new FeatureDescriberFactory());
 
-            var serviceProviderMock = new Mock<IServiceProvider>();
-            var serviceProvider = serviceProviderMock.Object;
+            var serviceProvider = Substitute.For<IServiceProvider>();
 
-            var featureFactoryMock = new Mock<IFeatureFactory>();
-            featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature>()).Returns(() => new ScopedFeature());
-            featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature2>()).Returns(() => new ScopedFeature2());
-            featureFactoryMock.Setup(x => x.GetFeature<SingletonFeature>()).Returns(new SingletonFeature());
-            featureFactoryMock.Setup(x => x.GetFeature<SingletonFeature2>()).Returns(new SingletonFeature2());
-            featureFactoryMock.Setup(x => x.GetFeature<RealObservableSwitch>()).Returns(new RealObservableSwitch());
-            featureFactoryMock.Setup(x => x.GetFeature<RealObservableSwitch2>()).Returns(new RealObservableSwitch2());
-            var featureFactory = featureFactoryMock.Object;
+
+            var featureFactory = Substitute.For<IFeatureFactory>();
+            featureFactory.GetFeature(typeof(ScopedFeature)).Returns(x => new ScopedFeature());
+            featureFactory.GetFeature(typeof(ScopedFeature2)).Returns(x => new ScopedFeature2());
+            featureFactory.GetFeature(typeof(SingletonFeature)).Returns(x => new SingletonFeature());
+            featureFactory.GetFeature(typeof(SingletonFeature2)).Returns(x => new SingletonFeature2());
+            featureFactory.GetFeature(typeof(RealObservableSwitch)).Returns(x => new RealObservableSwitch());
+            featureFactory.GetFeature(typeof(RealObservableSwitch2)).Returns(x => new RealObservableSwitch2());
+
 
             var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
 
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<ScopedFeature>))).Returns(() => new FeatureImpl< ScopedFeature>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<ScopedFeature2>))).Returns(() => new FeatureImpl<ScopedFeature2>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<SingletonFeature>))).Returns(new FeatureImpl<SingletonFeature>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<SingletonFeature2>))).Returns(new FeatureImpl<SingletonFeature2>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<RealObservableSwitch>))).Returns(new FeatureImpl<RealObservableSwitch>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<RealObservableSwitch2>))).Returns(new FeatureImpl<RealObservableSwitch2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<ScopedFeature>)).Returns(x => new FeatureImpl<ScopedFeature>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<ScopedFeature2>)).Returns(x => new FeatureImpl<ScopedFeature2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<SingletonFeature>)).Returns(x => new FeatureImpl<SingletonFeature>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<SingletonFeature2>)).Returns(x => new FeatureImpl<SingletonFeature2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<RealObservableSwitch>)).Returns(x => new FeatureImpl<RealObservableSwitch>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<RealObservableSwitch2>)).Returns(x => new FeatureImpl<RealObservableSwitch2>(featureFactory));
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
             var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, serviceProvider, service);
-            var realObservableSubjectFactoryMock = new Mock<IFeatureSubjectFactory>();
-            realObservableSubjectFactoryMock.Setup(x => x.GetSubject(It.IsAny<Type>())).Returns(realObservableSubject);
-            var realObservableSubjectFactory = realObservableSubjectFactoryMock.Object;
-            serviceProviderMock.Setup(x => x.GetService(typeof(ObservableFeature<RealObservableSwitch>))).Returns(new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
+            var realObservableSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
+            realObservableSubjectFactory.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject);
+
+            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
 
             var realObservableSwitch2 = new FeatureImpl<RealObservableSwitch2>(featureFactory);
             var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, serviceProvider, service);
-            var realObservableSubjectFactoryMock2 = new Mock<IFeatureSubjectFactory>();
-            realObservableSubjectFactoryMock2.Setup(x => x.GetSubject(It.IsAny<Type>())).Returns(realObservableSubject2);
-            var realObservableSubjectFactory2 = realObservableSubjectFactoryMock2.Object;
-            serviceProviderMock.Setup(x => x.GetService(typeof(ObservableFeature<RealObservableSwitch2>))).Returns(new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
+            var realObservableSubjectFactory2 = Substitute.For<IFeatureSubjectFactory>();
+            realObservableSubjectFactory2.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject2);
+
+            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch2>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
 
             bool result = false;
             result = service.ValidateRequiredFeatures(typeof(ScopedFeature));
@@ -140,46 +141,48 @@ namespace Features.Tests
             typeof(RealObservableSwitch2),
             }.Select(x => x.GetTypeInfo());
 
-            var featureTypeProviderMock = new Mock<IFeatureTypeProvider>();
-            featureTypeProviderMock.Setup(x => x.FeatureTypes).Returns(servicesCollection);
-            var featureTypeProvider = featureTypeProviderMock.Object;
+            var featureTypeProvider = Substitute.For<IFeatureTypeProvider>();
+            featureTypeProvider.FeatureTypes.Returns(x => servicesCollection);
+
 
             var featureDescriberProvider = new FeatureDescriberProvider(featureTypeProvider, new FeatureDescriberFactory());
 
-            var featureFactoryMock = new Mock<IFeatureFactory>();
-            featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature>()).Returns(() => new ScopedFeature());
-            featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature2>()).Returns(() => new ScopedFeature2());
-            featureFactoryMock.Setup(x => x.GetFeature<SingletonFeature>()).Returns(new SingletonFeature());
-            featureFactoryMock.Setup(x => x.GetFeature<SingletonFeature2>()).Returns(new SingletonFeature2());
-            featureFactoryMock.Setup(x => x.GetFeature<RealObservableSwitch>()).Returns(new RealObservableSwitch());
-            featureFactoryMock.Setup(x => x.GetFeature<RealObservableSwitch2>()).Returns(new RealObservableSwitch2());
-            var featureFactory = featureFactoryMock.Object;
+            var featureFactory = Substitute.For<IFeatureFactory>();
+            featureFactory.GetFeature(typeof(ScopedFeature)).Returns(x => new ScopedFeature());
+            featureFactory.GetFeature(typeof(ScopedFeature2)).Returns(x => new ScopedFeature2());
+            featureFactory.GetFeature(typeof(SingletonFeature)).Returns(x => new SingletonFeature());
+            featureFactory.GetFeature(typeof(SingletonFeature2)).Returns(x => new SingletonFeature2());
+            featureFactory.GetFeature(typeof(RealObservableSwitch)).Returns(x => new RealObservableSwitch());
+            featureFactory.GetFeature(typeof(RealObservableSwitch2)).Returns(x => new RealObservableSwitch2());
 
-            var serviceProviderMock = new Mock<IServiceProvider>();
-            var serviceProvider = serviceProviderMock.Object;
+
+            var serviceProvider = Substitute.For<IServiceProvider>();
+
 
             var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
 
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<ScopedFeature>))).Returns(() => new FeatureImpl<ScopedFeature>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<ScopedFeature2>))).Returns(() => new FeatureImpl<ScopedFeature2>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<SingletonFeature>))).Returns(new FeatureImpl<SingletonFeature>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<SingletonFeature2>))).Returns(new FeatureImpl<SingletonFeature2>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<RealObservableSwitch>))).Returns(new FeatureImpl<RealObservableSwitch>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<RealObservableSwitch2>))).Returns(new FeatureImpl<RealObservableSwitch2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<ScopedFeature>)).Returns(x => new FeatureImpl<ScopedFeature>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<ScopedFeature2>)).Returns(x => new FeatureImpl<ScopedFeature2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<SingletonFeature>)).Returns(x => new FeatureImpl<SingletonFeature>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<SingletonFeature2>)).Returns(x => new FeatureImpl<SingletonFeature2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<RealObservableSwitch>)).Returns(x => new FeatureImpl<RealObservableSwitch>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<RealObservableSwitch2>)).Returns(x => new FeatureImpl<RealObservableSwitch2>(featureFactory));
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
             var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, serviceProvider, service);
-            var realObservableSubjectFactoryMock = new Mock<IFeatureSubjectFactory>();
-            realObservableSubjectFactoryMock.Setup(x => x.GetSubject(It.IsAny<Type>())).Returns(realObservableSubject);
-            var realObservableSubjectFactory = realObservableSubjectFactoryMock.Object;
-            serviceProviderMock.Setup(x => x.GetService(typeof(ObservableFeature<RealObservableSwitch>))).Returns(new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
+            var realObservableSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
+            realObservableSubjectFactory.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject);
+
+            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch>))
+                .Returns(x => new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
 
             var realObservableSwitch2 = new FeatureImpl<RealObservableSwitch2>(featureFactory);
             var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, serviceProvider, service);
-            var realObservableSubjectFactoryMock2 = new Mock<IFeatureSubjectFactory>();
-            realObservableSubjectFactoryMock2.Setup(x => x.GetSubject(It.IsAny<Type>())).Returns(realObservableSubject2);
-            var realObservableSubjectFactory2 = realObservableSubjectFactoryMock2.Object;
-            serviceProviderMock.Setup(x => x.GetService(typeof(ObservableFeature<RealObservableSwitch2>))).Returns(new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
+            var realObservableSubjectFactory2 = Substitute.For<IFeatureSubjectFactory>();
+            realObservableSubjectFactory2.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject2);
+
+            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch2>))
+                .Returns(x => new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
 
             bool result = false;
 
@@ -213,49 +216,51 @@ namespace Features.Tests
             typeof(RealObservableSwitch2),
             }.Select(x => x.GetTypeInfo());
 
-            var featureTypeProviderMock = new Mock<IFeatureTypeProvider>();
-            featureTypeProviderMock.Setup(x => x.FeatureTypes).Returns(servicesCollection);
-            var featureTypeProvider = featureTypeProviderMock.Object;
+            var featureTypeProvider = Substitute.For<IFeatureTypeProvider>();
+            featureTypeProvider.FeatureTypes.Returns(x => servicesCollection);
+
 
             var featureDescriberProvider = new FeatureDescriberProvider(featureTypeProvider, new FeatureDescriberFactory());
 
-            var serviceProviderMock = new Mock<IServiceProvider>();
-            var serviceProvider = serviceProviderMock.Object;
+            var serviceProvider = Substitute.For<IServiceProvider>();
 
-            var ScopedFeature = new ScopedFeature();
-            ScopedFeature.IsEnabled = false;
 
-            var featureFactoryMock = new Mock<IFeatureFactory>();
-            featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature>()).Returns(() => ScopedFeature);
-            featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature2>()).Returns(() => new ScopedFeature2());
-            featureFactoryMock.Setup(x => x.GetFeature<SingletonFeature>()).Returns(new SingletonFeature());
-            featureFactoryMock.Setup(x => x.GetFeature<SingletonFeature2>()).Returns(new SingletonFeature2());
-            featureFactoryMock.Setup(x => x.GetFeature<RealObservableSwitch>()).Returns(new RealObservableSwitch());
-            featureFactoryMock.Setup(x => x.GetFeature<RealObservableSwitch2>()).Returns(new RealObservableSwitch2());
-            var featureFactory = featureFactoryMock.Object;
+            var scopedFeature = new ScopedFeature();
+            scopedFeature.IsEnabled = false;
+
+            var featureFactory = Substitute.For<IFeatureFactory>();
+            featureFactory.GetFeature(typeof(ScopedFeature)).Returns(x => scopedFeature);
+            featureFactory.GetFeature(typeof(ScopedFeature2)).Returns(x => new ScopedFeature2());
+            featureFactory.GetFeature(typeof(SingletonFeature)).Returns(x => new SingletonFeature());
+            featureFactory.GetFeature(typeof(SingletonFeature2)).Returns(x => new SingletonFeature2());
+            featureFactory.GetFeature(typeof(RealObservableSwitch)).Returns(x => new RealObservableSwitch());
+            featureFactory.GetFeature(typeof(RealObservableSwitch2)).Returns(x => new RealObservableSwitch2());
+
 
             var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
 
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<ScopedFeature>))).Returns(() => new FeatureImpl<ScopedFeature>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<ScopedFeature2>))).Returns(() => new FeatureImpl<ScopedFeature2>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<SingletonFeature>))).Returns(new FeatureImpl<SingletonFeature>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<SingletonFeature2>))).Returns(new FeatureImpl<SingletonFeature2>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<RealObservableSwitch>))).Returns(new FeatureImpl<RealObservableSwitch>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<RealObservableSwitch2>))).Returns(new FeatureImpl<RealObservableSwitch2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<ScopedFeature>)).Returns(x => new FeatureImpl<ScopedFeature>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<ScopedFeature2>)).Returns(x => new FeatureImpl<ScopedFeature2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<SingletonFeature>)).Returns(x => new FeatureImpl<SingletonFeature>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<SingletonFeature2>)).Returns(x => new FeatureImpl<SingletonFeature2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<RealObservableSwitch>)).Returns(x => new FeatureImpl<RealObservableSwitch>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<RealObservableSwitch2>)).Returns(x => new FeatureImpl<RealObservableSwitch2>(featureFactory));
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
             var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, serviceProvider, service);
-            var realObservableSubjectFactoryMock = new Mock<IFeatureSubjectFactory>();
-            realObservableSubjectFactoryMock.Setup(x => x.GetSubject(It.IsAny<Type>())).Returns(realObservableSubject);
-            var realObservableSubjectFactory = realObservableSubjectFactoryMock.Object;
-            serviceProviderMock.Setup(x => x.GetService(typeof(ObservableFeature<RealObservableSwitch>))).Returns(new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
+            var realObservableSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
+            realObservableSubjectFactory.GetSubject(typeof(RealObservableSwitch)).Returns(x => realObservableSubject);
+
+            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch>))
+                .Returns(x => new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
 
             var realObservableSwitch2 = new FeatureImpl<RealObservableSwitch2>(featureFactory);
             var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, serviceProvider, service);
-            var realObservableSubjectFactoryMock2 = new Mock<IFeatureSubjectFactory>();
-            realObservableSubjectFactoryMock2.Setup(x => x.GetSubject(It.IsAny<Type>())).Returns(realObservableSubject2);
-            var realObservableSubjectFactory2 = realObservableSubjectFactoryMock2.Object;
-            serviceProviderMock.Setup(x => x.GetService(typeof(ObservableFeature<RealObservableSwitch2>))).Returns(new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
+            var realObservableSubjectFactory2 = Substitute.For<IFeatureSubjectFactory>();
+            realObservableSubjectFactory2.GetSubject(typeof(RealObservableSwitch2)).Returns(x => realObservableSubject2);
+
+            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch2>))
+                .Returns(x => new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
 
             bool result = false;
             result = service.ValidateRequiredFeatures(typeof(ScopedFeature));
@@ -300,48 +305,48 @@ namespace Features.Tests
             typeof(RealObservableSwitch2),
             }.Select(x => x.GetTypeInfo());
 
-            var featureTypeProviderMock = new Mock<IFeatureTypeProvider>();
-            featureTypeProviderMock.Setup(x => x.FeatureTypes).Returns(servicesCollection);
-            var featureTypeProvider = featureTypeProviderMock.Object;
+            var featureTypeProvider = Substitute.For<IFeatureTypeProvider>();
+            featureTypeProvider.FeatureTypes.Returns(x => servicesCollection);
+
 
             var featureDescriberProvider = new FeatureDescriberProvider(featureTypeProvider, new FeatureDescriberFactory());
 
             var ScopedFeature = new ScopedFeature();
             var singletonFeature = new SingletonFeature();
-            var featureFactoryMock = new Mock<IFeatureFactory>();
-            featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature>()).Returns(() => ScopedFeature);
-            featureFactoryMock.Setup(x => x.GetFeature<ScopedFeature3>()).Returns(() => new ScopedFeature3());
-            featureFactoryMock.Setup(x => x.GetFeature<SingletonFeature>()).Returns(singletonFeature);
-            featureFactoryMock.Setup(x => x.GetFeature<SingletonFeature2>()).Returns(new SingletonFeature2());
-            featureFactoryMock.Setup(x => x.GetFeature<RealObservableSwitch>()).Returns(new RealObservableSwitch());
-            featureFactoryMock.Setup(x => x.GetFeature<RealObservableSwitch2>()).Returns(new RealObservableSwitch2());
-            var featureFactory = featureFactoryMock.Object;
+            var featureFactory = Substitute.For<IFeatureFactory>();
+            featureFactory.GetFeature(typeof(ScopedFeature)).Returns(x => ScopedFeature);
+            featureFactory.GetFeature(typeof(ScopedFeature3)).Returns(x => new ScopedFeature3());
+            featureFactory.GetFeature(typeof(SingletonFeature)).Returns(x => singletonFeature);
+            featureFactory.GetFeature(typeof(SingletonFeature2)).Returns(x => new SingletonFeature2());
+            featureFactory.GetFeature(typeof(RealObservableSwitch)).Returns(x => new RealObservableSwitch());
+            featureFactory.GetFeature(typeof(RealObservableSwitch2)).Returns(x => new RealObservableSwitch2());
 
-            var serviceProviderMock = new Mock<IServiceProvider>();
-            var serviceProvider = serviceProviderMock.Object;
+
+            var serviceProvider = Substitute.For<IServiceProvider>();
+
 
             var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
 
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<ScopedFeature>))).Returns(() => new FeatureImpl<ScopedFeature>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<ScopedFeature2>))).Returns(() => new FeatureImpl<ScopedFeature2>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<SingletonFeature>))).Returns(new FeatureImpl<SingletonFeature>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<SingletonFeature2>))).Returns(new FeatureImpl<SingletonFeature2>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<RealObservableSwitch>))).Returns(new FeatureImpl<RealObservableSwitch>(featureFactory));
-            serviceProviderMock.Setup(x => x.GetService(typeof(Feature<RealObservableSwitch2>))).Returns(new FeatureImpl<RealObservableSwitch2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<ScopedFeature>)).Returns(x => new FeatureImpl<ScopedFeature>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<ScopedFeature2>)).Returns(x => new FeatureImpl<ScopedFeature2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<SingletonFeature>)).Returns(x => new FeatureImpl<SingletonFeature>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<SingletonFeature2>)).Returns(x => new FeatureImpl<SingletonFeature2>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<RealObservableSwitch>)).Returns(x => new FeatureImpl<RealObservableSwitch>(featureFactory));
+            serviceProvider.GetService(typeof(Feature<RealObservableSwitch2>)).Returns(x => new FeatureImpl<RealObservableSwitch2>(featureFactory));
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
             var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, serviceProvider, service);
-            var realObservableSubjectFactoryMock = new Mock<IFeatureSubjectFactory>();
-            realObservableSubjectFactoryMock.Setup(x => x.GetSubject(It.IsAny<Type>())).Returns(realObservableSubject);
-            var realObservableSubjectFactory = realObservableSubjectFactoryMock.Object;
-            serviceProviderMock.Setup(x => x.GetService(typeof(ObservableFeature<RealObservableSwitch>))).Returns(new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
+            var realObservableSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
+            realObservableSubjectFactory.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject);
+
+            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
 
             var realObservableSwitch2 = new FeatureImpl<RealObservableSwitch2>(featureFactory);
             var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, serviceProvider, service);
-            var realObservableSubjectFactoryMock2 = new Mock<IFeatureSubjectFactory>();
-            realObservableSubjectFactoryMock2.Setup(x => x.GetSubject(It.IsAny<Type>())).Returns(realObservableSubject2);
-            var realObservableSubjectFactory2 = realObservableSubjectFactoryMock2.Object;
-            serviceProviderMock.Setup(x => x.GetService(typeof(ObservableFeature<RealObservableSwitch2>))).Returns(new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
+            var realObservableSubjectFactory2 = Substitute.For<IFeatureSubjectFactory>();
+            realObservableSubjectFactory2.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject2);
+
+            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch2>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
 
             bool result = false;
 

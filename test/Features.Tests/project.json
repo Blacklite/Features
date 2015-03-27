@@ -1,19 +1,20 @@
 ﻿{
-	"dependencies": {
+    "dependencies": {
         "Blacklite.Framework.Features": "",
         "Blacklite.Framework.Multitenancy.Features": "",
-        "Moq": "4.2",
-        "xunit.runner.kre": "1.0.0-beta3-*"
-	},
+        "NSubstitute": "1.8.1",
+        "xunit": "2.1.0-*",
+        "xunit.runner.aspnet": "2.1.0-*"
+    },
 
-	"commands": {
-		"test": "xunit.runner.kre"
-	},
+    "commands": {
+        "test": "xunit.runner.aspnet"
+    },
 
-	"frameworks": {
-		"aspnet50": {
-			"dependencies": {
-			}
-		}
-	}
+    "frameworks": {
+        "aspnet50": {
+            "dependencies": {
+            }
+        }
+    }
 }
