@@ -41,7 +41,6 @@ namespace Blacklite.Framework.Features.Composition
             {
                 foreach (var property in describer.Properties)
                 {
-
                     if (_configuration.TryGet($"{describer.Type.Name}:{property.Name}", out value))
                     {
                         if (!typeof(IConvertible).GetTypeInfo().IsAssignableFrom(property.Type.GetTypeInfo()))
