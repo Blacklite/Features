@@ -18,7 +18,7 @@ namespace Blacklite.Framework.Features.Mvc
         {
             if (this.TryValidateModel(editor))
             {
-                editor.Save(ModelState);
+                editor.Save();
             }
             return View(editor);
         }

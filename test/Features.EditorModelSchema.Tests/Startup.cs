@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Hosting;
@@ -12,6 +13,7 @@ using Microsoft.Framework.Logging.Console;
 using Blacklite.Framework.Features;
 using Features.EditorModelSchema.Tests.Features;
 using Blacklite.Framework.Features.EditorModel;
+using System.Collections.Generic;
 
 namespace Features.EditorModelSchema.Tests
 {
@@ -39,6 +41,7 @@ namespace Features.EditorModelSchema.Tests
             services.AddFeatures()
                 .AddFeatureEditorModel()
                 .AddFeaturesMvc()
+                .AddFeaturesHttp()
                 .AddFeaturesConfiguration(Configuration);
         }
 
@@ -61,8 +64,20 @@ namespace Features.EditorModelSchema.Tests
                 app.UseErrorHandler("/Home/Error");
             }
 
+            app.UseFeaturesHttp("/features");
             // Add static files to the request pipeline.
             app.UseStaticFiles();
+            
+            app.Map("/configuration", b =>
+            {
+                b.Use(async (httpContext, next) =>
+                {
+                    var root = this.Configuration as IConfigurationSourceContainer;
+                    var keys = root.OfType<BaseConfigurationSource>().SelectMany(z => z.Data).ToArray();
+                    await httpContext.Response.WriteAsync(string.Join("\n", keys.Select(z => $"{z.Key}: {z.Value}")));
+                });
+            });
+
 
             // Add MVC to the request pipeline.
             app.UseMvc(routes =>

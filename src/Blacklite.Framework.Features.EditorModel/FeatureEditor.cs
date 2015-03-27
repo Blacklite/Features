@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using Microsoft.AspNet.Mvc.ModelBinding;
 using Blacklite.Framework.Features.Describers;
 
 namespace Blacklite.Framework.Features.EditorModel
@@ -30,7 +29,7 @@ namespace Blacklite.Framework.Features.EditorModel
 
         string Prefix { get; }
 
-        void Save(ModelStateDictionary modelState);
+        void Save();
     }
 
     public class FeatureEditor : IFeatureEditor
@@ -149,9 +148,9 @@ namespace Blacklite.Framework.Features.EditorModel
             return schemaContainer.Schema;
         }
 
-        public void Save(ModelStateDictionary modelState)
+        public void Save()
         {
-            var changedItems = _models.SelectMany(x => SaveModel(modelState, x, Model[x.Name])).ToArray();
+            var changedItems = _models.SelectMany(x => SaveModel(x, Model[x.Name])).ToArray();
 
             foreach (var item in changedItems)
             {
@@ -175,21 +174,21 @@ namespace Blacklite.Framework.Features.EditorModel
             public IFeatureDescriber Describer { get; }
         }
 
-        private IEnumerable<SaveContext> SaveModel(ModelStateDictionary modelState, FeatureGroup group, JToken json)
+        private IEnumerable<SaveContext> SaveModel(FeatureGroup group, JToken json)
         {
             foreach (var item in group.Items)
             {
                 var model = item as FeatureModel;
                 if (model != null)
                 {
-                    foreach (var result in SaveModel(modelState, model, json[model.Name]))
+                    foreach (var result in SaveModel(model, json[model.Name]))
                         yield return result;
                 }
 
                 var grouping = item as FeatureGroup;
                 if (grouping != null)
                 {
-                    foreach (var result in SaveModel(modelState, grouping, json[grouping.Name]))
+                    foreach (var result in SaveModel(grouping, json[grouping.Name]))
                         yield return result;
                 }
             }
@@ -209,7 +208,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return left.Value.Equals(right.Value);
         }
 
-        private IEnumerable<SaveContext> SaveModel(ModelStateDictionary modelState, FeatureModel model, JToken json)
+        private IEnumerable<SaveContext> SaveModel(FeatureModel model, JToken json)
         {
             //json.Add(model.Name, model.Name);
             var feature = _getFeature(model.FeatureType);
@@ -296,7 +295,7 @@ namespace Blacklite.Framework.Features.EditorModel
             //{
             //    foreach (var child in model.Children)
             //    {
-            //        foreach (var item in SaveModel(modelState, child, json[child.Name]))
+            //        foreach (var item in SaveModel( child, json[child.Name]))
             //            yield return item;
             //    }
             //}
@@ -342,9 +341,9 @@ namespace Blacklite.Framework.Features.EditorModel
             }
         }
 
-        public void Save(ModelStateDictionary modelState)
+        public void Save()
         {
-            _editor.Save(modelState);
+            _editor.Save();
         }
     }
 }

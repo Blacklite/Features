@@ -21,7 +21,7 @@ namespace Blacklite.Framework.Features.Observables
 
         private IFeatureSubject CreateSubject(Type featureType)
         {
-            var subjectType = typeof(FeatureSubject<>).MakeGenericType(featureType);
+            var subjectType = typeof(IFeatureSubject<>).MakeGenericType(featureType);
             return (IFeatureSubject)_serviceProvider.GetService(subjectType);
         }
     }

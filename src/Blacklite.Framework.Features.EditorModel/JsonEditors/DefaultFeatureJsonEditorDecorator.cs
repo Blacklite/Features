@@ -18,6 +18,8 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
         TagBuilder DecorateTabHeader(IJsonEditorResolutionContext context, JSchema schema, TagBuilder container);
         TagBuilder DecorateTabContainer(IJsonEditorResolutionContext context, TagBuilder container, IEnumerable<TagBuilder> tabs);
         TagBuilder DecorateTab(IJsonEditorResolutionContext context, JSchema schema, TagBuilder container);
+        string EmitRequiredConstraint(string id, string requiredValue);
+        string EmitRequiredConstraintOnChange(string id, string constraint);
     }
 
     public class DefaultFeatureJsonEditorDecorator : IFeatureJsonEditorDecorator
@@ -236,7 +238,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
         private bool Visible(string key, JSchema schema, IJsonEditorResolutionContext context)
         {
-            var editor = _editorProvider.Value.GetJsonEditor(schema, context.Path);
+            var editor = _editorProvider.Value.GetJsonEditor(schema, context.Path, context);
 
             if (editor.Context.Options.Hidden)
                 return false;
@@ -261,6 +263,43 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
             li.Attributes.Add("role", "presentation");
 
             return li;
+        }
+
+        public string EmitRequiredConstraint(string id, string constraint)
+        {
+            return $@"
+        var ele = elements[key],
+            dom = ele[0],
+            sw = ele.data('bootstrapSwitch'),
+            valueWhenNotDisabled = {{0}};
+
+        var checkConstraints = function() {{
+            var disable = !({constraint});
+            if (disable) {{
+                valueWhenNotDisabled = dom.checked;
+                sw.indeterminate(true);
+                sw.disabled(disable);
+                dom.disabled = disable;
+            }} else {{
+                dom.checked = valueWhenNotDisabled;
+                dom.disabled = disable;
+                sw.disabled(disable);
+                sw.state(valueWhenNotDisabled);
+            }}
+        }};
+";
+        }
+
+        public string EmitRequiredConstraintOnChange(string id, string methodName)
+        {
+            return $@"(function() {{
+    var s = elements['{id}'].data('bootstrapSwitch'),
+        current = s.onSwitchChange();
+    if (!current)
+        s.onSwitchChange(checkConstraints);
+    else
+        s.onSwitchChange(function() {{ current(); {methodName}(); }});
+}})();";
         }
     }
 }

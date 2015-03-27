@@ -49,38 +49,14 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                 {
                     var constraintObjects = string.Join(";\n", requireObjects.Select(item => $" elements['{item.id}']=elements['{item.id}'] || (elements['{item.id}'] = $('#{item.id}'))"));
                     var constraint = string.Join(" && ", requireObjects.Select(item => $"elements['{item.id}'][0].checked == {item.value}"));
-                    var constraintSwitch = string.Join(";\n", requireObjects.Select(item => $@"(function() {{
-            var s = elements['{item.id}'].data('bootstrapSwitch');
-            var current = s.onSwitchChange();
-            if (!current)
-                s.onSwitchChange(checkConstraints);
-            else
-                s.onSwitchChange(function() {{ current(); checkConstraints(); }});
-        }})();"));
+                    var constraintSwitch = string.Join(";\n", requireObjects.Select(item => _featureJsonEditorDecorator.EmitRequiredConstraintOnChange(item.id, "checkConstraints")));
 
                     javaScript = $@"
     (function() {{
         var key = '{elementId}';
         elements[key]=elements[key] || (elements[key] = $('#'+key));
         {constraintObjects};
-        var ele = elements[key];
-        var dom = ele[0];
-        var sw = ele.data('bootstrapSwitch');
-        var valueWhenNotDisabled = {{0}};
-        var checkConstraints = function() {{
-            var disable = !({constraint});
-            if (disable) {{
-                valueWhenNotDisabled = dom.checked;
-                sw.indeterminate(true);
-                sw.disabled(disable);
-                dom.disabled = disable;
-            }} else {{
-                dom.checked = valueWhenNotDisabled;
-                dom.disabled = disable;
-                sw.disabled(disable);
-                sw.state(valueWhenNotDisabled);
-            }}
-        }};
+        {_featureJsonEditorDecorator.EmitRequiredConstraint(elementId, constraint)}
         {constraintSwitch}
         callbacks.push(checkConstraints);
     }})();
@@ -163,7 +139,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
                     var sb = new StringBuilder();
                     if (propertiesRenderer != null)
                     {
-                        sb.Append(propertiesRenderer.Render(value));
+                        sb.Append(propertiesRenderer.Render(value[FeatureEditor.SettingsKey]));
                     }
 
                     if (settingsRenderer != null)
@@ -234,7 +210,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
         private JsonEditorRenderer GetPropertyTagBuilder(string key, JSchema schema)
         {
-            var editor = _editorProvider.GetJsonEditor(schema, $"{Context.Options.Key}.{key}", Context.Prefix.Split('.')[0]);
+            var editor = _editorProvider.GetJsonEditor(schema, $"{Context.Options.Key}.{key}", Context.Prefix.Split('.')[0], Context);
 
             if (editor.Context.Options.Hidden)
                 return null;
@@ -245,7 +221,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
         private JsonEditorRenderer GetChildFeatureTagBuilder(string key, JSchema schema)
         {
-            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Prefix.Split('.')[0]);
+            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Prefix.Split('.')[0], Context);
 
             if (editor.Context.Options.Hidden)
                 return null;
@@ -256,7 +232,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
         private JsonEditorRenderer GetSettingsTagBuilder(string key, JSchema schema)
         {
-            var editor = _editorProvider.GetJsonEditor(schema, $"{Context.Options.Key}.{key}", Context.Prefix.Split('.')[0]);
+            var editor = _editorProvider.GetJsonEditor(schema, $"{Context.Options.Key}.{key}", Context.Prefix.Split('.')[0], Context);
 
             if (editor.Context.Options.Hidden)
                 return null;
@@ -267,7 +243,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
         private JsonEditorRenderer GetFeatureOptionsTagBuilder(string key, JSchema schema)
         {
-            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Prefix.Split('.')[0]);
+            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Prefix.Split('.')[0], Context);
 
             if (editor.Context.Options.Hidden)
                 return null;
@@ -312,7 +288,7 @@ namespace Blacklite.Framework.Features.EditorModel.JsonEditors
 
         private JsonEditorRenderer GetPropertyTagBuilder(string key, JSchema schema)
         {
-            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Path);
+            var editor = _editorProvider.GetJsonEditor(schema, key, Context.Path, Context);
 
             if (editor.Context.Options.Hidden)
                 return null;

@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-switch/css/bootstrap-switch.min.css" />
+    <style>
+               /**
+        *  Bootstrap pull 3.x-1.1 for Twitter Bootstrap v3.
+        *
+        *  To have pull-right and pull-left to Bootstrap v3 for xs, sm, md, lg media.
+        *  This will help having some complex behavior for contents.
+        *  https://github.com/Natshah/bootstrap-pull
+        *
+        */
+               @media (max-width: 767px) {
+                   /** Pull left xs **/
+                   .pull-left-xs {
+                       float: left !important;
+                   }
+
+                   /** Pull right xs **/
+                   .pull-right-xs {
+                       float: right !important;
+                   }
+               }
+
+               @media (min-width: 768px) {
+                   /** Pull left sm **/
+                   .pull-left-sm {
+                       float: left !important;
+                   }
+
+                   /** Pull right sm **/
+                   .pull-right-sm {
+                       float: right !important;
+                   }
+               }
+
+               @media (min-width: 992px) {
+                   /** Pull left **/
+                   .pull-left-md {
+                       float: left !important;
+                   }
+
+                   /** Pull right **/
+                   .pull-right-md {
+                       float: right !important;
+                   }
+               }
+
+               @media (min-width: 1200px) {
+                   /** Pull left **/
+                   .pull-left-lg {
+                       float: left !important;
+                   }
+
+                   /** Pull right **/
+                   .pull-right-lg {
+                       float: right !important;
+                   }
+               }
+
+               .feature {
+                   padding-top: 4px;
+               }
+
+               @media (max-width: 767px) {
+                   .feature .btn {
+                       margin-left: 2px;
+                   }
+               }
+
+               @media (min-width: 768px) {
+                   .feature .btn {
+                       margin-right: 2px;
+                   }
+               }
+
+               .feature-label {
+                   margin-top: 5px;
+               }
+    </style>
+</head>
+<body>
+    <div class="container body-content">
+        <form action="{{path}}" method="post">
+            {{content}}
+            <input class="btn btn-success btn-sm" type="submit" value="Save">
+            {{antiforgery}}
+        </form>
+    </div>
+    <script src="~/lib/jquery/js/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/lib/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+    <script>
+        $(function () {
+
+            var size = 42;
+            $.fn.bootstrapSwitch.defaults.size = 'mini';
+            $.fn.bootstrapSwitch.defaults.labelWidth = size / 2;
+            $.fn.bootstrapSwitch.defaults.handleWidth = size;
+
+            // bug in bootswitch :(
+            $.fn.bootstrapSwitch.Constructor.prototype._width = function () {
+                var $handles, handleWidth;
+                $handles = this.$on.add(this.$off);
+                $handles.add(this.$label).css('width', '');
+                var handleAuto = this.options.handleWidth === 'auto';
+                var labelAuto = this.options.labelWidth === 'auto';
+                handleWidth = handleAuto ? Math.max(this.$on.width(), this.$off.width()) : this.options.handleWidth;
+                $handles.css('width', handleWidth);
+                this.$label.css('width', (function (_this) {
+                    return function (index, width) {
+                        if (_this.options.labelWidth !== 'auto') {
+                            return _this.options.labelWidth;
+                        }
+                        if (width < handleWidth) {
+                            return handleWidth;
+                        } else {
+                            return width;
+                        }
+                    };
+                })(this));
+                this._handleWidth = handleAuto ? this.$on.outerWidth() : this.options.handleWidth;
+                this._labelWidth = labelAuto ? this.$label.outerWidth() : this.options.labelWidth;
+                this.$container.css('width', (this._handleWidth * 2) + this._labelWidth);
+                return this.$wrapper.css('width', this._handleWidth + this._labelWidth);
+            }
+
+            $('input[type="checkbox"]').bootstrapSwitch();
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
+    {{scripts}}
+</body>
+</html>

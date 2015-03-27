@@ -1,4 +1,5 @@
 ﻿using Blacklite.Framework.Features.EditorModel;
+using Blacklite.Framework.Features.EditorModel.JsonEditors.Resolvers;
 using Blacklite.Json.Schema;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Razor.Runtime.TagHelpers;
@@ -15,10 +16,13 @@ namespace Blacklite.Framework.Features.Mvc
         [Activate]
         public IJsonEditorProvider EditorProvider { get; private set; }
 
+        [Activate]
+        public TabsJsonEditorResolver TabsJsonEditorResolver { get; private set; }
+
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = "div";
-            var renderer = EditorProvider.GetJsonEditor(Editor.Schema, Editor.Prefix).Build();
+            var renderer = EditorProvider.GetJsonEditor(Editor.Schema, Editor.Prefix, TabsJsonEditorResolver).Build();
             output.Content = renderer.Render(Editor.Model);
             var jsContent = renderer.JavaScript(Editor.Model);
             /*

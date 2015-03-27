@@ -29,7 +29,7 @@ namespace Blacklite.Framework.Features.EditorModel
         {
             var describe = new ServiceDescriber(configuration);
 
-            yield return describe.Transient<IJsonEditorResolver, TabsJsonEditorResolver>();
+            yield return describe.Transient<TabsJsonEditorResolver, TabsJsonEditorResolver>();
             yield return describe.Transient<IConfigureOptions<JsonEditorOptions>, ConfigureJsonEditorOptions>();
         }
     }
