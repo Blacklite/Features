@@ -1,4 +1,5 @@
-﻿using Blacklite.Framework.Features.Observables;
+﻿using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Observables;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Reactive.Subjects;
@@ -30,15 +31,30 @@ namespace Blacklite.Framework.Features
     {
         private readonly ISubject<T> _feature;
         private readonly IServiceProvider _serviceProvider;
-        public FeatureSubject(Feature<T> feature, IServiceProvider serviceProvider, IRequiredFeaturesService requiredFeaturesService)
+        public FeatureSubject(Feature<T> feature,
+            IServiceProvider serviceProvider,
+            IRequiredFeaturesService requiredFeaturesService,
+            IFeatureDescriberProvider featureDescriberProvider,
+            IFeatureSubjectFactory subjectFactory)
         {
             _feature = new BehaviorSubject<T>(feature.Value);
             _serviceProvider = serviceProvider;
+            var describer = featureDescriberProvider.Describers[typeof(T)];
 
             var observable = requiredFeaturesService.GetObservableRequiredFeatures(typeof(T));
             if (observable != null)
             {
                 observable.Subscribe(x => Update());
+            }
+
+            if (describer.HasOptions && describer.Options.IsFeature)
+            {
+                var optionsDesciber = featureDescriberProvider.Describers[describer.Options.Type];
+                if (optionsDesciber.IsObservable)
+                {
+                    var relatedSubject = subjectFactory.GetSubject(optionsDesciber.Type);
+                    _feature.Subscribe(x => relatedSubject.Update());
+                }
             }
         }
 

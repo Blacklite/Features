@@ -13,15 +13,9 @@ namespace Blacklite.Framework.Features
     {
         private readonly IFeatureRepositoryProvider _repositoryProvider;
         private readonly IFeatureSubjectFactory _subjectFactory;
-        private readonly IDictionary<Type, IFeatureDescriber> _observableOptionFeatures;
 
         public FeatureManager(IFeatureRepositoryProvider repositoryProvider, IFeatureDescriberProvider featureDescriberProvider, IFeatureSubjectFactory subjectFactory)
         {
-            _observableOptionFeatures = featureDescriberProvider
-                .Describers.Values
-                .Where(z => z.HasOptions && z.Options.IsFeature)
-                .Where(z => featureDescriberProvider.Describers[z.Options.Type].IsObservable)
-                .ToDictionary(x => x.Type);
 
             _repositoryProvider = repositoryProvider;
             _subjectFactory = subjectFactory;
@@ -39,13 +33,6 @@ namespace Blacklite.Framework.Features
 
             if (describer.IsObservable)
             {
-                IFeatureDescriber observableDescriber;
-                if (_observableOptionFeatures.TryGetValue(describer.Type, out observableDescriber))
-                {
-                    var optionsSubject = _subjectFactory.GetSubject(observableDescriber.Options.Type);
-                    optionsSubject.Update();
-                }
-
                 var subject = _subjectFactory.GetSubject(describer.Type);
                 subject.Update();
             }
