@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Blacklite.Framework.Features.Composition
 {
-    public class RequiredFeatureComposer : IFeatureComposition
+    public class RequiredFeatureComposer : IFeatureComposition, IRequiredFeatureComposer
     {
         private readonly IRequiredFeaturesService _requiredFeatures;
         public RequiredFeatureComposer(IRequiredFeaturesService requiredFeatures)

@@ -12,6 +12,7 @@ namespace Blacklite.Framework.Features.Factory
         {
             _factory = new FeatureFactory(featureCompositionProvider, featureDescriberProvider);
         }
+
         public IFeature GetFeature(Type featureType)
         {
             return _factory.GetFeature(featureType);

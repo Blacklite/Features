@@ -42,8 +42,8 @@ namespace Blacklite.Framework.Features
 
             yield return describe.Transient<DefaultFeatureDescriberEnumerable, DefaultFeatureDescriberEnumerable>();
 
-            yield return describe.Transient<IFeatureComposition, OptionsFeatureComposer>();
-            yield return describe.Transient<IFeatureComposition, RequiredFeatureComposer>();
+            yield return describe.Transient<IOptionsFeatureComposer, OptionsFeatureComposer>();
+            yield return describe.Transient<IRequiredFeatureComposer, RequiredFeatureComposer>();
             yield return describe.Singleton<IFeatureRepositoryProvider, FeatureRepositoryProvider>();
         }
 

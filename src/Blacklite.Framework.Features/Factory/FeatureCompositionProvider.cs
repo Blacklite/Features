@@ -9,35 +9,26 @@ using System.Reflection;
 
 namespace Blacklite.Framework.Features.Factory
 {
-    public static class FeatureCompositionProviderExtensions
-    {
-        public static MethodInfo GetComposersGenericMethod = typeof(IFeatureCompositionProvider).GetTypeInfo().GetDeclaredMethod(nameof(IFeatureCompositionProvider.GetComposers));
-        public static IEnumerable<IFeatureComposition> GetComposers(this IFeatureCompositionProvider provider, Type featureType)
-        {
-            return (IEnumerable<IFeatureComposition>)GetComposersGenericMethod.MakeGenericMethod(featureType).Invoke(provider, null);
-        }
-    }
-
-    public interface IFeatureCompositionProvider
-    {
-        IEnumerable<IFeatureComposition> GetComposers<TFeature>()
-            where TFeature : class, new();
-    }
-
     public class FeatureCompositionProvider : IFeatureCompositionProvider
     {
         private readonly IEnumerable<IFeatureComposition> _composers;
         private readonly IServiceProvider _serviceProvider;
         private readonly IFeatureDescriberProvider _describerProvider;
         private readonly ConcurrentDictionary<Type, IEnumerable<IFeatureComposition>> _featureComposers = new ConcurrentDictionary<Type, IEnumerable<IFeatureComposition>>();
+        private readonly IFeatureComposition[] _requiredFeatureComposer;
+        private readonly IFeatureComposition[] _optionsFeatureComposer;
 
         public FeatureCompositionProvider(
             IEnumerable<IFeatureComposition> globalComposers,
             IServiceProvider serviceProvider,
+            IOptionsFeatureComposer optionsFeatureComposer,
+            IRequiredFeatureComposer requiredFeatureComposer,
             IFeatureDescriberProvider describerProvider)
         {
             _composers = globalComposers;
             _serviceProvider = serviceProvider;
+            _optionsFeatureComposer = new IFeatureComposition[] { optionsFeatureComposer };
+            _requiredFeatureComposer = new IFeatureComposition[] { requiredFeatureComposer };
             _describerProvider = describerProvider;
         }
 
@@ -49,6 +40,7 @@ namespace Blacklite.Framework.Features.Factory
             {
                 throw new KeyNotFoundException($"Could not find feature ${typeof(TFeature).Name}.");
             }
+
             IEnumerable<IFeatureComposition> composers;
             if (!_featureComposers.TryGetValue(typeof(TFeature), out composers))
             {
@@ -58,6 +50,11 @@ namespace Blacklite.Framework.Features.Factory
                     )
                     .Where(x => x.IsApplicableTo(describer))
                     .OrderByDescending(x => x.Priority);
+
+                // Enforce options first (so it gets populated)
+                // Enfroce required last, so it overrides anything else for IsEnabled
+                composers = _optionsFeatureComposer.Concat(composers).Concat(_requiredFeatureComposer);
+                _featureComposers.TryAdd(typeof(TFeature), composers);
             }
 
             return composers;

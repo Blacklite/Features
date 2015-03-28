@@ -7,7 +7,7 @@ using Blacklite.Framework.Features.Describers;
 
 namespace Blacklite.Framework.Features.Composition
 {
-    public class OptionsFeatureComposer : IFeatureComposition
+    public class OptionsFeatureComposer : IFeatureComposition, IOptionsFeatureComposer
     {
         private readonly IServiceProvider _serviceProvider;
         public OptionsFeatureComposer(IServiceProvider serviceProvider)

@@ -12,6 +12,10 @@ namespace Blacklite.Framework.Features.Composition
         T Configure<T>(T feature, IFeatureDescriber describer);
     }
 
+    public interface IOptionsFeatureComposer : IFeatureComposition { }
+
+    public interface IRequiredFeatureComposer : IFeatureComposition { }
+
     public interface IFeatureComposition<in TFeature>
         where TFeature : class, new()
     {
