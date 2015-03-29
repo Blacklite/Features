@@ -1,7 +1,6 @@
 ﻿using Blacklite.Framework.Features.Describers;
 using System;
 using System.Reactive.Subjects;
-using Microsoft.Framework.DependencyInjection;
 using Blacklite.Framework.Features.Factory;
 using System.Reflection;
 

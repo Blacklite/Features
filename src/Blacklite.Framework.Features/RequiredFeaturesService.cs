@@ -1,7 +1,6 @@
 ﻿using Blacklite.Framework.Features.Describers;
 using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.Observables;
-using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

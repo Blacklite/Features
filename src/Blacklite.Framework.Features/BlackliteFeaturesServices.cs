@@ -43,8 +43,8 @@ namespace Blacklite.Framework.Features
 
             yield return describe.Transient<DefaultFeatureDescriberEnumerable, DefaultFeatureDescriberEnumerable>();
 
-            yield return describe.Transient<IOptionsFeatureComposer, OptionsFeatureComposer>();
-            yield return describe.Transient<IRequiredFeatureComposer, RequiredFeatureComposer>();
+            yield return describe.Transient<IPreFeatureComposition, OptionsFeatureComposer>();
+            yield return describe.Transient<IPostFeatureComposition, RequiredFeatureComposer>();
             yield return describe.Singleton<IFeatureRepositoryProvider, FeatureRepositoryProvider>();
         }
 
@@ -62,6 +62,18 @@ namespace Blacklite.Framework.Features
                 yield return describe.Instance<IFeatureComposition>(new ConfigurationFeatureComposer(configuration, predicate));
                 yield return describe.Instance<IFeatureRepository>(new ConfigurationFeatureRepository(configuration, predicate));
             }
+        }
+
+        internal static IEnumerable<IServiceDescriptor> GetFeaturesOptions(IServiceCollection services, IConfiguration configuration = null, Func<IFeatureDescriber, bool> predicate = null)
+        {
+            var describe = new ServiceDescriber(configuration);
+            yield return describe.Transient<IPreFeatureComposition, OptionsFeatureComposer>();
+        }
+
+        internal static IEnumerable<IServiceDescriptor> GetFeaturesRequired(IServiceCollection services, IConfiguration configuration = null, Func<IFeatureDescriber, bool> predicate = null)
+        {
+            var describe = new ServiceDescriber(configuration);
+            yield return describe.Transient<IPostFeatureComposition, RequiredFeatureComposer>();
         }
     }
 }

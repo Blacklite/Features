@@ -1,5 +1,4 @@
 ﻿using Blacklite.Framework.Features.OptionsModel;
-using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,8 +21,8 @@ namespace Blacklite.Framework.Features.Describers
 
             if (HasOptions)
             {
-                _optionsProperty = TypeInfo
-                    .FindDeclaredProperty(nameof(ISwitch<object>.Options));
+                _optionsProperty = Type
+                    .GetRuntimeProperty(nameof(ISwitch<object>.Options));
 
                 Options = new FeatureOptionsDescriber(_optionsProperty.PropertyType);
             }
@@ -31,13 +30,13 @@ namespace Blacklite.Framework.Features.Describers
 
             if (HasEnabled)
             {
-                var isEnabledProperty = TypeInfo.FindDeclaredProperty(nameof(ISwitch.IsEnabled));
+                var isEnabledProperty = Type.GetRuntimeProperty(nameof(ISwitch.IsEnabled));
                 // If we are not observable, and our lifecycle is a singleton, changes in our value cannot accurately be observed.
                 IsReadOnly = !isEnabledProperty.CanWrite;// || (!IsObservable && Lifecycle == LifecycleKind.Singleton);
                 _isEnabledProperty = isEnabledProperty;
             }
 
-            var properties = TypeInfo.GetDeclaredProperties();
+            var properties = Type.GetRuntimeProperties();
 
             if (HasEnabled)
                 properties = properties.Where(x => x.Name != nameof(ISwitch.IsEnabled));
@@ -52,7 +51,7 @@ namespace Blacklite.Framework.Features.Describers
             DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(new Dictionary<IFeatureDescriber, bool>());
             Children = Enumerable.Empty<IFeatureDescriber>();
 
-            DisplayName = TypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? Type.Name.AsUserFriendly();
+            DisplayName = TypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? Type.Name;
             Description = TypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
 
             Groups = TypeInfo.GetCustomAttributes<FeatureGroupAttribute>()?.SelectMany(x => x.Groups).ToArray();

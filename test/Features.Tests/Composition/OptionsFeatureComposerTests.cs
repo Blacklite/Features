@@ -24,9 +24,7 @@ namespace Features.Tests.Composition
         [Fact]
         public void IsOnlyApplicableToTypesWithTheProperAttribute()
         {
-            var serviceProvider = Substitute.For<IServiceProvider>();
-
-            var composer = new OptionsFeatureComposer(serviceProvider);
+            var composer = new OptionsFeatureComposer(Substitute.For<IFeatureFactory>(), Substitute.For<IFeatureOptionsProvider>());
 
             var describer = Substitute.For<IFeatureDescriber>();
             describer.HasOptions.Returns(true);
@@ -40,13 +38,12 @@ namespace Features.Tests.Composition
         [Fact]
         public void SetFeatureBasedOptions()
         {
-            var serviceProvider = Substitute.For<IServiceProvider>();
-            var factorySub = Substitute.For<IFeatureFactory>();
-            factorySub.GetFeature(typeof(FeatureOptions)).Returns(new FeatureOptions());
-            var featureSub = new FeatureImpl<FeatureOptions>(factorySub);
-            serviceProvider.GetService(typeof(Feature<FeatureOptions>)).Returns(featureSub);
+            var featureFactory = Substitute.For<IFeatureFactory>();
+            featureFactory.GetFeature(typeof(FeatureOptions)).Returns(new FeatureOptions());
+            var featureSub = new FeatureImpl<FeatureOptions>(featureFactory);
+            featureFactory.GetFeature(typeof(Feature<FeatureOptions>)).Returns(featureSub.Value);
 
-            var composer = new OptionsFeatureComposer(serviceProvider);
+            var composer = new OptionsFeatureComposer(featureFactory, Substitute.For<IFeatureOptionsProvider>());
             var feature = new SwitchFeatureOptions();
 
             var describer = new FeatureDescriberFactory().Create(new[] { typeof(SwitchFeatureOptions).GetTypeInfo() }).Single();
@@ -58,11 +55,11 @@ namespace Features.Tests.Composition
         [Fact]
         public void SetOptions()
         {
-            var serviceProvider = Substitute.For<IServiceProvider>();
-            var sub = Substitute.For< IFeatureOptions<Options>>();
-            serviceProvider.GetService(typeof(IFeatureOptions<Options>)).Returns(sub);
+            var optionsProvider = Substitute.For<IFeatureOptionsProvider>();
+            var sub = Substitute.For<IFeatureOptions<Options>>();
+            optionsProvider.GetOptions(typeof(Options)).Returns(sub.Options);
 
-            var composer = new OptionsFeatureComposer(serviceProvider);
+            var composer = new OptionsFeatureComposer(Substitute.For<IFeatureFactory>(), optionsProvider);
             var feature = new SwitchOptions();
 
             var describer = new FeatureDescriberFactory().Create(new[] { typeof(SwitchOptions).GetTypeInfo() }).Single();

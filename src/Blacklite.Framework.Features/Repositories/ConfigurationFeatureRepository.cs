@@ -44,7 +44,7 @@ namespace Blacklite.Framework.Features.Repositories
             if (describer.HasOptions && !describer.Options.IsFeature)
             {
                 var options = describer.GetOptions<object>(feature);
-                foreach (var property in describer.Options.TypeInfo.GetDeclaredProperties())
+                foreach (var property in describer.Options.Type.GetRuntimeProperties())
                 {
                     _configuration.Set($"{describer.Type.Name}:Options:{property.Name}", property.GetValue(options)?.ToString() ?? string.Empty);
                 }

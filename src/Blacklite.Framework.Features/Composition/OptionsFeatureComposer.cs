@@ -1,18 +1,20 @@
-﻿using Microsoft.Framework.DependencyInjection;
-using Blacklite.Framework.Features.OptionsModel;
-using System;
-using System.Linq;
+﻿using Blacklite.Framework.Features.OptionsModel;
 using System.Reflection;
 using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 
 namespace Blacklite.Framework.Features.Composition
 {
-    public class OptionsFeatureComposer : IFeatureComposition, IOptionsFeatureComposer
+    public class OptionsFeatureComposer : IFeatureComposition, IPreFeatureComposition
     {
-        private readonly IServiceProvider _serviceProvider;
-        public OptionsFeatureComposer(IServiceProvider serviceProvider)
+        private readonly IFeatureFactory _featureFactory;
+        private readonly IFeatureOptionsProvider _optionsProvider;
+
+        public OptionsFeatureComposer(IFeatureFactory featureFactory,
+            IFeatureOptionsProvider optionsProvider)
         {
-            _serviceProvider = serviceProvider;
+            _featureFactory = featureFactory;
+            _optionsProvider = optionsProvider;
         }
 
         public int Priority { get; } = int.MaxValue;
@@ -25,13 +27,11 @@ namespace Blacklite.Framework.Features.Composition
                 object options;
                 if (typeof(IFeature).GetTypeInfo().IsAssignableFrom(describer.Options.TypeInfo))
                 {
-                    var optionsType = typeof(Feature<>).MakeGenericType(describer.Options.Type);
-                    options = ((Feature<object>)_serviceProvider.GetService(optionsType)).Value;
+                    options = _featureFactory.GetFeature(describer.Options.Type);
                 }
                 else
                 {
-                    var optionsType = typeof(IFeatureOptions<>).MakeGenericType(describer.Options.Type);
-                    options = ((IFeatureOptions<object>)_serviceProvider.GetService(optionsType)).Options;
+                    options = _optionsProvider.GetOptions(describer.Options.Type);
                 }
                 traitOptions.SetOptions(options);
             }

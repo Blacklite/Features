@@ -6,7 +6,6 @@ using Temp.Newtonsoft.Json.Linq;
 using Temp.Newtonsoft.Json.Schema;
 using Temp.Newtonsoft.Json.Schema.Generation;
 using Temp.Newtonsoft.Json.Serialization;
-using Blacklite.Framework.Shared;
 
 namespace Blacklite.Framework.Features.EditorModel
 {
@@ -173,7 +172,7 @@ namespace Blacklite.Framework.Features.EditorModel
             schema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { key = model.Name }, _serializer);
             schema.ExtensionData["requires"] = JObject.FromObject(
                 model.Describer.DependsOn.ToDictionary(
-                    x => $"{x.Key.Type.Name.CamelCase()}.isEnabled", 
+                    x => $"{x.Key.Type.Name.CamelCase()}.isEnabled",
                     x => new
                     {
                         requiredValue = x.Value,

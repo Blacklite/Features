@@ -1,11 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
-using Blacklite.Framework.Features.OptionsModel;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Blacklite.Framework.Features.Composition;
+﻿using System;
 using Blacklite.Framework.Features.Factory;
 
 namespace Blacklite.Framework.Features

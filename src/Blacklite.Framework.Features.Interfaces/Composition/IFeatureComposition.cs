@@ -1,7 +1,6 @@
 ﻿using Blacklite.Framework.Features.Describers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Blacklite.Framework.Features.Composition
 {
@@ -12,7 +11,7 @@ namespace Blacklite.Framework.Features.Composition
         T Configure<T>(T feature, IFeatureDescriber describer);
     }
 
-    public interface IOptionsFeatureComposer : IFeatureComposition { }
+    public interface IPreFeatureComposition : IFeatureComposition { }
 
-    public interface IRequiredFeatureComposer : IFeatureComposition { }
+    public interface IPostFeatureComposition : IFeatureComposition { }
 }

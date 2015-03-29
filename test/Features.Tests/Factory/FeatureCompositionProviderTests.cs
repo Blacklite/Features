@@ -2,6 +2,7 @@
 using Blacklite.Framework.Features.Composition;
 using Blacklite.Framework.Features.Describers;
 using Blacklite.Framework.Features.Factory;
+using Blacklite.Framework.Features.OptionsModel;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,8 @@ namespace Features.Tests.Factory
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
             var serviceProvider = Substitute.For<IServiceProvider>();
-            var optionsComposer = Substitute.For<IOptionsFeatureComposer>();
-            var requiredComposer = Substitute.For<IRequiredFeatureComposer>();
+            var optionsComposer = Substitute.For<IEnumerable<IPreFeatureComposition>>();
+            var requiredComposer = Substitute.For<IEnumerable<IPostFeatureComposition>>();
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
             var provider = new FeatureCompositionProvider(
@@ -39,8 +40,8 @@ namespace Features.Tests.Factory
             var composers = Enumerable.Empty<IFeatureComposition>();
             var serviceProvider = Substitute.For<IServiceProvider>();
 
-            var optionsComposer = Substitute.For<IOptionsFeatureComposer>();
-            var requiredComposer = Substitute.For<IRequiredFeatureComposer>();
+            var optionsComposer = Substitute.For<IEnumerable<IPreFeatureComposition>>();
+            var requiredComposer = Substitute.For<IEnumerable<IPostFeatureComposition>>();
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
             var describer = Substitute.For<IFeatureDescriber>();
@@ -68,9 +69,8 @@ namespace Features.Tests.Factory
         public void GetsOptionComposer()
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
-            var serviceProvider = Substitute.For<IServiceProvider>();
 
-            var optionsComposer = new OptionsFeatureComposer(serviceProvider);
+            var optionsComposer = new OptionsFeatureComposer(Substitute.For<IFeatureFactory>(), Substitute.For<IFeatureOptionsProvider>());
             var requiredComposer = new RequiredFeatureComposer(Substitute.For<IRequiredFeaturesService>());
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
@@ -88,22 +88,21 @@ namespace Features.Tests.Factory
 
             var provider = new FeatureCompositionProvider(
                 composers,
-                optionsComposer,
-                requiredComposer,
+                new[] { optionsComposer },
+                new[] { requiredComposer },
                 describerProvider
             );
 
             var result = provider.GetComposers<Feature2>();
-            Assert.Same(optionsComposer, result.OfType<IOptionsFeatureComposer>().Single());
+            Assert.Same(optionsComposer, result.OfType<IEnumerable<IPreFeatureComposition>>().Single());
         }
 
         [Fact]
         public void GetsRequireComposer()
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
-            var serviceProvider = Substitute.For<IServiceProvider>();
 
-            var optionsComposer = new OptionsFeatureComposer(serviceProvider);
+            var optionsComposer = new OptionsFeatureComposer(Substitute.For<IFeatureFactory>(), Substitute.For<IFeatureOptionsProvider>());
             var requiredComposer = new RequiredFeatureComposer(Substitute.For<IRequiredFeaturesService>());
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
@@ -123,22 +122,21 @@ namespace Features.Tests.Factory
 
             var provider = new FeatureCompositionProvider(
                 composers,
-                optionsComposer,
-                requiredComposer,
+                new[] { optionsComposer },
+                new[] { requiredComposer },
                 describerProvider
             );
 
             var result = provider.GetComposers<Feature2>();
-            Assert.Same(requiredComposer, result.OfType<IRequiredFeatureComposer>().Single());
+            Assert.Same(requiredComposer, result.OfType<IEnumerable<IPostFeatureComposition>>().Single());
         }
 
         [Fact]
         public void CachesResults()
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
-            var serviceProvider = Substitute.For<IServiceProvider>();
 
-            var optionsComposer = new OptionsFeatureComposer(serviceProvider);
+            var optionsComposer = new OptionsFeatureComposer(Substitute.For<IFeatureFactory>(), Substitute.For<IFeatureOptionsProvider>());
             var requiredComposer = new RequiredFeatureComposer(Substitute.For<IRequiredFeaturesService>());
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
@@ -159,8 +157,8 @@ namespace Features.Tests.Factory
 
             var provider = new FeatureCompositionProvider(
                 composers,
-                optionsComposer,
-                requiredComposer,
+                new[] { optionsComposer },
+                new[] { requiredComposer },
                 describerProvider
             );
 

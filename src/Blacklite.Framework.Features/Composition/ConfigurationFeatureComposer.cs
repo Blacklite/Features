@@ -54,7 +54,7 @@ namespace Blacklite.Framework.Features.Composition
             if (describer.HasOptions && !describer.Options.IsFeature)
             {
                 var options = describer.GetOptions<object>(feature);
-                foreach (var property in describer.Options.TypeInfo.GetDeclaredProperties())
+                foreach (var property in describer.Options.Type.GetRuntimeProperties())
                 {
                     if (_configuration.TryGet($"{describer.Type.Name}:Options:{property.Name}", out value))
                     {
