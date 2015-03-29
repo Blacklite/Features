@@ -19,7 +19,6 @@ namespace Blacklite.Framework.Features.Factory
 
         public FeatureCompositionProvider(
             IEnumerable<IFeatureComposition> globalComposers,
-            IServiceProvider serviceProvider,
             IOptionsFeatureComposer optionsFeatureComposer,
             IRequiredFeatureComposer requiredFeatureComposer,
             IFeatureDescriberProvider describerProvider)

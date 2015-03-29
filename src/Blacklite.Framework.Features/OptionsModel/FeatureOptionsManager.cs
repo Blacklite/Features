@@ -14,8 +14,7 @@ namespace Blacklite.Framework.Features.OptionsModel
 
         public FeatureOptionsManager(
             IEnumerable<IConfigureFeatureOptions<TOptions>> configurators,
-            IEnumerable<IConfigureFeatureOptions> globalConfigurators,
-            IServiceProvider serviceProvider)
+            IEnumerable<IConfigureFeatureOptions> globalConfigurators)
         {
             _configurators = new Lazy<IEnumerable<IConfigureFeatureOptions>>(() =>
                  configurators

@@ -1,4 +1,5 @@
 ﻿using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 using System;
 using System.Collections.Concurrent;
 
@@ -6,12 +7,21 @@ namespace Blacklite.Framework.Features.Observables
 {
     public class FeatureSubjectFactory : IFeatureSubjectFactory
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IFeatureDescriberProvider _featureDescriberProvider;
+        private readonly IFeatureFactory _featureFactory;
+        private readonly IRequiredFeaturesService _requiredFeaturesService;
+        private readonly IFeatureSubjectFactory _subjectFactory;
         private readonly ConcurrentDictionary<Type, IFeatureSubject> _subjects = new ConcurrentDictionary<Type, IFeatureSubject>();
 
-        public FeatureSubjectFactory(IServiceProvider serviceProvider)
+        public FeatureSubjectFactory(IFeatureFactory featureFactory,
+            IRequiredFeaturesService requiredFeaturesService,
+            IFeatureDescriberProvider featureDescriberProvider,
+            IFeatureSubjectFactory subjectFactory)
         {
-            _serviceProvider = serviceProvider;
+            _featureFactory = featureFactory;
+            _requiredFeaturesService = requiredFeaturesService;
+            _featureDescriberProvider = featureDescriberProvider;
+            _subjectFactory = subjectFactory;
         }
 
         public IFeatureSubject GetSubject(Type featureType)
@@ -21,8 +31,12 @@ namespace Blacklite.Framework.Features.Observables
 
         private IFeatureSubject CreateSubject(Type featureType)
         {
-            var subjectType = typeof(IFeatureSubject<>).MakeGenericType(featureType);
-            return (IFeatureSubject)_serviceProvider.GetService(subjectType);
+            return FeatureSubject.Create(featureType,
+                _featureFactory,
+                _requiredFeaturesService,
+                _featureDescriberProvider,
+                _subjectFactory
+                );
         }
     }
 }

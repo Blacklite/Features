@@ -25,7 +25,6 @@ namespace Features.Tests.Factory
 
             var provider = new FeatureCompositionProvider(
                 composers,
-                serviceProvider,
                 optionsComposer,
                 requiredComposer,
                 describerProvider
@@ -57,7 +56,6 @@ namespace Features.Tests.Factory
 
             var provider = new FeatureCompositionProvider(
                 composers,
-                serviceProvider,
                 optionsComposer,
                 requiredComposer,
                 describerProvider
@@ -90,7 +88,6 @@ namespace Features.Tests.Factory
 
             var provider = new FeatureCompositionProvider(
                 composers,
-                serviceProvider,
                 optionsComposer,
                 requiredComposer,
                 describerProvider
@@ -126,7 +123,6 @@ namespace Features.Tests.Factory
 
             var provider = new FeatureCompositionProvider(
                 composers,
-                serviceProvider,
                 optionsComposer,
                 requiredComposer,
                 describerProvider
@@ -163,7 +159,6 @@ namespace Features.Tests.Factory
 
             var provider = new FeatureCompositionProvider(
                 composers,
-                serviceProvider,
                 optionsComposer,
                 requiredComposer,
                 describerProvider

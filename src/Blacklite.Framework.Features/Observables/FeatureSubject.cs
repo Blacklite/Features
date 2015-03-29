@@ -3,6 +3,7 @@ using System;
 using System.Reactive.Subjects;
 using Microsoft.Framework.DependencyInjection;
 using Blacklite.Framework.Features.Factory;
+using System.Reflection;
 
 namespace Blacklite.Framework.Features.Observables
 {
@@ -10,6 +11,35 @@ namespace Blacklite.Framework.Features.Observables
            where T : class, IObservableFeature, new()
     {
 
+    }
+
+    static class FeatureSubject
+    {
+        public static IFeatureSubject Create(
+            Type featureType,
+            IFeatureFactory featureFactory,
+            IRequiredFeaturesService requiredFeaturesService,
+            IFeatureDescriberProvider featureDescriberProvider,
+            IFeatureSubjectFactory subjectFactory)
+        {
+            return (IFeatureSubject)_createSubjectMethod.MakeGenericMethod(featureType).Invoke(null, new object[] {
+                featureFactory,
+                requiredFeaturesService,
+                featureDescriberProvider,
+                subjectFactory
+            });
+        }
+
+        private static MethodInfo _createSubjectMethod = typeof(FeatureSubject).GetTypeInfo().GetDeclaredMethod(nameof(FeatureSubject.CreateSubject));
+        private static FeatureSubject<T> CreateSubject<T>(
+            IFeatureFactory featureFactory,
+            IRequiredFeaturesService requiredFeaturesService,
+            IFeatureDescriberProvider featureDescriberProvider,
+            IFeatureSubjectFactory subjectFactory)
+            where T : class, IObservableFeature, new()
+        {
+            return new FeatureSubject<T>(new FeatureImpl<T>(featureFactory), featureFactory, requiredFeaturesService, featureDescriberProvider, subjectFactory);
+        }
     }
 
     class FeatureSubject<T> : IFeatureSubject<T>, IFeatureSubject
