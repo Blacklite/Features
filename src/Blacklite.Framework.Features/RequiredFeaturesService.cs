@@ -1,6 +1,5 @@
 ﻿using Blacklite.Framework.Features.Describers;
-using Blacklite.Framework.Features.Factory;
-using Blacklite.Framework.Features.Observables;
+using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,24 +12,20 @@ namespace Blacklite.Framework.Features
     class RequiredFeaturesService : IRequiredFeaturesService
     {
         private readonly IFeatureDescriberProvider _provider;
-        private readonly IFeatureFactory _factory;
-        private readonly IObservableFeatureFactory _observableFeatureFactory;
+        private readonly IServiceProvider _serviceProvider;
 
-        public RequiredFeaturesService(IFeatureFactory factory,
-            IFeatureDescriberProvider provider,
-            IObservableFeatureFactory observableFeatureFactory)
+        public RequiredFeaturesService(IServiceProvider serviceProvider, IFeatureDescriberProvider provider)
         {
             _provider = provider;
-            _factory = factory;
-            _observableFeatureFactory = observableFeatureFactory;
+            _serviceProvider = serviceProvider;
         }
 
         private object GetRequiredFeature(IFeatureDescriber describer)
         {
             if (describer.IsObservable)
-                return _observableFeatureFactory.GetObservableFeature(describer.Type);
+                return _serviceProvider.GetRequiredService(typeof(ObservableFeature<>).MakeGenericType(describer.Type));
 
-            return _factory.GetFeature(describer.Type);
+            return _serviceProvider.GetRequiredService(typeof(Feature<>).MakeGenericType(describer.Type));
         }
 
         private IEnumerable<FeatureDependency> GetFeatureDependencies(IFeatureDescriber describer)
@@ -130,7 +125,8 @@ namespace Blacklite.Framework.Features
 
             private static ISwitch GetTrait(FeatureDependency dependency)
             {
-                return (ISwitch)dependency.Service;
+                var property = typeof(Feature<object>).GetTypeInfo().GetDeclaredProperty(nameof(Feature<object>.Value));
+                return (ISwitch)property.GetValue(dependency.Service, null);
             }
 
             public bool IsEnabled { get; set; }

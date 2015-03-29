@@ -68,7 +68,7 @@ namespace Features.Tests.Factory
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
 
-            var optionsComposer = new OptionsFeatureComposer(Substitute.For<IFeatureFactory>(), Substitute.For<IFeatureOptionsProvider>());
+            var optionsComposer = new OptionsFeatureComposer(Substitute.For<IServiceProvider>());
             var requiredComposer = new RequiredFeatureComposer(Substitute.For<IRequiredFeaturesService>());
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
@@ -92,7 +92,7 @@ namespace Features.Tests.Factory
             );
 
             var result = provider.GetComposers<Feature2>();
-            Assert.Same(optionsComposer, result.OfType<IEnumerable<IPreFeatureComposition>>().Single());
+            Assert.Same(optionsComposer, result.OfType<IPreFeatureComposition>().Single());
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace Features.Tests.Factory
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
 
-            var optionsComposer = new OptionsFeatureComposer(Substitute.For<IFeatureFactory>(), Substitute.For<IFeatureOptionsProvider>());
+            var optionsComposer = new OptionsFeatureComposer(Substitute.For<IServiceProvider>());
             var requiredComposer = new RequiredFeatureComposer(Substitute.For<IRequiredFeaturesService>());
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
@@ -126,7 +126,7 @@ namespace Features.Tests.Factory
             );
 
             var result = provider.GetComposers<Feature2>();
-            Assert.Same(requiredComposer, result.OfType<IEnumerable<IPostFeatureComposition>>().Single());
+            Assert.Same(requiredComposer, result.OfType<IPostFeatureComposition>().Single());
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace Features.Tests.Factory
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
 
-            var optionsComposer = new OptionsFeatureComposer(Substitute.For<IFeatureFactory>(), Substitute.For<IFeatureOptionsProvider>());
+            var optionsComposer = new OptionsFeatureComposer(Substitute.For<IServiceProvider>());
             var requiredComposer = new RequiredFeatureComposer(Substitute.For<IRequiredFeaturesService>());
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 

@@ -1,20 +1,18 @@
-﻿using Blacklite.Framework.Features.OptionsModel;
+﻿using Microsoft.Framework.DependencyInjection;
+using Blacklite.Framework.Features.OptionsModel;
+using System;
+using System.Linq;
 using System.Reflection;
 using Blacklite.Framework.Features.Describers;
-using Blacklite.Framework.Features.Factory;
 
 namespace Blacklite.Framework.Features.Composition
 {
     public class OptionsFeatureComposer : IFeatureComposition, IPreFeatureComposition
     {
-        private readonly IFeatureFactory _featureFactory;
-        private readonly IFeatureOptionsProvider _optionsProvider;
-
-        public OptionsFeatureComposer(IFeatureFactory featureFactory,
-            IFeatureOptionsProvider optionsProvider)
+        private readonly IServiceProvider _serviceProvider;
+        public OptionsFeatureComposer(IServiceProvider serviceProvider)
         {
-            _featureFactory = featureFactory;
-            _optionsProvider = optionsProvider;
+            _serviceProvider = serviceProvider;
         }
 
         public int Priority { get; } = int.MaxValue;
@@ -27,11 +25,13 @@ namespace Blacklite.Framework.Features.Composition
                 object options;
                 if (typeof(IFeature).GetTypeInfo().IsAssignableFrom(describer.Options.TypeInfo))
                 {
-                    options = _featureFactory.GetFeature(describer.Options.Type);
+                    var optionsType = typeof(Feature<>).MakeGenericType(describer.Options.Type);
+                    options = ((Feature<object>)_serviceProvider.GetService(optionsType)).Value;
                 }
                 else
                 {
-                    options = _optionsProvider.GetOptions(describer.Options.Type);
+                    var optionsType = typeof(IFeatureOptions<>).MakeGenericType(describer.Options.Type);
+                    options = ((IFeatureOptions<object>)_serviceProvider.GetService(optionsType)).Options;
                 }
                 traitOptions.SetOptions(options);
             }

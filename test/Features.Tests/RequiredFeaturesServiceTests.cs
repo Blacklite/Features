@@ -81,8 +81,16 @@ namespace Features.Tests
             var featureSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
             var observableFeatureFactory = new ObservableFeatureFactory(featureSubjectFactory);
 
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            serviceProvider.GetService(Arg.Any<Type>()).Returns(x =>
+            {
+                var arg = (Type)x.Args()[0];
+                if (arg.GetGenericTypeDefinition() == typeof(Feature<>))
+                    return Activator.CreateInstance(typeof(FeatureImpl<>).MakeGenericType(arg.GetGenericArguments()[0]), featureFactory);
 
-            var service = new RequiredFeaturesService(featureFactory, featureDescriberProvider, observableFeatureFactory);
+                return Activator.CreateInstance(typeof(ObservableFeatureImpl<>).MakeGenericType(arg.GetGenericArguments()[0]), featureSubjectFactory);
+            });
+            var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
             var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
@@ -144,8 +152,16 @@ namespace Features.Tests
             var featureSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
             var observableFeatureFactory = new ObservableFeatureFactory(featureSubjectFactory);
 
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            serviceProvider.GetService(Arg.Any<Type>()).Returns(x =>
+            {
+                var arg = (Type)x.Args()[0];
+                if (arg.GetGenericTypeDefinition() == typeof(Feature<>))
+                    return Activator.CreateInstance(typeof(FeatureImpl<>).MakeGenericType(arg.GetGenericArguments()[0]), featureFactory);
 
-            var service = new RequiredFeaturesService(featureFactory, featureDescriberProvider, observableFeatureFactory);
+                return Activator.CreateInstance(typeof(ObservableFeatureImpl<>).MakeGenericType(arg.GetGenericArguments()[0]), featureSubjectFactory);
+            });
+            var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
             var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
@@ -209,8 +225,16 @@ namespace Features.Tests
             var featureSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
             var observableFeatureFactory = new ObservableFeatureFactory(featureSubjectFactory);
 
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            serviceProvider.GetService(Arg.Any<Type>()).Returns(x =>
+            {
+                var arg = (Type)x.Args()[0];
+                if (arg.GetGenericTypeDefinition() == typeof(Feature<>))
+                    return Activator.CreateInstance(typeof(FeatureImpl<>).MakeGenericType(arg.GetGenericArguments()[0]), featureFactory);
 
-            var service = new RequiredFeaturesService(featureFactory, featureDescriberProvider, observableFeatureFactory);
+                return Activator.CreateInstance(typeof(ObservableFeatureImpl<>).MakeGenericType(arg.GetGenericArguments()[0]), featureSubjectFactory);
+            });
+            var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
             var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
@@ -282,8 +306,16 @@ namespace Features.Tests
             var featureSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
             var observableFeatureFactory = new ObservableFeatureFactory(featureSubjectFactory);
 
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            serviceProvider.GetService(Arg.Any<Type>()).Returns(x =>
+            {
+                var arg = (Type)x.Args()[0];
+                if (arg.GetGenericTypeDefinition() == typeof(Feature<>))
+                    return Activator.CreateInstance(typeof(FeatureImpl<>).MakeGenericType(arg.GetGenericArguments()[0]), featureFactory);
 
-            var service = new RequiredFeaturesService(featureFactory, featureDescriberProvider, observableFeatureFactory);
+                return Activator.CreateInstance(typeof(ObservableFeatureImpl<>).MakeGenericType(arg.GetGenericArguments()[0]), featureSubjectFactory);
+            });
+            var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
             var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
