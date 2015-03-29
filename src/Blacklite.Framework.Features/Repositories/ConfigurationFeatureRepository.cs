@@ -24,7 +24,7 @@ namespace Blacklite.Framework.Features.Repositories
 
         public int Priority { get; } = 100;
 
-        public bool CanStore(IFeatureDescriber describer) => _predicate(describer);
+        public bool IsApplicableTo(IFeatureDescriber describer) => _predicate(describer);
 
         public void Store(IFeature feature, IFeatureDescriber describer)
         {

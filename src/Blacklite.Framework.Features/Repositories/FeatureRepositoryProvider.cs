@@ -16,7 +16,7 @@ namespace Blacklite.Framework.Features.Repositories
 
         public IFeatureRepository GetFeatureRepository(IFeatureDescriber describer)
         {
-            return _repositories.FirstOrDefault(x => x.CanStore(describer));
+            return _repositories.FirstOrDefault(x => x.IsApplicableTo(describer));
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Blacklite.Framework.Features.Repositories
     {
         int Priority { get; }
 
-        bool CanStore(IFeatureDescriber describer);
+        bool IsApplicableTo(IFeatureDescriber describer);
 
         void Store(IFeature feature, IFeatureDescriber describer);
     }

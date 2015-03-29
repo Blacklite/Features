@@ -1,17 +1,17 @@
 ﻿using Blacklite.Framework.Features;
-using Blacklite.Framework.Features.Composition;
 using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.OptionsModel;
+using Blacklite.Framework.Features.Repositories;
 using Microsoft.Framework.ConfigurationModel;
 using NSubstitute;
 using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Xunit;
 
-namespace Features.Tests.Composition
+namespace Features.Tests.Repositories
 {
-    public class ConfigurationFeatureComposerTests
+    public class ConfigurationFeatureRepositoryTests
     {
         [ConfigurationFeature]
         class ConfigurationFeature : IFeature { }
@@ -21,7 +21,7 @@ namespace Features.Tests.Composition
         {
             var configuration = Substitute.For<IConfiguration>();
 
-            var composer = new ConfigurationFeatureComposer(configuration);
+            var composer = new ConfigurationFeatureRepository(configuration);
 
             var describer = Substitute.For<IFeatureDescriber>();
             describer.TypeInfo.Returns(typeof(ConfigurationFeature).GetTypeInfo());
@@ -42,7 +42,7 @@ namespace Features.Tests.Composition
         {
             var configuration = Substitute.For<IConfiguration>();
 
-            var composer = new ConfigurationFeatureComposer(configuration, x => x.TypeInfo.GetCustomAttributes<CustomAttributeAttribute>().Any());
+            var composer = new ConfigurationFeatureRepository(configuration, x => x.TypeInfo.GetCustomAttributes<CustomAttributeAttribute>().Any());
 
             var describer = Substitute.For<IFeatureDescriber>();
             describer.TypeInfo.Returns(typeof(ConfigurationFeature).GetTypeInfo());
@@ -53,20 +53,21 @@ namespace Features.Tests.Composition
             Assert.True(composer.IsApplicableTo(describer));
         }
 
+
         class TestSwitch : Switch { }
         class TestFeature : Feature { public string Property1 { get; set; } public string Property2 { get; set; } }
         class TestSwitchFeature : Switch { public string Property1 { get; set; } public string Property2 { get; set; } }
-        class TestOptions { public string Property1 { get; set; } public string Property2 { get; set; } }
+        public class TestOptions { public string Property1 { get; set; } public string Property2 { get; set; } }
         class TestFeatureOptions : Switch { public string Property1 { get; set; } public string Property2 { get; set; } }
-        class TestOptionsSwitch : Switch<TestOptions> { }
+        public class TestOptionsSwitch : Switch<TestOptions> { }
         class TestFeatureOptionsSwitch : Switch<TestFeatureOptions> { }
 
         [Fact]
-        public void TryGetSwitch()
+        public void SetSwitch()
         {
             var configuration = Substitute.For<IConfiguration>();
 
-            var composer = new ConfigurationFeatureComposer(configuration);
+            var composer = new ConfigurationFeatureRepository(configuration);
             var factory = new FeatureDescriberFactory();
             var describers = factory.Create(new Type[]
             {
@@ -80,22 +81,21 @@ namespace Features.Tests.Composition
             .ToArray());
 
             var testSwitchDescriber = describers.Single(x => x.Type == typeof(TestSwitch));
-            string value;
 
-            composer.Configure(
+            composer.Store(
                 new TestSwitch(),
                 testSwitchDescriber
             );
 
-            configuration.Received().TryGet($"TestSwitch:IsEnabled", out value);
+            configuration.Received().Set($"TestSwitch:IsEnabled", Arg.Any<string>());
         }
 
         [Fact]
-        public void TryGetProperties()
+        public void SetProperties()
         {
             var configuration = Substitute.For<IConfiguration>();
 
-            var composer = new ConfigurationFeatureComposer(configuration);
+            var composer = new ConfigurationFeatureRepository(configuration);
             var factory = new FeatureDescriberFactory();
             var describers = factory.Create(new Type[]
             {
@@ -111,39 +111,38 @@ namespace Features.Tests.Composition
             var testFeatureDescriber = describers.Single(x => x.Type == typeof(TestFeature));
             var testSwitchFeatureDescriber = describers.Single(x => x.Type == typeof(TestSwitchFeature));
             var testFeatureOptionsDescriber = describers.Single(x => x.Type == typeof(TestFeatureOptions));
-            string value;
 
-            composer.Configure(
+            composer.Store(
                 new TestFeature(),
                 testFeatureDescriber
             );
 
-            configuration.Received().TryGet($"TestFeature:Property1", out value);
-            configuration.Received().TryGet($"TestFeature:Property2", out value);
+            configuration.Received().Set($"TestFeature:Property1", Arg.Any<string>());
+            configuration.Received().Set($"TestFeature:Property2", Arg.Any<string>());
 
-            composer.Configure(
+            composer.Store(
                 new TestSwitchFeature(),
                 testSwitchFeatureDescriber
             );
 
-            configuration.Received().TryGet($"TestSwitchFeature:Property1", out value);
-            configuration.Received().TryGet($"TestSwitchFeature:Property2", out value);
+            configuration.Received().Set($"TestSwitchFeature:Property1", Arg.Any<string>());
+            configuration.Received().Set($"TestSwitchFeature:Property2", Arg.Any<string>());
 
-            composer.Configure(
+            composer.Store(
                 new TestFeatureOptions(),
                 testFeatureOptionsDescriber
             );
 
-            configuration.Received().TryGet($"TestFeatureOptions:Property1", out value);
-            configuration.Received().TryGet($"TestFeatureOptions:Property2", out value);
+            configuration.Received().Set($"TestFeatureOptions:Property1", Arg.Any<string>());
+            configuration.Received().Set($"TestFeatureOptions:Property2", Arg.Any<string>());
         }
 
         [Fact]
-        public void TryGetNonFeatureOptions()
+        public void SetNonFeatureOptions()
         {
             var configuration = Substitute.For<IConfiguration>();
 
-            var composer = new ConfigurationFeatureComposer(configuration);
+            var composer = new ConfigurationFeatureRepository(configuration);
             var factory = new FeatureDescriberFactory();
             var describers = factory.Create(new Type[]
             {
@@ -158,23 +157,25 @@ namespace Features.Tests.Composition
 
             var testOptionsSwitchDescriber = describers.Single(x => x.Type == typeof(TestOptionsSwitch));
             var testFeatureOptionsSwitchDescriber = describers.Single(x => x.Type == typeof(TestFeatureOptionsSwitch));
-            string value;
 
-            composer.Configure(
-                new TestOptionsSwitch(),
+            var testOptionsSwitch = new TestOptionsSwitch();
+            (testOptionsSwitch as IFeatureOptions).SetOptions(new TestOptions());
+
+            composer.Store(
+                testOptionsSwitch,
                 testOptionsSwitchDescriber
             );
 
-            configuration.Received().TryGet($"TestOptionsSwitch:Options:Property1", out value);
-            configuration.Received().TryGet($"TestOptionsSwitch:Options:Property2", out value);
+            configuration.Received().Set($"TestOptionsSwitch:Options:Property1", Arg.Any<string>());
+            configuration.Received().Set($"TestOptionsSwitch:Options:Property2", Arg.Any<string>());
 
-            composer.Configure(
+            composer.Store(
                 new TestFeatureOptionsSwitch(),
                 testFeatureOptionsSwitchDescriber
             );
 
-            configuration.DidNotReceive().TryGet($"TestFeatureOptionsSwitch:Options:Property1", out value);
-            configuration.DidNotReceive().TryGet($"TestFeatureOptionsSwitch:Options:Property2", out value);
+            configuration.DidNotReceive().Set($"TestFeatureOptionsSwitch:Options:Property1", Arg.Any<string>());
+            configuration.DidNotReceive().Set($"TestFeatureOptionsSwitch:Options:Property2", Arg.Any<string>());
         }
     }
 }

@@ -17,20 +17,11 @@ namespace Blacklite.Framework.Features.OptionsModel
             IEnumerable<IConfigureFeatureOptions> globalConfigurators,
             IServiceProvider serviceProvider)
         {
-            if (typeof(IFeature).GetTypeInfo().IsAssignableFrom(typeof(TOptions).GetTypeInfo()))
-            {
-                _options = serviceProvider.GetService<Feature<TOptions>>().Value;
-            }
-            else
-            {
-                //var configurators = serviceProvider.GetService<IEnumerable<IConfigureFeatureOptions<TOptions>>>() ?? Enumerable.Empty<IConfigureFeatureOptions<TOptions>>();
-                //Lazy <IEnumerable<IConfigureFeatureOptions<TOptions>>> configurators,
-                   _configurators = new Lazy<IEnumerable<IConfigureFeatureOptions>>(() =>
-                        configurators
-                            .Select(x => new ObjectConfigurator<TOptions>(x))
-                            .Union(globalConfigurators)
-                            .OrderByDescending(x => x.Priority));
-            }
+            _configurators = new Lazy<IEnumerable<IConfigureFeatureOptions>>(() =>
+                 configurators
+                     .Select(x => new ObjectConfigurator<TOptions>(x))
+                     .Union(globalConfigurators)
+                     .OrderByDescending(x => x.Priority));
         }
 
         private TOptions _options;
