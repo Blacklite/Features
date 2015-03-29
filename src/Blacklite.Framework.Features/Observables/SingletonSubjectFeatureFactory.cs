@@ -1,22 +1,13 @@
-﻿using Blacklite.Framework.Features.Describers;
-using Blacklite.Framework.Features.Factory;
-using System;
+﻿using System;
 
 namespace Blacklite.Framework.Features.Observables
 {
     public class SingletonFeatureSubjectFactory : ISingletonFeatureSubjectFactory
     {
         private readonly IFeatureSubjectFactory _factory;
-        public SingletonFeatureSubjectFactory(IFeatureFactory featureFactory,
-            IRequiredFeaturesService requiredFeaturesService,
-            IFeatureDescriberProvider featureDescriberProvider,
-            IFeatureSubjectFactory subjectFactory)
+        public SingletonFeatureSubjectFactory(IServiceProvider serviceProvider)
         {
-            _factory = new FeatureSubjectFactory(
-                featureFactory,
-                requiredFeaturesService,
-                featureDescriberProvider,
-                subjectFactory);
+            _factory = new FeatureSubjectFactory(serviceProvider);
         }
 
         public IFeatureSubject GetSubject(Type featureType)

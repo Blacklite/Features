@@ -19,7 +19,6 @@ namespace Features.Tests.Factory
         public void ThrowsIfNoDescriberFound()
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
-            var serviceProvider = Substitute.For<IServiceProvider>();
             var optionsComposer = Substitute.For<IEnumerable<IPreFeatureComposition>>();
             var requiredComposer = Substitute.For<IEnumerable<IPostFeatureComposition>>();
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
@@ -38,7 +37,6 @@ namespace Features.Tests.Factory
         public void GetsComposers()
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
-            var serviceProvider = Substitute.For<IServiceProvider>();
 
             var optionsComposer = Substitute.For<IEnumerable<IPreFeatureComposition>>();
             var requiredComposer = Substitute.For<IEnumerable<IPostFeatureComposition>>();
