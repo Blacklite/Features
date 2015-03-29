@@ -2,7 +2,7 @@
 
 namespace Blacklite.Framework.Features
 {
-    public interface ObservableFeature<T> : IObservable<T>
+    public interface ObservableFeature<out T> : IObservable<T>
         where T : IObservableFeature
     {
     }

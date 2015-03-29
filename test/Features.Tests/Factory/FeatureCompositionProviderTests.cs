@@ -39,8 +39,6 @@ namespace Features.Tests.Factory
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
             var serviceProvider = Substitute.For<IServiceProvider>();
-            serviceProvider.GetService(typeof(IEnumerable<IFeatureComposition<Feature2>>))
-                .Returns(Enumerable.Empty<IFeatureComposition<Feature2>>());
 
             var optionsComposer = Substitute.For<IOptionsFeatureComposer>();
             var requiredComposer = Substitute.For<IRequiredFeatureComposer>();
@@ -73,14 +71,13 @@ namespace Features.Tests.Factory
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
             var serviceProvider = Substitute.For<IServiceProvider>();
-            serviceProvider.GetService(typeof(IEnumerable<IFeatureComposition<Feature2>>))
-                .Returns(Enumerable.Empty<IFeatureComposition<Feature2>>());
 
-            var optionsComposer = Substitute.For<IOptionsFeatureComposer>();
-            var requiredComposer = Substitute.For<IRequiredFeatureComposer>();
+            var optionsComposer = new OptionsFeatureComposer(serviceProvider);
+            var requiredComposer = new RequiredFeatureComposer(Substitute.For<IRequiredFeaturesService>());
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
             var describer = Substitute.For<IFeatureDescriber>();
+            describer.HasOptions.Returns(true);
             describerProvider.Describers[typeof(Feature2)].Returns(describer);
 
             IFeatureDescriber describer2;
@@ -108,14 +105,15 @@ namespace Features.Tests.Factory
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
             var serviceProvider = Substitute.For<IServiceProvider>();
-            serviceProvider.GetService(typeof(IEnumerable<IFeatureComposition<Feature2>>))
-                .Returns(Enumerable.Empty<IFeatureComposition<Feature2>>());
 
-            var optionsComposer = Substitute.For<IOptionsFeatureComposer>();
-            var requiredComposer = Substitute.For<IRequiredFeatureComposer>();
+            var optionsComposer = new OptionsFeatureComposer(serviceProvider);
+            var requiredComposer = new RequiredFeatureComposer(Substitute.For<IRequiredFeaturesService>());
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
             var describer = Substitute.For<IFeatureDescriber>();
+            describer.Requires.Returns(new RequiredFeatureAttribute[1]);
+            describer.HasEnabled.Returns(true);
+            describer.IsReadOnly.Returns(false);
             describerProvider.Describers[typeof(Feature2)].Returns(describer);
 
             IFeatureDescriber describer2;
@@ -143,14 +141,16 @@ namespace Features.Tests.Factory
         {
             var composers = Enumerable.Empty<IFeatureComposition>();
             var serviceProvider = Substitute.For<IServiceProvider>();
-            serviceProvider.GetService(typeof(IEnumerable<IFeatureComposition<Feature2>>))
-                .Returns(Enumerable.Empty<IFeatureComposition<Feature2>>());
 
-            var optionsComposer = Substitute.For<IOptionsFeatureComposer>();
-            var requiredComposer = Substitute.For<IRequiredFeatureComposer>();
+            var optionsComposer = new OptionsFeatureComposer(serviceProvider);
+            var requiredComposer = new RequiredFeatureComposer(Substitute.For<IRequiredFeaturesService>());
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
 
             var describer = Substitute.For<IFeatureDescriber>();
+            describer.HasOptions.Returns(true);
+            describer.Requires.Returns(new RequiredFeatureAttribute[1]);
+            describer.HasEnabled.Returns(true);
+            describer.IsReadOnly.Returns(false);
             describerProvider.Describers[typeof(Feature2)].Returns(describer);
 
             IFeatureDescriber describer2;

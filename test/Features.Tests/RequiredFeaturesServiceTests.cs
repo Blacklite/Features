@@ -71,8 +71,6 @@ namespace Features.Tests
 
             var featureDescriberProvider = new FeatureDescriberProvider(featureTypeProvider, new FeatureDescriberFactory());
 
-            var serviceProvider = Substitute.For<IServiceProvider>();
-
 
             var featureFactory = Substitute.For<IFeatureFactory>();
             featureFactory.GetFeature(typeof(ScopedFeature)).Returns(x => new ScopedFeature());
@@ -83,29 +81,19 @@ namespace Features.Tests
             featureFactory.GetFeature(typeof(RealObservableSwitch2)).Returns(x => new RealObservableSwitch2());
 
 
-            var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
+            var featureSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
+            var observableFeatureFactory = new ObservableFeatureFactory(featureSubjectFactory);
 
-            serviceProvider.GetService(typeof(Feature<ScopedFeature>)).Returns(x => new FeatureImpl<ScopedFeature>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<ScopedFeature2>)).Returns(x => new FeatureImpl<ScopedFeature2>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<SingletonFeature>)).Returns(x => new FeatureImpl<SingletonFeature>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<SingletonFeature2>)).Returns(x => new FeatureImpl<SingletonFeature2>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<RealObservableSwitch>)).Returns(x => new FeatureImpl<RealObservableSwitch>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<RealObservableSwitch2>)).Returns(x => new FeatureImpl<RealObservableSwitch2>(featureFactory));
+
+            var service = new RequiredFeaturesService(featureFactory, featureDescriberProvider, observableFeatureFactory);
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
-
-            var realObservableSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
-            var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, serviceProvider, service, featureDescriberProvider, realObservableSubjectFactory);
-            realObservableSubjectFactory.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject);
-
-            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
+            var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
+            featureSubjectFactory.GetSubject(typeof(RealObservableSwitch)).Returns(x => realObservableSubject);
 
             var realObservableSwitch2 = new FeatureImpl<RealObservableSwitch2>(featureFactory);
-            var realObservableSubjectFactory2 = Substitute.For<IFeatureSubjectFactory>();
-            var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, serviceProvider, service, featureDescriberProvider, realObservableSubjectFactory2);
-            realObservableSubjectFactory2.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject2);
-
-            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch2>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
+            var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
+            featureSubjectFactory.GetSubject(typeof(RealObservableSwitch2)).Returns(x => realObservableSubject2);
 
             bool result = false;
             result = service.ValidateRequiredFeatures(typeof(ScopedFeature));
@@ -156,33 +144,19 @@ namespace Features.Tests
             featureFactory.GetFeature(typeof(RealObservableSwitch)).Returns(x => new RealObservableSwitch());
             featureFactory.GetFeature(typeof(RealObservableSwitch2)).Returns(x => new RealObservableSwitch2());
 
+            var featureSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
+            var observableFeatureFactory = new ObservableFeatureFactory(featureSubjectFactory);
 
-            var serviceProvider = Substitute.For<IServiceProvider>();
 
-
-            var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
-
-            serviceProvider.GetService(typeof(Feature<ScopedFeature>)).Returns(x => new FeatureImpl<ScopedFeature>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<ScopedFeature2>)).Returns(x => new FeatureImpl<ScopedFeature2>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<SingletonFeature>)).Returns(x => new FeatureImpl<SingletonFeature>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<SingletonFeature2>)).Returns(x => new FeatureImpl<SingletonFeature2>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<RealObservableSwitch>)).Returns(x => new FeatureImpl<RealObservableSwitch>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<RealObservableSwitch2>)).Returns(x => new FeatureImpl<RealObservableSwitch2>(featureFactory));
+            var service = new RequiredFeaturesService(featureFactory, featureDescriberProvider, observableFeatureFactory);
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
-            var realObservableSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
-            var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, serviceProvider, service, featureDescriberProvider, realObservableSubjectFactory);
-            realObservableSubjectFactory.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject);
-
-            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
+            var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
+            featureSubjectFactory.GetSubject(typeof(RealObservableSwitch)).Returns(x => realObservableSubject);
 
             var realObservableSwitch2 = new FeatureImpl<RealObservableSwitch2>(featureFactory);
-            var realObservableSubjectFactory2 = Substitute.For<IFeatureSubjectFactory>();
-            var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, serviceProvider, service, featureDescriberProvider, realObservableSubjectFactory2);
-            realObservableSubjectFactory2.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject2);
-
-            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch2>))
-                .Returns(x => new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
+            var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
+            featureSubjectFactory.GetSubject(typeof(RealObservableSwitch2)).Returns(x => realObservableSubject2);
 
             bool result = false;
 
@@ -222,8 +196,6 @@ namespace Features.Tests
 
             var featureDescriberProvider = new FeatureDescriberProvider(featureTypeProvider, new FeatureDescriberFactory());
 
-            var serviceProvider = Substitute.For<IServiceProvider>();
-
 
             var scopedFeature = new ScopedFeature();
             scopedFeature.IsEnabled = false;
@@ -237,29 +209,19 @@ namespace Features.Tests
             featureFactory.GetFeature(typeof(RealObservableSwitch2)).Returns(x => new RealObservableSwitch2());
 
 
-            var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
+            var featureSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
+            var observableFeatureFactory = new ObservableFeatureFactory(featureSubjectFactory);
 
-            serviceProvider.GetService(typeof(Feature<ScopedFeature>)).Returns(x => new FeatureImpl<ScopedFeature>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<ScopedFeature2>)).Returns(x => new FeatureImpl<ScopedFeature2>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<SingletonFeature>)).Returns(x => new FeatureImpl<SingletonFeature>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<SingletonFeature2>)).Returns(x => new FeatureImpl<SingletonFeature2>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<RealObservableSwitch>)).Returns(x => new FeatureImpl<RealObservableSwitch>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<RealObservableSwitch2>)).Returns(x => new FeatureImpl<RealObservableSwitch2>(featureFactory));
+
+            var service = new RequiredFeaturesService(featureFactory, featureDescriberProvider, observableFeatureFactory);
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
-            var realObservableSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
-            var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, serviceProvider, service, featureDescriberProvider, realObservableSubjectFactory);
-            realObservableSubjectFactory.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject);
-
-            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
+            var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
+            featureSubjectFactory.GetSubject(typeof(RealObservableSwitch)).Returns(x => realObservableSubject);
 
             var realObservableSwitch2 = new FeatureImpl<RealObservableSwitch2>(featureFactory);
-            var realObservableSubjectFactory2 = Substitute.For<IFeatureSubjectFactory>();
-            var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, serviceProvider, service, featureDescriberProvider, realObservableSubjectFactory2);
-            realObservableSubjectFactory2.GetSubject(typeof(RealObservableSwitch2)).Returns(x => realObservableSubject2);
-
-            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch2>))
-                .Returns(x => new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
+            var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
+            featureSubjectFactory.GetSubject(typeof(RealObservableSwitch2)).Returns(x => realObservableSubject2);
 
             bool result = false;
             result = service.ValidateRequiredFeatures(typeof(ScopedFeature));
@@ -321,31 +283,19 @@ namespace Features.Tests
             featureFactory.GetFeature(typeof(RealObservableSwitch2)).Returns(x => new RealObservableSwitch2());
 
 
-            var serviceProvider = Substitute.For<IServiceProvider>();
+            var featureSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
+            var observableFeatureFactory = new ObservableFeatureFactory(featureSubjectFactory);
 
 
-            var service = new RequiredFeaturesService(serviceProvider, featureDescriberProvider);
-
-            serviceProvider.GetService(typeof(Feature<ScopedFeature>)).Returns(x => new FeatureImpl<ScopedFeature>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<ScopedFeature2>)).Returns(x => new FeatureImpl<ScopedFeature2>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<SingletonFeature>)).Returns(x => new FeatureImpl<SingletonFeature>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<SingletonFeature2>)).Returns(x => new FeatureImpl<SingletonFeature2>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<RealObservableSwitch>)).Returns(x => new FeatureImpl<RealObservableSwitch>(featureFactory));
-            serviceProvider.GetService(typeof(Feature<RealObservableSwitch2>)).Returns(x => new FeatureImpl<RealObservableSwitch2>(featureFactory));
+            var service = new RequiredFeaturesService(featureFactory, featureDescriberProvider, observableFeatureFactory);
 
             var realObservableSwitch = new FeatureImpl<RealObservableSwitch>(featureFactory);
-            var realObservableSubjectFactory = Substitute.For<IFeatureSubjectFactory>();
-            var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, serviceProvider, service, featureDescriberProvider, realObservableSubjectFactory);
-            realObservableSubjectFactory.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject);
-
-            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch>(realObservableSubjectFactory));
+            var realObservableSubject = new FeatureSubject<RealObservableSwitch>(realObservableSwitch, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
+            featureSubjectFactory.GetSubject(typeof(RealObservableSwitch)).Returns(x => realObservableSubject);
 
             var realObservableSwitch2 = new FeatureImpl<RealObservableSwitch2>(featureFactory);
-            var realObservableSubjectFactory2 = Substitute.For<IFeatureSubjectFactory>();
-            var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, serviceProvider, service, featureDescriberProvider, realObservableSubjectFactory2);
-            realObservableSubjectFactory2.GetSubject(Arg.Any<Type>()).Returns(x => realObservableSubject2);
-
-            serviceProvider.GetService(typeof(ObservableFeature<RealObservableSwitch2>)).Returns(x => new ObservableFeatureImpl<RealObservableSwitch2>(realObservableSubjectFactory2));
+            var realObservableSubject2 = new FeatureSubject<RealObservableSwitch2>(realObservableSwitch2, featureFactory, service, featureDescriberProvider, featureSubjectFactory);
+            featureSubjectFactory.GetSubject(typeof(RealObservableSwitch2)).Returns(x => realObservableSubject2);
 
             bool result = false;
 

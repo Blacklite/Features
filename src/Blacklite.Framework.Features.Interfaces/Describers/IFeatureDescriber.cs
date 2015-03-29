@@ -12,8 +12,6 @@ namespace Blacklite.Framework.Features.Describers
     {
         Type Type { get; }
         TypeInfo TypeInfo { get; }
-        Type InterfaceType { get; }
-        Type ObservableInterfaceType { get; }
         LifecycleKind Lifecycle { get; }
         bool IsObservable { get; }
         bool HasEnabled { get; }

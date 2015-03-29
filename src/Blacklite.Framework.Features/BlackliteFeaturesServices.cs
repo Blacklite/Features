@@ -36,8 +36,9 @@ namespace Blacklite.Framework.Features
             yield return describe.Scoped(typeof(Feature<>), typeof(FeatureImpl<>));
             yield return describe.Scoped(typeof(IFeatureSubject<>), typeof(FeatureSubject<>));
             yield return describe.Scoped(typeof(ObservableFeature<>), typeof(ObservableFeatureImpl<>));
+            yield return describe.Singleton<IObservableFeatureFactory, ObservableFeatureFactory>();
 
-            yield return describe.Transient<IRequiredFeaturesService, RequiredFeaturesService>();
+            yield return describe.Singleton<IRequiredFeaturesService, RequiredFeaturesService>();
             yield return describe.Singleton(typeof(IFeatureOptions<>), typeof(FeatureOptionsManager<>));
 
             yield return describe.Transient<DefaultFeatureDescriberEnumerable, DefaultFeatureDescriberEnumerable>();

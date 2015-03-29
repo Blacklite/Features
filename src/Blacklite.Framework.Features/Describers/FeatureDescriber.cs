@@ -61,11 +61,6 @@ namespace Blacklite.Framework.Features.Describers
             {
                 Groups = new[] { "( not grouped )" };
             }
-
-            if (IsObservable)
-                ObservableInterfaceType = typeof(ObservableFeature<>).MakeGenericType(Type);
-            else
-                InterfaceType = typeof(Feature<>).MakeGenericType(Type);
         }
 
         public Type Type { get; }
@@ -86,10 +81,6 @@ namespace Blacklite.Framework.Features.Describers
         public IEnumerable<IFeatureDescriber> Children { get; set; }
 
         public IEnumerable<string> Groups { get; }
-
-        public Type InterfaceType { get; }
-
-        public Type ObservableInterfaceType { get; }
 
         public IEnumerable<IFeaturePropertyDescriber> Properties { get; }
 

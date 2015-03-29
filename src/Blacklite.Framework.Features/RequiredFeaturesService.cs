@@ -1,4 +1,6 @@
 ﻿using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
+using Blacklite.Framework.Features.Observables;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
@@ -12,20 +14,24 @@ namespace Blacklite.Framework.Features
     class RequiredFeaturesService : IRequiredFeaturesService
     {
         private readonly IFeatureDescriberProvider _provider;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IFeatureFactory _factory;
+        private readonly IObservableFeatureFactory _observableFeatureFactory;
 
-        public RequiredFeaturesService(IServiceProvider serviceProvider, IFeatureDescriberProvider provider)
+        public RequiredFeaturesService(IFeatureFactory factory,
+            IFeatureDescriberProvider provider,
+            IObservableFeatureFactory observableFeatureFactory)
         {
             _provider = provider;
-            _serviceProvider = serviceProvider;
+            _factory = factory;
+            _observableFeatureFactory = observableFeatureFactory;
         }
 
         private object GetRequiredFeature(IFeatureDescriber describer)
         {
             if (describer.IsObservable)
-                return _serviceProvider.GetRequiredService(describer.ObservableInterfaceType);
+                return _observableFeatureFactory.GetObservableFeature(describer.Type);
 
-            return _serviceProvider.GetRequiredService(describer.InterfaceType);
+            return _factory.GetFeature(describer.Type);
         }
 
         private IEnumerable<FeatureDependency> GetFeatureDependencies(IFeatureDescriber describer)
@@ -125,8 +131,7 @@ namespace Blacklite.Framework.Features
 
             private static ISwitch GetTrait(FeatureDependency dependency)
             {
-                var property = typeof(Feature<object>).GetTypeInfo().GetDeclaredProperty(nameof(Feature<object>.Value));
-                return (ISwitch)property.GetValue(dependency.Service, null);
+                return (ISwitch)dependency.Service;
             }
 
             public bool IsEnabled { get; set; }

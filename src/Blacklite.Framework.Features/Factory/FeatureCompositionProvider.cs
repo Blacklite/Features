@@ -12,7 +12,6 @@ namespace Blacklite.Framework.Features.Factory
     public class FeatureCompositionProvider : IFeatureCompositionProvider
     {
         private readonly IEnumerable<IFeatureComposition> _composers;
-        private readonly IServiceProvider _serviceProvider;
         private readonly IFeatureDescriberProvider _describerProvider;
         private readonly ConcurrentDictionary<Type, IEnumerable<IFeatureComposition>> _featureComposers = new ConcurrentDictionary<Type, IEnumerable<IFeatureComposition>>();
         private readonly IFeatureComposition[] _requiredFeatureComposer;
@@ -26,7 +25,6 @@ namespace Blacklite.Framework.Features.Factory
             IFeatureDescriberProvider describerProvider)
         {
             _composers = globalComposers;
-            _serviceProvider = serviceProvider;
             _optionsFeatureComposer = new IFeatureComposition[] { optionsFeatureComposer };
             _requiredFeatureComposer = new IFeatureComposition[] { requiredFeatureComposer };
             _describerProvider = describerProvider;
@@ -44,39 +42,20 @@ namespace Blacklite.Framework.Features.Factory
             IEnumerable<IFeatureComposition> composers;
             if (!_featureComposers.TryGetValue(typeof(TFeature), out composers))
             {
-                composers = _composers.Union(
-                        _serviceProvider.GetRequiredService<IEnumerable<IFeatureComposition<TFeature>>>()
-                        .Select(x => new ObjectComposer<TFeature>(x))
-                    )
-                    .Where(x => x.IsApplicableTo(describer))
+                composers = _composers
                     .OrderByDescending(x => x.Priority);
 
                 // Enforce options first (so it gets populated)
                 // Enfroce required last, so it overrides anything else for IsEnabled
-                composers = _optionsFeatureComposer.Concat(composers).Concat(_requiredFeatureComposer);
+                composers = _optionsFeatureComposer
+                    .Concat(_composers.OrderByDescending(x => x.Priority))
+                    .Concat(_requiredFeatureComposer)
+                    .Where(x => x.IsApplicableTo(describer))
+                    .ToArray();
                 _featureComposers.TryAdd(typeof(TFeature), composers);
             }
 
             return composers;
-        }
-
-        public class ObjectComposer<TFeature> : IFeatureComposition
-            where TFeature : class, new()
-        {
-            private readonly IFeatureComposition<TFeature> _configurator;
-            public ObjectComposer(IFeatureComposition<TFeature> configurator)
-            {
-                _configurator = configurator;
-            }
-
-            public int Priority { get { return _configurator.Priority; } }
-
-            public T Configure<T>(T feature, IFeatureDescriber describer) => (T)_configurator.Configure(feature as TFeature, describer);
-
-            public bool IsApplicableTo(IFeatureDescriber describer)
-            {
-                return typeof(TFeature).GetTypeInfo().IsAssignableFrom(describer.TypeInfo);
-            }
         }
     }
 }

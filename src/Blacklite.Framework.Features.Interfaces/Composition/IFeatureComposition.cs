@@ -15,11 +15,4 @@ namespace Blacklite.Framework.Features.Composition
     public interface IOptionsFeatureComposer : IFeatureComposition { }
 
     public interface IRequiredFeatureComposer : IFeatureComposition { }
-
-    public interface IFeatureComposition<in TFeature>
-        where TFeature : class, new()
-    {
-        int Priority { get; }
-        IFeature Configure(TFeature aspect, IFeatureDescriber describer);
-    }
 }
