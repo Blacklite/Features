@@ -14,7 +14,6 @@ namespace Features.Tests
 {
     public class RequiredFeaturesServiceTests
     {
-        [ScopedFeature]
         class ScopedFeature : Switch
         {
         }
@@ -31,7 +30,6 @@ namespace Features.Tests
         [RequiredFeature(typeof(RealObservableSwitch2), true)]
         [RequiredFeature(typeof(SingletonFeature))]
         [RequiredFeature(typeof(ScopedFeature), true)]
-        [ScopedFeature]
         class ScopedFeature2 : Switch
         {
         }
@@ -42,7 +40,6 @@ namespace Features.Tests
         {
         }
 
-        [RequiredFeature(typeof(SingletonFeature), true)]
         class RealObservableSwitch2 : ObservableSwitch
         {
         }
@@ -249,7 +246,6 @@ namespace Features.Tests
         [RequiredFeature(typeof(RealObservableSwitch2), false)]
         [RequiredFeature(typeof(SingletonFeature), true)]
         [RequiredFeature(typeof(ScopedFeature), false)]
-        [ScopedFeature]
         class ScopedFeature3 : Switch
         {
         }

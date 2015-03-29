@@ -18,21 +18,21 @@ namespace Features.Tests.Factory
             var singletonFactory = Substitute.For<ISingletonFeatureFactory>();
             var scopedFactory = Substitute.For<IScopedFeatureFactory>();
             var describer = Substitute.For<IFeatureDescriber>();
-            describer.Lifecycle.Returns(LifecycleKind.Singleton);
+            describer.IsObservable.Returns(true);
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
-            describerProvider.Describers[Arg.Any<Type>()].Returns(describer);
+            describerProvider.Describers[typeof(Feature2)].Returns(describer);
 
 
             var factory = new CompositeFeatureFactory(
                 singletonFactory,
                 scopedFactory,
-                Substitute.For<IFeatureDescriberProvider>()
+                describerProvider
             );
 
             var result = factory.GetFeature(typeof(Feature2));
 
-            singletonFactory.Received().GetFeature(Arg.Any<Type>());
-            scopedFactory.DidNotReceive().GetFeature(Arg.Any<Type>());
+            singletonFactory.Received().GetFeature(typeof(Feature2));
+            scopedFactory.DidNotReceive().GetFeature(typeof(Feature2));
         }
 
         [Fact]
@@ -41,21 +41,21 @@ namespace Features.Tests.Factory
             var singletonFactory = Substitute.For<ISingletonFeatureFactory>();
             var scopedFactory = Substitute.For<IScopedFeatureFactory>();
             var describer = Substitute.For<IFeatureDescriber>();
-            describer.Lifecycle.Returns(LifecycleKind.Scoped);
+            describer.IsObservable.Returns(false);
             var describerProvider = Substitute.For<IFeatureDescriberProvider>();
-            describerProvider.Describers[Arg.Any<Type>()].Returns(describer);
+            describerProvider.Describers[typeof(Feature2)].Returns(describer);
 
 
             var factory = new CompositeFeatureFactory(
                 singletonFactory,
                 scopedFactory,
-                Substitute.For<IFeatureDescriberProvider>()
+                describerProvider
             );
 
             var result = factory.GetFeature(typeof(Feature2));
 
-            singletonFactory.Received().GetFeature(Arg.Any<Type>());
-            scopedFactory.DidNotReceive().GetFeature(Arg.Any<Type>());
+            scopedFactory.Received().GetFeature(typeof(Feature2));
+            singletonFactory.DidNotReceive().GetFeature(typeof(Feature2));
         }
 
 

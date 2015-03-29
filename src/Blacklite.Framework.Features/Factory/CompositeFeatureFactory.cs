@@ -24,7 +24,7 @@ namespace Blacklite.Framework.Features.Factory
         {
             var describer = _describerProvider.Describers[featureType];
 
-            if (describer.Lifecycle == LifecycleKind.Scoped)
+            if (!describer.IsObservable)
                 return _scopedFeatureFactory.GetFeature(featureType);
 
             return _singletonFeatureFactory.GetFeature(featureType);

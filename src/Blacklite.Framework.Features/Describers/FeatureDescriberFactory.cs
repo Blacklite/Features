@@ -39,14 +39,9 @@ namespace Blacklite.Framework.Features.Describers
             where T : FeatureDescriber
         {
             var requires = describer.DependsOn.Keys.Cast<T>();
-            if (describer.Lifecycle == LifecycleKind.Singleton && requires.Any(z => z.Lifecycle == LifecycleKind.Scoped))
+            if (describer.IsObservable && requires.Any(z => !z.IsObservable))
             {
-                throw new NotSupportedException($"Lifecycle '{LifecycleKind.Scoped}' cannot be required by features with a lifecycle of '{describer.Lifecycle}'.");
-            }
-
-            if (describer.IsObservable && describer.Lifecycle == LifecycleKind.Scoped)
-            {
-                throw new NotSupportedException($"Lifecycle '{describer.Lifecycle}' is not supported by observable features'.");
+                throw new NotSupportedException($"Observable features cannot depend on non-observable features.");
             }
         }
     }

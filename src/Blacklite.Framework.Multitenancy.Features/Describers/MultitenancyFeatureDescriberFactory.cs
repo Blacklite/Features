@@ -41,13 +41,19 @@ namespace Blacklite.Framework.Multitenancy.Features.Describers
             FeatureDescriberFactory.ValidateDescriber(describer);
             var requires = describer.DependsOn.Keys.Cast<T>();
 
-            if (describer.Lifecycle == LifecycleKind.Singleton && !(describer.IsTenantScoped || describer.IsApplicationScoped) && requires.Any(z => z.IsTenantScoped))
+            if (!describer.IsObservable && (describer.IsTenantScoped || describer.IsApplicationScoped))
             {
-                throw new NotSupportedException($"Lifecycle '{nameof(Tenant)}' cannot be required by features with a lifecycle of '{describer.Lifecycle}'.");
+                throw new NotSupportedException($"Tenant or Application features must be observable");
             }
-            if (describer.Lifecycle == LifecycleKind.Singleton && !(describer.IsTenantScoped || describer.IsApplicationScoped) && requires.Any(z => z.IsApplicationScoped))
+
+            if (describer.IsObservable && !(describer.IsTenantScoped || describer.IsApplicationScoped) && requires.Any(z => z.IsTenantScoped))
             {
-                throw new NotSupportedException($"Lifecycle 'Application' cannot be required by features with a lifecycle of '{describer.Lifecycle}'.");
+                throw new NotSupportedException($"Lifecycle '{nameof(Tenant)}' cannot be required by features with singleton observable features.");
+            }
+
+            if (describer.IsObservable && !(describer.IsTenantScoped || describer.IsApplicationScoped) && requires.Any(z => z.IsApplicationScoped))
+            {
+                throw new NotSupportedException($"Lifecycle 'Application' cannot be required by features with singleton observable features.");
             }
         }
     }

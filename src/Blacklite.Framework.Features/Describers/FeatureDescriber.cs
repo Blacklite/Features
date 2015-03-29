@@ -17,7 +17,6 @@ namespace Blacklite.Framework.Features.Describers
         {
             Type = typeInfo.AsType();
             TypeInfo = typeInfo;
-            Lifecycle = TypeInfo.GetCustomAttributes<ScopedFeatureAttribute>().Any() ? LifecycleKind.Scoped : LifecycleKind.Singleton;
             IsObservable = TypeInfo.ImplementedInterfaces.Contains(typeof(IObservableFeature));
             HasOptions = TypeInfo.ImplementedInterfaces.Contains(typeof(IFeatureOptions));
 
@@ -65,7 +64,6 @@ namespace Blacklite.Framework.Features.Describers
 
         public Type Type { get; }
         public TypeInfo TypeInfo { get; }
-        public LifecycleKind Lifecycle { get; }
         public string DisplayName { get; }
         public string Description { get; }
         public bool IsObservable { get; }

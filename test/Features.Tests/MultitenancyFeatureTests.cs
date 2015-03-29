@@ -12,7 +12,6 @@ namespace Multitenancy.Tests
 {
     public class MultitenancyFeatureTests
     {
-        [ScopedFeature]
         class ScopedFeature : Feature
         {
         }
@@ -27,14 +26,14 @@ namespace Multitenancy.Tests
         {
         }
 
-
-        [RequiredFeature(typeof(ScopedFeature)), TenantOnly]
-        class InvalidTenantFeature : Feature
+        [RequiredFeature(typeof(SingletonFeature)), ApplicationOnly]
+        class ApplicationFeature : Feature
         {
         }
 
-        [RequiredFeature(typeof(SingletonFeature)), ApplicationOnly]
-        class ApplicationFeature : Feature
+
+        [RequiredFeature(typeof(ScopedFeature)), TenantOnly]
+        class InvalidTenantFeature : Feature
         {
         }
 
