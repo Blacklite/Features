@@ -29,7 +29,7 @@ namespace Blacklite.Framework.Features.Composition
         {
             string value;
 
-            if (describer.HasEnabled)
+            if (describer.HasEnabled && !describer.IsReadOnly)
             {
                 if (_configuration.TryGet($"{describer.Type.Name}:IsEnabled", out value))
                 {
@@ -39,7 +39,7 @@ namespace Blacklite.Framework.Features.Composition
 
             if (describer.Properties.Any())
             {
-                foreach (var property in describer.Properties)
+                foreach (var property in describer.Properties.Where(z => !z.IsReadOnly))
                 {
                     if (_configuration.TryGet($"{describer.Type.Name}:{property.Name}", out value))
                     {
@@ -54,7 +54,7 @@ namespace Blacklite.Framework.Features.Composition
             if (describer.HasOptions && !describer.Options.IsFeature)
             {
                 var options = describer.GetOptions<object>(feature);
-                foreach (var property in describer.Options.Type.GetRuntimeProperties())
+                foreach (var property in describer.Options.Type.GetRuntimeProperties().Where(z => z.CanWrite))
                 {
                     if (_configuration.TryGet($"{describer.Type.Name}:Options:{property.Name}", out value))
                     {

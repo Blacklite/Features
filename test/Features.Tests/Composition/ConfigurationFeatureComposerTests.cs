@@ -1,6 +1,7 @@
 ﻿using Blacklite.Framework.Features;
 using Blacklite.Framework.Features.Composition;
 using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.OptionsModel;
 using Microsoft.Framework.ConfigurationModel;
 using NSubstitute;
 using System;
@@ -61,6 +62,75 @@ namespace Features.Tests.Composition
         class TestOptionsSwitch : Switch<TestOptions> { }
         class TestFeatureOptionsSwitch : Switch<TestFeatureOptions> { }
 
+        class AlwaysOnSwitch : Feature.AlwaysOn { }
+        class AlwaysOffSwitch : Feature.AlwaysOff { }
+
+        [Fact]
+        public void SetSwitch()
+        {
+            var configuration = Substitute.For<IConfiguration>();
+
+            var composer = new ConfigurationFeatureComposer(configuration);
+            var factory = new FeatureDescriberFactory();
+            var describers = factory.Create(new Type[]
+            {
+                typeof(TestSwitch),
+                typeof(TestFeature),
+                typeof(TestSwitchFeature),
+                typeof(TestFeatureOptions),
+                typeof(TestOptionsSwitch),
+                typeof(TestFeatureOptionsSwitch),
+            }.Select(IntrospectionExtensions.GetTypeInfo)
+            .ToArray());
+
+            string value;
+            var testSwitchDescriber = describers.Single(x => x.Type == typeof(TestSwitch));
+
+            composer.Configure(
+                new TestSwitch(),
+                testSwitchDescriber
+            );
+
+            configuration.Received().TryGet($"TestSwitch:IsEnabled", out value);
+        }
+
+        [Fact]
+        public void NotSetReadOnlySwitch()
+        {
+            var configuration = Substitute.For<IConfiguration>();
+
+            var composer = new ConfigurationFeatureComposer(configuration);
+            var factory = new FeatureDescriberFactory();
+            var describers = factory.Create(new Type[]
+            {
+                typeof(AlwaysOnSwitch),
+                typeof(AlwaysOffSwitch),
+                typeof(TestSwitchFeature)
+            }.Select(IntrospectionExtensions.GetTypeInfo)
+            .ToArray());
+
+            string value;
+            var describer = describers.Single(x => x.Type == typeof(TestSwitchFeature));
+            composer.Configure(
+                new TestSwitchFeature(),
+                describer
+            );
+            configuration.Received().TryGet($"TestSwitchFeature:IsEnabled", out value);
+
+            describer = describers.Single(x => x.Type == typeof(AlwaysOnSwitch));
+            composer.Configure(
+                new AlwaysOnSwitch(),
+                describer
+            );
+            configuration.DidNotReceive().TryGet($"AlwaysOnSwitch:IsEnabled", out value);
+
+            describer = describers.Single(x => x.Type == typeof(AlwaysOffSwitch));
+            composer.Configure(
+                new AlwaysOffSwitch(),
+                describer
+            );
+            configuration.DidNotReceive().TryGet($"AlwaysOffSwitch:IsEnabled", out value);
+        }
         [Fact]
         public void TryGetSwitch()
         {
@@ -162,6 +232,91 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 new TestOptionsSwitch(),
+                testOptionsSwitchDescriber
+            );
+
+            configuration.Received().TryGet($"TestOptionsSwitch:Options:Property1", out value);
+            configuration.Received().TryGet($"TestOptionsSwitch:Options:Property2", out value);
+
+            composer.Configure(
+                new TestFeatureOptionsSwitch(),
+                testFeatureOptionsSwitchDescriber
+            );
+
+            configuration.DidNotReceive().TryGet($"TestFeatureOptionsSwitch:Options:Property1", out value);
+            configuration.DidNotReceive().TryGet($"TestFeatureOptionsSwitch:Options:Property2", out value);
+        }
+
+        public class ReadOnlyOptions { public string Property1 { get; } public string Property2 { get; set; } }
+        public class ReadOnlyFeatureOptions : Switch { public string Property1 { get; set; } public string Property2 { get; } }
+        public class ReadOnlyOptionsSwitch : Switch<ReadOnlyOptions> { }
+
+        [Fact]
+        public void HandlesReadOnlyProperties()
+        {
+            var configuration = Substitute.For<IConfiguration>();
+
+            var composer = new ConfigurationFeatureComposer(configuration);
+            var factory = new FeatureDescriberFactory();
+            var describers = factory.Create(new Type[]
+            {
+                typeof(ReadOnlyOptions),
+                typeof(ReadOnlyFeatureOptions),
+                typeof(ReadOnlyOptionsSwitch),
+            }.Select(IntrospectionExtensions.GetTypeInfo)
+            .ToArray());
+
+            string value;
+            var describer = describers.Single(x => x.Type == typeof(ReadOnlyOptionsSwitch));
+
+            var testOptionsSwitch = new ReadOnlyOptionsSwitch();
+            (testOptionsSwitch as IFeatureOptions).SetOptions(new ReadOnlyOptions());
+
+            composer.Configure(
+                testOptionsSwitch,
+                describer
+            );
+
+            configuration.DidNotReceive().TryGet($"ReadOnlyOptionsSwitch:Options:Property1", out value);
+            configuration.Received().TryGet($"ReadOnlyOptionsSwitch:Options:Property2", out value);
+
+            describer = describers.Single(x => x.Type == typeof(ReadOnlyFeatureOptions));
+            composer.Configure(
+                new ReadOnlyFeatureOptions(),
+                describer
+            );
+
+            configuration.Received().TryGet($"ReadOnlyFeatureOptions:Property1", out value);
+            configuration.DidNotReceive().TryGet($"ReadOnlyFeatureOptions:Property2", out value);
+        }
+
+        [Fact]
+        public void HandlesReadOnlyOptionProperties()
+        {
+            var configuration = Substitute.For<IConfiguration>();
+
+            var composer = new ConfigurationFeatureComposer(configuration);
+            var factory = new FeatureDescriberFactory();
+            var describers = factory.Create(new Type[]
+            {
+                typeof(TestSwitch),
+                typeof(TestFeature),
+                typeof(TestSwitchFeature),
+                typeof(TestFeatureOptions),
+                typeof(TestOptionsSwitch),
+                typeof(TestFeatureOptionsSwitch),
+            }.Select(IntrospectionExtensions.GetTypeInfo)
+            .ToArray());
+
+            string value;
+            var testOptionsSwitchDescriber = describers.Single(x => x.Type == typeof(TestOptionsSwitch));
+            var testFeatureOptionsSwitchDescriber = describers.Single(x => x.Type == typeof(TestFeatureOptionsSwitch));
+
+            var testOptionsSwitch = new TestOptionsSwitch();
+            (testOptionsSwitch as IFeatureOptions).SetOptions(new TestOptions());
+
+            composer.Configure(
+                testOptionsSwitch,
                 testOptionsSwitchDescriber
             );
 

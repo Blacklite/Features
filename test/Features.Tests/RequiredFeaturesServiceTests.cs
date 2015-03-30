@@ -174,7 +174,7 @@ namespace Features.Tests
             bool result = false;
 
             result = service.ValidateRequiredFeatures(typeof(ScopedFeature2));
-            Assert.True(result);
+            Assert.True(result); 
 
             realObservableSwitch.Value.IsEnabled = false;
             realObservableSubject.OnNext(realObservableSwitch.Value);

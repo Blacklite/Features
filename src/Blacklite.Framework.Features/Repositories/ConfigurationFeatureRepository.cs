@@ -28,14 +28,14 @@ namespace Blacklite.Framework.Features.Repositories
 
         public void Store(IFeature feature, IFeatureDescriber describer)
         {
-            if (describer.HasEnabled)
+            if (describer.HasEnabled && !describer.IsReadOnly)
             {
                 _configuration.Set($"{describer.Type.Name}:IsEnabled", describer.GetIsEnabled<bool>(feature).ToString() ?? string.Empty);
             }
 
             if (describer.Properties.Any())
             {
-                foreach (var property in describer.Properties)
+                foreach (var property in describer.Properties.Where(z => !z.IsReadOnly))
                 {
                     _configuration.Set($"{describer.Type.Name}:{property.Name}", property.GetProperty<object>(feature)?.ToString() ?? string.Empty);
                 }
@@ -44,7 +44,7 @@ namespace Blacklite.Framework.Features.Repositories
             if (describer.HasOptions && !describer.Options.IsFeature)
             {
                 var options = describer.GetOptions<object>(feature);
-                foreach (var property in describer.Options.Type.GetRuntimeProperties())
+                foreach (var property in describer.Options.Type.GetRuntimeProperties().Where(z => z.CanWrite))
                 {
                     _configuration.Set($"{describer.Type.Name}:Options:{property.Name}", property.GetValue(options)?.ToString() ?? string.Empty);
                 }

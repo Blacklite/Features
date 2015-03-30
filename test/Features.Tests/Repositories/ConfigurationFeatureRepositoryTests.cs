@@ -61,6 +61,8 @@ namespace Features.Tests.Repositories
         class TestFeatureOptions : Switch { public string Property1 { get; set; } public string Property2 { get; set; } }
         public class TestOptionsSwitch : Switch<TestOptions> { }
         class TestFeatureOptionsSwitch : Switch<TestFeatureOptions> { }
+        class AlwaysOnSwitch : Feature.AlwaysOn { }
+        class AlwaysOffSwitch : Feature.AlwaysOff { }
 
         [Fact]
         public void SetSwitch()
@@ -88,6 +90,43 @@ namespace Features.Tests.Repositories
             );
 
             configuration.Received().Set($"TestSwitch:IsEnabled", Arg.Any<string>());
+        }
+
+        [Fact]
+        public void NotSetReadOnlySwitch()
+        {
+            var configuration = Substitute.For<IConfiguration>();
+
+            var composer = new ConfigurationFeatureRepository(configuration);
+            var factory = new FeatureDescriberFactory();
+            var describers = factory.Create(new Type[]
+            {
+                typeof(AlwaysOnSwitch),
+                typeof(AlwaysOffSwitch),
+                typeof(TestSwitchFeature)
+            }.Select(IntrospectionExtensions.GetTypeInfo)
+            .ToArray());
+
+            var describer = describers.Single(x => x.Type == typeof(TestSwitchFeature));
+            composer.Store(
+                new TestSwitchFeature(),
+                describer
+            );
+            configuration.Received().Set($"TestSwitchFeature:IsEnabled", Arg.Any<string>());
+
+            describer = describers.Single(x => x.Type == typeof(AlwaysOnSwitch));
+            composer.Store(
+                new AlwaysOnSwitch(),
+                describer
+            );
+            configuration.DidNotReceive().Set($"AlwaysOnSwitch:IsEnabled", Arg.Any<string>());
+
+            describer = describers.Single(x => x.Type == typeof(AlwaysOffSwitch));
+            composer.Store(
+                new AlwaysOffSwitch(),
+                describer
+            );
+            configuration.DidNotReceive().Set($"AlwaysOffSwitch:IsEnabled", Arg.Any<string>());
         }
 
         [Fact]
@@ -139,6 +178,90 @@ namespace Features.Tests.Repositories
 
         [Fact]
         public void SetNonFeatureOptions()
+        {
+            var configuration = Substitute.For<IConfiguration>();
+
+            var composer = new ConfigurationFeatureRepository(configuration);
+            var factory = new FeatureDescriberFactory();
+            var describers = factory.Create(new Type[]
+            {
+                typeof(TestSwitch),
+                typeof(TestFeature),
+                typeof(TestSwitchFeature),
+                typeof(TestFeatureOptions),
+                typeof(TestOptionsSwitch),
+                typeof(TestFeatureOptionsSwitch),
+            }.Select(IntrospectionExtensions.GetTypeInfo)
+            .ToArray());
+
+            var testOptionsSwitchDescriber = describers.Single(x => x.Type == typeof(TestOptionsSwitch));
+            var testFeatureOptionsSwitchDescriber = describers.Single(x => x.Type == typeof(TestFeatureOptionsSwitch));
+
+            var testOptionsSwitch = new TestOptionsSwitch();
+            (testOptionsSwitch as IFeatureOptions).SetOptions(new TestOptions());
+
+            composer.Store(
+                testOptionsSwitch,
+                testOptionsSwitchDescriber
+            );
+
+            configuration.Received().Set($"TestOptionsSwitch:Options:Property1", Arg.Any<string>());
+            configuration.Received().Set($"TestOptionsSwitch:Options:Property2", Arg.Any<string>());
+
+            composer.Store(
+                new TestFeatureOptionsSwitch(),
+                testFeatureOptionsSwitchDescriber
+            );
+
+            configuration.DidNotReceive().Set($"TestFeatureOptionsSwitch:Options:Property1", Arg.Any<string>());
+            configuration.DidNotReceive().Set($"TestFeatureOptionsSwitch:Options:Property2", Arg.Any<string>());
+        }
+
+        public class ReadOnlyOptions { public string Property1 { get; } public string Property2 { get; set; } }
+        public class ReadOnlyFeatureOptions : Switch { public string Property1 { get; set; } public string Property2 { get; } }
+        public class ReadOnlyOptionsSwitch : Switch<ReadOnlyOptions> { }
+
+
+        [Fact]
+        public void HandlesReadOnlyProperties()
+        {
+            var configuration = Substitute.For<IConfiguration>();
+
+            var composer = new ConfigurationFeatureRepository(configuration);
+            var factory = new FeatureDescriberFactory();
+            var describers = factory.Create(new Type[]
+            {
+                typeof(ReadOnlyOptions),
+                typeof(ReadOnlyFeatureOptions),
+                typeof(ReadOnlyOptionsSwitch),
+            }.Select(IntrospectionExtensions.GetTypeInfo)
+            .ToArray());
+
+            var describer = describers.Single(x => x.Type == typeof(ReadOnlyOptionsSwitch));
+
+            var testOptionsSwitch = new ReadOnlyOptionsSwitch();
+            (testOptionsSwitch as IFeatureOptions).SetOptions(new ReadOnlyOptions());
+
+            composer.Store(
+                testOptionsSwitch,
+                describer
+            );
+
+            configuration.DidNotReceive().Set($"ReadOnlyOptionsSwitch:Options:Property1", Arg.Any<string>());
+            configuration.Received().Set($"ReadOnlyOptionsSwitch:Options:Property2", Arg.Any<string>());
+
+            describer = describers.Single(x => x.Type == typeof(ReadOnlyFeatureOptions));
+            composer.Store(
+                new ReadOnlyFeatureOptions(),
+                describer
+            );
+
+            configuration.Received().Set($"ReadOnlyFeatureOptions:Property1", Arg.Any<string>());
+            configuration.DidNotReceive().Set($"ReadOnlyFeatureOptions:Property2", Arg.Any<string>());
+        }
+
+        [Fact]
+        public void HandlesReadOnlyOptionProperties()
         {
             var configuration = Substitute.For<IConfiguration>();
 
