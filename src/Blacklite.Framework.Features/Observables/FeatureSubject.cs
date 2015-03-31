@@ -5,13 +5,13 @@ using Blacklite.Framework.Features.Factory;
 
 namespace Blacklite.Framework.Features.Observables
 {
-    interface IFeatureSubject<T> : IObservable<T>, IObserver<T>
+    interface IFeatureSubject<T> : IObservable<T>, IObserver<T>, IFeatureSubject
            where T : class, IObservableFeature, new()
     {
         T Value { get; }
     }
 
-    class FeatureSubject<T> : IFeatureSubject<T>, IFeatureSubject
+    class FeatureSubject<T> : IFeatureSubject<T>
         where T : class, IObservableFeature, new()
     {
         private readonly BehaviorSubject<T> _feature;

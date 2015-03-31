@@ -11,7 +11,7 @@ namespace Blacklite.Framework.Features.Observables
         }
 
         public ObservableFeature<T> GetObservableFeature<T>()
-            where T : class, IObservableFeature
+            where T : class, IObservableFeature, new()
         {
             return new ObservableFeatureImpl<T>(_featureSubjectFactory);
         }

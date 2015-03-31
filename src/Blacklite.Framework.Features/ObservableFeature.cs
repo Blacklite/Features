@@ -9,13 +9,15 @@ namespace Blacklite.Framework.Features
     public abstract class ObservableFeature : Feature, IObservableFeature { }
 
     class ObservableFeatureImpl<T> : ObservableFeature<T>
-        where T : class, IObservableFeature
+        where T : class, IObservableFeature, new()
     {
-        private readonly ISubject<T> _feature;
+        private readonly IFeatureSubject<T> _feature;
         public ObservableFeatureImpl(IFeatureSubjectFactory factory)
         {
-            _feature = (ISubject<T>)factory.GetSubject(typeof(T));
+            _feature = (IFeatureSubject<T>)factory.GetSubject(typeof(T));
         }
+
+        public T Value { get { return _feature.Value; } }
 
         public IDisposable Subscribe(IObserver<T> observer) => _feature.Subscribe(observer);
     }

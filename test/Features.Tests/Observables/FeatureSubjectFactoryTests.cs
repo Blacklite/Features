@@ -8,7 +8,7 @@ namespace Features.Tests.Observables
 {
     public class FeatureSubjectFactoryTests
     {
-        public class Feature2 : IFeature { }
+        public class Feature2 : IObservableFeature { }
 
         [Fact]
         public void GetFeatureCachesInstances()
