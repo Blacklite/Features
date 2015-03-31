@@ -10,8 +10,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Editors.Models;
+using Blacklite.Framework.Features.Editors.Schema;
 
-namespace Blacklite.Framework.Features.EditorModel
+namespace Blacklite.Framework.Features.Editors
 {
     static class StringExtension
     {
@@ -34,8 +36,8 @@ namespace Blacklite.Framework.Features.EditorModel
 
     public class FeatureEditor : IFeatureEditor
     {
-        private readonly IEnumerable<FeatureModel> _models;
-        private readonly IEnumerable<FeatureGroup> _groups;
+        private readonly IEnumerable<EditorModel> _models;
+        private readonly IEnumerable<EditorGroup> _groups;
         private readonly Func<Type, IFeature> _getFeature;
         private readonly Func<Type, object> _getFeatureOption;
         private readonly JsonSerializer _serializer;
@@ -44,7 +46,7 @@ namespace Blacklite.Framework.Features.EditorModel
         public const string SettingsKey = "settings";
         public const string OptionsKey = "options";
 
-        public FeatureEditor(IFeatureManager featureManager, IEnumerable<FeatureModel> models, IEnumerable<FeatureGroup> groups, Func<Type, IFeature> feature, Func<Type, object> featureOption)
+        public FeatureEditor(IFeatureManager featureManager, IEnumerable<EditorModel> models, IEnumerable<EditorGroup> groups, Func<Type, IFeature> feature, Func<Type, object> featureOption)
         {
             _featureManager = featureManager;
             _models = models;
@@ -88,7 +90,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return json;
         }
 
-        private JObject GetModelJObject(FeatureModel model)
+        private JObject GetModelJObject(EditorModel model)
         {
             var feature = _getFeature(model.FeatureType);
 
@@ -143,7 +145,7 @@ namespace Blacklite.Framework.Features.EditorModel
             schema.Title = "Features";
             schema.Format = "tabs";
 
-            var schemaContainer = new ModelSchemaContainer(schema, _models, _groups);
+            var schemaContainer = new SchemaContainer(schema, _models, _groups);
 
             return schemaContainer.Schema;
         }
@@ -174,18 +176,18 @@ namespace Blacklite.Framework.Features.EditorModel
             public IFeatureDescriber Describer { get; }
         }
 
-        private IEnumerable<SaveContext> SaveModel(FeatureGroup group, JToken json)
+        private IEnumerable<SaveContext> SaveModel(EditorGroup group, JToken json)
         {
             foreach (var item in group.Items)
             {
-                var model = item as FeatureModel;
+                var model = item as EditorModel;
                 if (model != null)
                 {
                     foreach (var result in SaveModel(model, json[model.Name]))
                         yield return result;
                 }
 
-                var grouping = item as FeatureGroup;
+                var grouping = item as EditorGroup;
                 if (grouping != null)
                 {
                     foreach (var result in SaveModel(grouping, json[grouping.Name]))
@@ -208,7 +210,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return left.Value.Equals(right.Value);
         }
 
-        private IEnumerable<SaveContext> SaveModel(FeatureModel model, JToken json)
+        private IEnumerable<SaveContext> SaveModel(EditorModel model, JToken json)
         {
             //json.Add(model.Name, model.Name);
             var feature = _getFeature(model.FeatureType);

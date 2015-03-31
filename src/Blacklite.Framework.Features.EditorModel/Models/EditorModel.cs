@@ -5,38 +5,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 
-namespace Blacklite.Framework.Features.EditorModel
+namespace Blacklite.Framework.Features.Editors.Models
 {
-    public class FeatureModelGroups
+    public class EditorModel : EditorGroupOrModel
     {
-        public IGrouping<string, FeatureModel> Groups { get; }
-        public IEnumerable<FeatureModel> Models { get; }
-    }
-
-    public abstract class FeatureGroupOrModel
-    {
-        public FeatureGroupOrModel(string name)
-        {
-            Name = name.CamelCase();
-        }
-        public string Name { get; }
-    }
-
-    public class FeatureGroup : FeatureGroupOrModel
-    {
-        public FeatureGroup(string name) : base(name)
-        {
-            Title = name;
-            Items = new List<FeatureGroupOrModel>();
-        }
-
-        public string Title { get; }
-        public IList<FeatureGroupOrModel> Items { get; }
-    }
-
-    public class FeatureModel : FeatureGroupOrModel
-    {
-        public FeatureModel(IFeatureDescriber describer) : base(describer.Type.Name)
+        public EditorModel(IFeatureDescriber describer) : base(describer.Type.Name)
         {
             Describer = describer;
             Title = describer.DisplayName;
@@ -50,9 +23,9 @@ namespace Blacklite.Framework.Features.EditorModel
             HasProperties = describer.Properties.Any();
             OptionsIsFeature = describer?.Options?.IsFeature ?? false;
             OptionsDescription = describer?.Options?.Description;
-            Children = describer.Children.Select(x => new FeatureModel(x)).ToArray();
+            Children = describer.Children.Select(x => new EditorModel(x)).ToArray();
             if (HasEnabled)
-                Enabled = new FeatureOptionPropertyModel(typeof(bool),
+                Enabled = new EditorOptionPropertyModel(typeof(bool),
                     nameof(ISwitch.IsEnabled),
                     "IsEnabled",
                     null,
@@ -61,10 +34,10 @@ namespace Blacklite.Framework.Features.EditorModel
                     describer.IsReadOnly);
             Options = GetOptions(describer).ToDictionary(x => x.Name);
             Properties = GetProperties(describer).ToDictionary(x => x.Name);
-            Dependencies = describer.DependsOn.Select(x => new FeatureDependencyModel(x.Key, x.Value)).ToArray();
+            Dependencies = describer.DependsOn.Select(x => new EditorDependencyModel(x.Key, x.Value)).ToArray();
         }
 
-        private IEnumerable<FeatureOptionPropertyModel> GetOptions(IFeatureDescriber describer)
+        private IEnumerable<EditorOptionPropertyModel> GetOptions(IFeatureDescriber describer)
         {
             if (describer.HasOptions && !describer.Options.IsFeature)
             {
@@ -72,16 +45,16 @@ namespace Blacklite.Framework.Features.EditorModel
 
                 foreach (var property in properties.Where(x => x.Name != nameof(ISwitch.IsEnabled)))
                 {
-                    yield return new FeatureOptionPropertyModel(property.PropertyType, property.Name, GetPropertyDisplayName(property), GetPropertyDescription(property), property.GetValue, property.SetValue, !property.CanWrite);
+                    yield return new EditorOptionPropertyModel(property.PropertyType, property.Name, GetPropertyDisplayName(property), GetPropertyDescription(property), property.GetValue, property.SetValue, !property.CanWrite);
                 }
             }
         }
 
-        private IEnumerable<FeatureOptionPropertyModel> GetProperties(IFeatureDescriber describer)
+        private IEnumerable<EditorOptionPropertyModel> GetProperties(IFeatureDescriber describer)
         {
             foreach (var property in describer.Properties)
             {
-                yield return new FeatureOptionPropertyModel(property.Type, property.Name, property.DisplayName, property.Description, (x) => property.GetProperty<object>(x), property.SetProperty, property.IsReadOnly);
+                yield return new EditorOptionPropertyModel(property.Type, property.Name, property.DisplayName, property.Description, (x) => property.GetProperty<object>(x), property.SetProperty, property.IsReadOnly);
             }
         }
 
@@ -99,12 +72,12 @@ namespace Blacklite.Framework.Features.EditorModel
         public bool HasProperties { get; }
         public bool OptionsIsFeature { get; }
         public string Description { get; }
-        public FeatureOptionPropertyModel Enabled { get; }
-        public IDictionary<string, FeatureOptionPropertyModel> Options { get; }
-        public IDictionary<string, FeatureOptionPropertyModel> Properties { get; }
-        public IEnumerable<FeatureModel> Children { get; }
-        public IEnumerable<FeatureDependencyModel> Dependencies { get; }
-        public FeatureModel OptionsFeature { get; set; }
+        public EditorOptionPropertyModel Enabled { get; }
+        public IDictionary<string, EditorOptionPropertyModel> Options { get; }
+        public IDictionary<string, EditorOptionPropertyModel> Properties { get; }
+        public IEnumerable<EditorModel> Children { get; }
+        public IEnumerable<EditorDependencyModel> Dependencies { get; }
+        public EditorModel OptionsFeature { get; set; }
         public IFeatureDescriber Describer { get; }
 
 
@@ -120,7 +93,7 @@ namespace Blacklite.Framework.Features.EditorModel
 
         public override bool Equals(object obj)
         {
-            var typed = obj as FeatureModel;
+            var typed = obj as EditorModel;
             if (typed != null)
                 return typed.Name.Equals(this.Name);
 

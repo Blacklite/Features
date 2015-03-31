@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Blacklite.Framework.Features.EditorModel
+namespace Blacklite.Framework.Features.Editors.Models
 {
-    public class FeatureOptionPropertyModel
+    public class EditorOptionPropertyModel
     {
-        public FeatureOptionPropertyModel(Type type, string name, string title, string description, Func<object, object> getValue, Action<object, object> setValue, bool isReadOnly = false)
+        public EditorOptionPropertyModel(Type type, string name, string title, string description, Func<object, object> getValue, Action<object, object> setValue, bool isReadOnly = false)
         {
             Type = type;
             Name = name.CamelCase();

@@ -1,11 +1,13 @@
 ﻿using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Editors.Factory;
+using Blacklite.Framework.Features.Editors.Models;
 using Blacklite.Framework.Features.OptionsModel;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Blacklite.Framework.Features.EditorModel
+namespace Blacklite.Framework.Features.Editors
 {
     public interface IFeatureEditorFactory
     {
@@ -46,25 +48,25 @@ namespace Blacklite.Framework.Features.EditorModel
                 .SelectMany(x => x.Groups, (Describer, Group) => GroupId(Describer, Group))
                 .Distinct();
 
-            var groupingContainer = new Dictionary<string, FeatureGroupOrModel>();
+            var groupingContainer = new Dictionary<string, EditorGroupOrModel>();
             foreach (var group in groups)
             {
-                FeatureGroupOrModel result;
+                EditorGroupOrModel result;
                 var subgroups = group.Split(':');
                 string previous = null;
-                FeatureGroup previousContainer = null;
+                EditorGroup previousContainer = null;
                 foreach (var subgroup in subgroups)
                 {
                     if (!groupingContainer.TryGetValue(group, out result))
                     {
                         var groupName = group.Split(':');
-                        result = new FeatureGroup(groupName[groupName.Length - 1]);
+                        result = new EditorGroup(groupName[groupName.Length - 1]);
                         groupingContainer.Add(group, result);
                     }
 
                     if (previous != null)
                     {
-                        previousContainer = (FeatureGroup)groupingContainer[previous];
+                        previousContainer = (EditorGroup)groupingContainer[previous];
                         previousContainer.Items.Add(result);
                     }
 
@@ -78,11 +80,11 @@ namespace Blacklite.Framework.Features.EditorModel
             var rootGroupings = groupingContainer
                 .Where(x => !x.Key.Contains(":"))
                 .Select(x => x.Value)
-                .Cast<FeatureGroup>();
+                .Cast<EditorGroup>();
 
-            var optionFeatureModels = new List<FeatureModel>();
+            var optionEditorModels = new List<EditorModel>();
 
-            var models = _describers.Select(z => new FeatureModel(z)).ToArray();
+            var models = _describers.Select(z => new EditorModel(z)).ToArray();
             var optionFeatures = models.Join(models, x => x.FeatureType, x => x.OptionsType, (a, b) => new { Option = a, Feature = b }).ToArray();
             foreach (var item in optionFeatures)
             {
@@ -104,12 +106,12 @@ namespace Blacklite.Framework.Features.EditorModel
                         .Select(z => modelsDictionary[z.Type.Name])
                 });
 
-            var groupings = new List<FeatureGroupOrModel>();
+            var groupings = new List<EditorGroupOrModel>();
             foreach (var group in groupedModels)
             {
                 if (!string.IsNullOrWhiteSpace(group.Key))
                 {
-                    var grouping = (FeatureGroup)groupingContainer[group.Key];
+                    var grouping = (EditorGroup)groupingContainer[group.Key];
                     foreach (var model in group.Models)
                     {
                         grouping.Items.Add(model);

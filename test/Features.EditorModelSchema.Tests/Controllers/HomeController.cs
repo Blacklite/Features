@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
-using Blacklite.Framework.Features.EditorModel;
+using Blacklite.Framework.Features.Editors;
 using Blacklite.Framework.Features;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using System.Threading.Tasks;

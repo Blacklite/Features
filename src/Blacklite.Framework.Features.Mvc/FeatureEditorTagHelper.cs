@@ -1,5 +1,5 @@
-﻿using Blacklite.Framework.Features.EditorModel;
-using Blacklite.Framework.Features.EditorModel.JsonEditors.Resolvers;
+﻿using Blacklite.Framework.Features.Editors;
+using Blacklite.Framework.Features.Editors.JsonEditors.Resolvers;
 using Blacklite.Json.Schema;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Razor.Runtime.TagHelpers;

@@ -1,11 +1,11 @@
 ﻿using Blacklite.Framework.Features.Describers;
 using System;
 
-namespace Blacklite.Framework.Features.EditorModel
+namespace Blacklite.Framework.Features.Editors.Models
 {
-    public class FeatureDependencyModel
+    public class EditorDependencyModel
     {
-        public FeatureDependencyModel(IFeatureDescriber describer, bool isEnabled)
+        public EditorDependencyModel(IFeatureDescriber describer, bool isEnabled)
         {
             Feature = describer;
             IsEnabled = isEnabled;

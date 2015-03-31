@@ -8,7 +8,7 @@ using System.Text;
 using Temp.Newtonsoft.Json.Linq;
 using Temp.Newtonsoft.Json.Schema;
 
-namespace Blacklite.Framework.Features.EditorModel.JsonEditors
+namespace Blacklite.Framework.Features.Editors.JsonEditors
 {
     public class FeatureInlineObjectJsonEditor : JsonEditor
     {

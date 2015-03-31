@@ -12,7 +12,7 @@ using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using Blacklite.Framework.Features;
 using Features.EditorModelSchema.Tests.Features;
-using Blacklite.Framework.Features.EditorModel;
+using Blacklite.Framework.Features.Editors;
 using System.Collections.Generic;
 
 namespace Features.EditorModelSchema.Tests
@@ -42,7 +42,7 @@ namespace Features.EditorModelSchema.Tests
                 .AddFeatureEditorModel()
                 .AddFeaturesMvc()
                 .AddFeaturesHttp()
-                .AddFeaturesConfiguration(Configuration);
+                .AddFeaturesConfiguration(Configuration.GetSubKey("Features"));
         }
 
         // Configure is called after ConfigureServices is called.
@@ -67,13 +67,18 @@ namespace Features.EditorModelSchema.Tests
             app.UseFeaturesHttp("/features");
             // Add static files to the request pipeline.
             app.UseStaticFiles();
-            
+
             app.Map("/configuration", b =>
             {
                 b.Use(async (httpContext, next) =>
                 {
                     var root = this.Configuration as IConfigurationSourceContainer;
-                    var keys = root.OfType<BaseConfigurationSource>().SelectMany(z => z.Data).ToArray();
+                    var keys = root.OfType<BaseConfigurationSource>()
+                        .SelectMany(z => z.Data)
+                        .Where(x => x.Key.StartsWith("Features:", StringComparison.Ordinal))
+                        .GroupBy(z => z.Key)
+                        .Select(z => z.First())
+                        .ToArray();
                     await httpContext.Response.WriteAsync(string.Join("\n", keys.Select(z => $"{z.Key}: {z.Value}")));
                 });
             });

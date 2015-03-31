@@ -7,7 +7,7 @@ using System.Linq;
 using Temp.Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
-namespace Blacklite.Framework.Features.EditorModel.JsonEditors.Resolvers
+namespace Blacklite.Framework.Features.Editors.JsonEditors.Resolvers
 {
     public class TabsJsonEditorResolver : IJsonEditorResolver
     {

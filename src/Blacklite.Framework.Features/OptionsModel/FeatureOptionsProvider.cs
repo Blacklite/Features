@@ -1,7 +1,6 @@
-﻿using Blacklite.Framework.Features.OptionsModel;
-using System;
+﻿using System;
 
-namespace Blacklite.Framework.Features.Http
+namespace Blacklite.Framework.Features.OptionsModel
 {
     public class FeatureOptionsProvider : IFeatureOptionsProvider
     {

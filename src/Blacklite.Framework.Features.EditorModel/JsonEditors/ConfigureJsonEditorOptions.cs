@@ -5,7 +5,7 @@ using Microsoft.AspNet.Mvc.Rendering;
 using System.Linq;
 using Temp.Newtonsoft.Json.Schema;
 
-namespace Blacklite.Framework.Features.EditorModel.JsonEditors
+namespace Blacklite.Framework.Features.Editors.JsonEditors
 {
     public class EditorModelJsonEditorDecorator : JsonEditorDecorator
     {

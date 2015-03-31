@@ -11,7 +11,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Shared.
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Shared", "..\Common\src\Blacklite.Framework.Shared\Blacklite.Framework.Shared.kproj", "{7D364B90-7F31-4B54-B00D-2B5518610917}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.EditorModel", "src\Blacklite.Framework.Features.EditorModel\Blacklite.Framework.Features.EditorModel.kproj", "{4BFB9998-E37D-48CB-A6AE-4DF1FA965DDC}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Editors", "src\Blacklite.Framework.Features.EditorModel\Blacklite.Framework.Features.Editors.kproj", "{4BFB9998-E37D-48CB-A6AE-4DF1FA965DDC}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Json.Schema.TagHelpers", "..\JsonSchema\src\Blacklite.Json.Schema.TagHelpers\Blacklite.Json.Schema.TagHelpers.kproj", "{82C0A8FB-34B1-4A12-9231-D794A288E1CE}"
 EndProject

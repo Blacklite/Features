@@ -1,5 +1,5 @@
 ﻿using Blacklite.Framework;
-using Blacklite.Framework.Features.EditorModel;
+using Blacklite.Framework.Features.Editors;
 using Blacklite.Framework.Features.Http.Extensions;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.FileProviders;
@@ -7,7 +7,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.StaticFiles;
 using System;
 using Microsoft.Framework.DependencyInjection;
-using Blacklite.Framework.Features.EditorModel.JsonEditors.Resolvers;
+using Blacklite.Framework.Features.Editors.JsonEditors.Resolvers;
 
 namespace Microsoft.AspNet.Builder
 {

@@ -1,5 +1,6 @@
-﻿using Blacklite.Framework.Features.EditorModel.JsonEditors;
-using Blacklite.Framework.Features.EditorModel.JsonEditors.Resolvers;
+﻿using Blacklite.Framework.Features.Editors.Factory;
+using Blacklite.Framework.Features.Editors.JsonEditors;
+using Blacklite.Framework.Features.Editors.JsonEditors.Resolvers;
 using Blacklite.Framework.Features.OptionsModel;
 using Blacklite.Json.Schema;
 using Microsoft.Framework.ConfigurationModel;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Blacklite.Framework.Features.EditorModel
+namespace Blacklite.Framework.Features.Editors
 {
     public static class BlackliteFeaturesEditorModelServices
     {

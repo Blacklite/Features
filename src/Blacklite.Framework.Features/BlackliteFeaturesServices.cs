@@ -24,6 +24,7 @@ namespace Blacklite.Framework.Features
             yield return describe.Singleton<IFeatureAssemblyProvider, FeatureAssemblyProvider>();
             yield return describe.Singleton<IFeatureTypeProvider, FeatureTypeProvider>();
             yield return describe.Singleton<IFeatureCompositionProvider, FeatureCompositionProvider>();
+            yield return describe.Singleton<IFeatureOptionsProvider, FeatureOptionsProvider>();
             yield return describe.Scoped<IFeatureManager, FeatureManager>();
 
             yield return describe.Scoped<IFeatureFactory, CompositeFeatureFactory>();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blacklite.Framework.Features.Editors.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Temp.Newtonsoft.Json;
@@ -7,12 +8,17 @@ using Temp.Newtonsoft.Json.Schema;
 using Temp.Newtonsoft.Json.Schema.Generation;
 using Temp.Newtonsoft.Json.Serialization;
 
-namespace Blacklite.Framework.Features.EditorModel
+namespace Blacklite.Framework.Features.Editors.Schema
 {
-    class ModelSchemaContainer
+    public interface ISchemaContainer
     {
-        private readonly IEnumerable<FeatureModel> _models;
-        private readonly IEnumerable<FeatureGroup> _groups;
+        JSchema Schema { get; }
+    }
+
+    class SchemaContainer : ISchemaContainer
+    {
+        private readonly IEnumerable<EditorModel> _models;
+        private readonly IEnumerable<EditorGroup> _groups;
         private readonly IDictionary<string, JSchema> _optionSchemas;
         private readonly IDictionary<string, JSchema> _modelSchemas;
         private readonly JSchemaGenerator _schemaGenerator;
@@ -20,7 +26,7 @@ namespace Blacklite.Framework.Features.EditorModel
         private readonly JObject _definitions;
         private readonly JSchema _schema;
 
-        public ModelSchemaContainer(JSchema master, IEnumerable<FeatureModel> models, IEnumerable<FeatureGroup> groups)
+        public SchemaContainer(JSchema master, IEnumerable<EditorModel> models, IEnumerable<EditorGroup> groups)
         {
             _schema = master;
             _models = models;
@@ -38,26 +44,26 @@ namespace Blacklite.Framework.Features.EditorModel
             _serializer.ContractResolver = new Temp.Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
         }
 
-        private IEnumerable<FeatureModel> GetOrderedFeatureModels(IEnumerable<FeatureGroupOrModel> gom)
+        private IEnumerable<EditorModel> GetOrderedEditorModels(IEnumerable<EditorGroupOrModel> gom)
         {
             foreach (var item in gom)
             {
-                var model = item as FeatureModel;
+                var model = item as EditorModel;
                 if (model != null)
                 {
                     if (model.Children?.Any() ?? false)
                     {
-                        foreach (var result in GetOrderedFeatureModels(model.Children))
+                        foreach (var result in GetOrderedEditorModels(model.Children))
                             yield return result;
                     }
 
                     yield return model;
                 }
 
-                var group = item as FeatureGroup;
+                var group = item as EditorGroup;
                 if (group != null)
                 {
-                    foreach (var result in GetOrderedFeatureModels(group.Items))
+                    foreach (var result in GetOrderedEditorModels(group.Items))
                     {
                         yield return result;
                     }
@@ -68,7 +74,7 @@ namespace Blacklite.Framework.Features.EditorModel
         private bool _generatedSchema = false;
         private void GenerateSchema()
         {
-            var orderedModels = GetOrderedFeatureModels(_groups).ToArray();
+            var orderedModels = GetOrderedEditorModels(_groups).ToArray();
             _schema.ExtensionData["definitions"] = _definitions;
             foreach (var model in orderedModels)
             {
@@ -93,7 +99,7 @@ namespace Blacklite.Framework.Features.EditorModel
             }
         }
 
-        private JSchema GetSchema(FeatureGroup group)
+        private JSchema GetSchema(EditorGroup group)
         {
             return GetGroupSchema(group);
             /*
@@ -107,7 +113,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return schema;*/
         }
 
-        private JSchema GetSchema(FeatureModel model)
+        private JSchema GetSchema(EditorModel model)
         {
             JSchema schema;
             if (!_modelSchemas.TryGetValue(model.Name, out schema))
@@ -119,7 +125,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return schema;
         }
 
-        private JSchema GetOptions(FeatureModel model)
+        private JSchema GetOptions(EditorModel model)
         {
             JSchema options = null;
             if (model.HasOptions && !model.OptionsIsFeature)
@@ -156,7 +162,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return options;
         }
 
-        private JSchema GetFeatureSchema(FeatureModel model)
+        private JSchema GetFeatureSchema(EditorModel model)
         {
             var schema = new JSchema();
 
@@ -191,7 +197,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return schema;
         }
 
-        private void AddFeatureProperties(FeatureModel model, JSchema schema)
+        private void AddFeatureProperties(EditorModel model, JSchema schema)
         {
             if (model.HasEnabled)
             {
@@ -222,7 +228,7 @@ namespace Blacklite.Framework.Features.EditorModel
             }
         }
 
-        private void AddOptions(FeatureModel model, JSchema schema, JSchema options)
+        private void AddOptions(EditorModel model, JSchema schema, JSchema options)
         {
             if (options != null && !model.OptionsIsFeature)
             {
@@ -241,7 +247,7 @@ namespace Blacklite.Framework.Features.EditorModel
             }
         }
 
-        private void AddChildren(FeatureModel model, JSchema schema)
+        private void AddChildren(EditorModel model, JSchema schema)
         {
             if (model.Children.Any())
             {
@@ -254,12 +260,12 @@ namespace Blacklite.Framework.Features.EditorModel
             }
         }
 
-        private JSchema GetGroupSchema(FeatureGroup group)
+        private JSchema GetGroupSchema(EditorGroup group)
         {
             var schema = new JSchema();
             schema.Type = JSchemaType.Object;
             schema.Title = group.Title;
-            if (!group.Items.Any(z => z is FeatureModel))
+            if (!group.Items.Any(z => z is EditorModel))
                 schema.Format = "tabs";
             else
             {
@@ -269,13 +275,13 @@ namespace Blacklite.Framework.Features.EditorModel
 
             foreach (var item in group.Items)
             {
-                var model = item as FeatureModel;
+                var model = item as EditorModel;
                 if (model != null)
                 {
                     schema.Properties.Add(item.Name, GetSchema(model));
                 }
 
-                var grouping = item as FeatureGroup;
+                var grouping = item as EditorGroup;
                 if (grouping != null)
                 {
                     schema.Properties.Add(grouping.Name, GetSchema(grouping));
@@ -285,7 +291,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return schema;
         }
 
-        private JSchema GetModelSchema(FeatureModel model)
+        private JSchema GetModelSchema(EditorModel model)
         {
             var options = GetOptions(model);
 
@@ -297,7 +303,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return schema;
         }
 
-        private JSchema GetOrUpdatePropertySchema(FeatureOptionPropertyModel property, JSchema schema = null)
+        private JSchema GetOrUpdatePropertySchema(EditorOptionPropertyModel property, JSchema schema = null)
         {
             // change this
             schema = schema ?? _schemaGenerator.Generate(property.Type);
@@ -311,7 +317,7 @@ namespace Blacklite.Framework.Features.EditorModel
             return schema;
         }
 
-        private JSchema GetEnabledPropertySchema(FeatureModel model)
+        private JSchema GetEnabledPropertySchema(EditorModel model)
         {
             var schema = _schemaGenerator.Generate(model.Enabled.Type);
             schema.Title = model.Enabled.Title;

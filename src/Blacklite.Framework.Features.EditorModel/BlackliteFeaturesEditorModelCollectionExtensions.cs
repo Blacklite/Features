@@ -1,7 +1,7 @@
 ﻿using Blacklite;
 using Blacklite.Framework;
 using Blacklite.Framework.Features;
-using Blacklite.Framework.Features.EditorModel;
+using Blacklite.Framework.Features.Editors;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using System;

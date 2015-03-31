@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework.Features.EditorModel;
+﻿using Blacklite.Framework.Features.Editors;
 using Blacklite.Json.Schema;
 using Microsoft.AspNet.FileProviders;
 using System;

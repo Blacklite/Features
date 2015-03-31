@@ -5,7 +5,7 @@ using Blacklite.Framework.Features.Composition;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Blacklite.Framework.Features.EditorModel
+namespace Blacklite.Framework.Features.Editors.Factory
 {
     public class EditorFeatureFactory : FeatureFactory
     {
