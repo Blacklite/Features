@@ -5,17 +5,18 @@ using Blacklite.Framework.Features.Factory;
 
 namespace Blacklite.Framework.Features.Observables
 {
-    interface IFeatureSubject<T> : ISubject<T>
+    interface IFeatureSubject<T> : IObservable<T>, IObserver<T>
            where T : class, IObservableFeature, new()
     {
-
+        T Value { get; }
     }
 
     class FeatureSubject<T> : IFeatureSubject<T>, IFeatureSubject
         where T : class, IObservableFeature, new()
     {
-        private readonly ISubject<T> _feature;
+        private readonly BehaviorSubject<T> _feature;
         private readonly IFeatureFactory _featureFactory;
+
         public FeatureSubject(Feature<T> feature,
             IFeatureFactory featureFactory,
             IRequiredFeaturesService requiredFeaturesService,
@@ -67,5 +68,7 @@ namespace Blacklite.Framework.Features.Observables
         {
             return _feature.Subscribe(observer);
         }
+
+        public T Value { get { return _feature.Value; } }
     }
 }
