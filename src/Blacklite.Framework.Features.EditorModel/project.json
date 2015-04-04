@@ -2,9 +2,7 @@
     "version": "1.0.0-*",
     "dependencies": {
         "Blacklite.Framework.Features": "1.0.0-*",
-        "Blacklite.Json.Schema": "1.0.0-*",
-        "Temp.Newtonsoft.Json": "1.0.0-*",
-        "Temp.Newtonsoft.Json.Schema": "1.0.0-*"
+        "Blacklite.Json.Schema": "1.0.0-*"
     },
 
    "devDependencies": {
