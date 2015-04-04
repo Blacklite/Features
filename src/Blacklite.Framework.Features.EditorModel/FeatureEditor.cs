@@ -37,7 +37,7 @@ namespace Blacklite.Framework.Features.Editors
     public class FeatureEditor : IFeatureEditor
     {
         private readonly IEnumerable<EditorModel> _models;
-        private readonly IEnumerable<EditorGroup> _groups;
+        private readonly IEnumerable<EditorGroupOrModel> _groups;
         private readonly Func<Type, IFeature> _getFeature;
         private readonly Func<Type, object> _getFeatureOption;
         private readonly JsonSerializer _serializer;
@@ -46,7 +46,7 @@ namespace Blacklite.Framework.Features.Editors
         public const string SettingsKey = "settings";
         public const string OptionsKey = "options";
 
-        public FeatureEditor(IFeatureManager featureManager, IEnumerable<EditorModel> models, IEnumerable<EditorGroup> groups, Func<Type, IFeature> feature, Func<Type, object> featureOption)
+        public FeatureEditor(IFeatureManager featureManager, IEnumerable<EditorModel> models, IEnumerable<EditorGroupOrModel> groups, Func<Type, IFeature> feature, Func<Type, object> featureOption)
         {
             _featureManager = featureManager;
             _models = models;
@@ -121,10 +121,6 @@ namespace Blacklite.Framework.Features.Editors
             {
                 json.Add(FeatureEditor.OptionsKey, JObject.FromObject(featureOptions, _serializer));
             }
-            //else if (model.HasOptions && model.OptionsIsFeature)
-            //{
-            //    json.Add(FeatureEditor.OptionsKey, JObject.FromObject(GetModelJObject(model.OptionsFeature), _serializer));
-            //}
 
             if (model.Children.Any())
             {
@@ -143,7 +139,7 @@ namespace Blacklite.Framework.Features.Editors
             schema.Type = JSchemaType.Object;
             schema.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { disable_collapse = true });
             schema.Title = "Features";
-            schema.Format = "tabs";
+            schema.Format = _groups.OfType<EditorModel>().Any() ? "rows" : "tabs";
 
             var schemaContainer = new SchemaContainer(schema, _models, _groups);
 

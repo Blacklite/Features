@@ -57,7 +57,7 @@ namespace Blacklite.Framework.Features.Describers
             Groups = TypeInfo.GetCustomAttributes<FeatureGroupAttribute>()?.SelectMany(x => x.Groups).ToArray();
             if (Parent == null && !Groups.Any())
             {
-                Groups = new[] { "( not grouped )" };
+                Groups = new[] { string.Empty };
             }
         }
 

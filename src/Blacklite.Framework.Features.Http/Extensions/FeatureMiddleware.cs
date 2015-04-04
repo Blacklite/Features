@@ -36,26 +36,41 @@ namespace Blacklite.Framework.Features.Http.Extensions
         {
             var editor = _factory.GetFeatureEditor();
 
-            if (httpContext.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
+            if (httpContext.Request.Path.Value.EndsWith("/model"))
             {
-                await antiForgery.ValidateAsync(httpContext);
-                var result = await LoadFormData(httpContext, editor, jsonEditorProvider);
-
-                if (result)
-                {
-                    editor.Save();
-                }
+                await httpContext.Response.WriteAsync(
+                    Temp.Newtonsoft.Json.JsonConvert.SerializeObject(editor.Model, Temp.Newtonsoft.Json.Formatting.Indented)
+                );
             }
+            else if (httpContext.Request.Path.Value.EndsWith("/schema"))
+            {
+                await httpContext.Response.WriteAsync(
+                    Temp.Newtonsoft.Json.JsonConvert.SerializeObject(editor.Schema, Temp.Newtonsoft.Json.Formatting.Indented)
+                );
+            }
+            else
+            {
+                if (httpContext.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
+                {
+                    await antiForgery.ValidateAsync(httpContext);
+                    var result = await LoadFormData(httpContext, editor, jsonEditorProvider);
 
-            var renderer = jsonEditorProvider.GetJsonEditor(editor.Schema, editor.Prefix, _options.JsonEditorResolver).Build();
+                    if (result)
+                    {
+                        editor.Save();
+                    }
+                }
 
-            await httpContext.Response.WriteAsync(_layout
-                .Replace("{{path}}", _options.Path)
-                .Replace("{{title}}", _options.Title)
-                .Replace("{{content}}", GetContent(renderer, editor))
-                .Replace("{{scripts}}", GetScripts(renderer, editor))
-                .Replace("{{antiforgery}}", antiForgery.GetHtml(httpContext).ToString())
-            );
+                var renderer = jsonEditorProvider.GetJsonEditor(editor.Schema, editor.Prefix, _options.JsonEditorResolver).Build();
+
+                await httpContext.Response.WriteAsync(_layout
+                    .Replace("{{path}}", _options.Path)
+                    .Replace("{{title}}", _options.Title)
+                    .Replace("{{content}}", GetContent(renderer, editor))
+                    .Replace("{{scripts}}", GetScripts(renderer, editor))
+                    .Replace("{{antiforgery}}", antiForgery.GetHtml(httpContext).ToString())
+                );
+            }
         }
 
         private string GetContent(JsonEditorRenderer renderer, IFeatureEditor editor)

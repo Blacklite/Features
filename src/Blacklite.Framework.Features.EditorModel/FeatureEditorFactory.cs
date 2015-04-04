@@ -52,7 +52,7 @@ namespace Blacklite.Framework.Features.Editors
             foreach (var group in groups)
             {
                 EditorGroupOrModel result;
-                var subgroups = group.Split(':');
+                var subgroups = group.Split(':').Where(z => !string.IsNullOrWhiteSpace(z));
                 string previous = null;
                 EditorGroup previousContainer = null;
                 foreach (var subgroup in subgroups)
@@ -80,7 +80,8 @@ namespace Blacklite.Framework.Features.Editors
             var rootGroupings = groupingContainer
                 .Where(x => !x.Key.Contains(":"))
                 .Select(x => x.Value)
-                .Cast<EditorGroup>();
+                .OfType<EditorGroup>()
+                .Cast<EditorGroupOrModel>();
 
             var optionEditorModels = new List<EditorModel>();
 
@@ -106,10 +107,9 @@ namespace Blacklite.Framework.Features.Editors
                         .Select(z => modelsDictionary[z.Type.Name])
                 });
 
-            var groupings = new List<EditorGroupOrModel>();
-            foreach (var group in groupedModels)
+            if (groupedModels.Where(group => !string.IsNullOrWhiteSpace(group.Key)).Any())
             {
-                if (!string.IsNullOrWhiteSpace(group.Key))
+                foreach (var group in groupedModels)
                 {
                     var grouping = (EditorGroup)groupingContainer[group.Key];
                     foreach (var model in group.Models)
@@ -117,6 +117,10 @@ namespace Blacklite.Framework.Features.Editors
                         grouping.Items.Add(model);
                     }
                 }
+            }
+            else
+            {
+                rootGroupings = groupedModels.SelectMany(z => z.Models);
             }
 
             return new FeatureEditor(_featureManager, models, rootGroupings, GetFeature, GetFeatureOptions);

@@ -18,7 +18,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
     class SchemaContainer : ISchemaContainer
     {
         private readonly IEnumerable<EditorModel> _models;
-        private readonly IEnumerable<EditorGroup> _groups;
+        private readonly IEnumerable<EditorGroupOrModel> _groups;
         private readonly IDictionary<string, JSchema> _optionSchemas;
         private readonly IDictionary<string, JSchema> _modelSchemas;
         private readonly JSchemaGenerator _schemaGenerator;
@@ -26,7 +26,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
         private readonly JObject _definitions;
         private readonly JSchema _schema;
 
-        public SchemaContainer(JSchema master, IEnumerable<EditorModel> models, IEnumerable<EditorGroup> groups)
+        public SchemaContainer(JSchema master, IEnumerable<EditorModel> models, IEnumerable<EditorGroupOrModel> groups)
         {
             _schema = master;
             _models = models;
@@ -83,7 +83,13 @@ namespace Blacklite.Framework.Features.Editors.Schema
 
             foreach (var rootModel in _groups)
             {
-                _schema.Properties.Add(rootModel.Name, GetSchema(rootModel));
+                var model = rootModel as EditorModel;
+                if (model != null)
+                    _schema.Properties.Add(model.Name, GetSchema(model));
+
+                var group = rootModel as EditorGroup;
+                if (group != null)
+                    _schema.Properties.Add(group.Name, GetSchema(group));
             }
 
             _generatedSchema = true;

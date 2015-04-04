@@ -15,9 +15,12 @@ namespace Microsoft.Framework.DependencyInjection
             [NotNull] this IServiceCollection services,
             IConfiguration configuration = null)
         {
-            services.AddJsonSchemaEditor(configuration);
+            services.AddFeatures(configuration)
+                    .AddJsonSchemaEditor(configuration);
+
             services.TryAdd(BlackliteFeaturesEditorModelServices.GetFeatureEditorModel(services, configuration));
             services.TryAddImplementation(BlackliteFeaturesEditorModelServices.GetFeatureEditorModelImplementations(services, configuration));
+            services.TryAdd(OptionsServiceCollectionExtensions.AddOptions(services, configuration));
             return services;
         }
     }

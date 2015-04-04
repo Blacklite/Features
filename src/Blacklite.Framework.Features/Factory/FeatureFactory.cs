@@ -26,6 +26,9 @@ namespace Blacklite.Framework.Features.Factory
         public IFeature GetFeature(Type featureType)
         {
             IFeatureDescriber describer = _featureDescriberProvider.Describers[featureType];
+            if (describer.IsObservable)
+                return Compose(featureType, describer);
+
             return _features.GetOrAdd(featureType, x => Compose(featureType, describer));
         }
 
