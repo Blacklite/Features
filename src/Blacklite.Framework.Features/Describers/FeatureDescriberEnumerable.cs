@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Blacklite.Framework.Features.Describers
 {
-    public class DefaultFeatureDescriberEnumerable : IFeatureDescriberEnumerable
+    public class FeatureDescriberCollection : IEnumerable<IFeatureDescriber>
     {
-        private readonly IFeatureDescriberProvider _describerProvider;
-        public DefaultFeatureDescriberEnumerable(IFeatureDescriberProvider describerProvider)
+        private readonly IEnumerable<IFeatureDescriber> _describers;
+        public FeatureDescriberCollection(IEnumerable<IFeatureDescriber> describers)
         {
-            _describerProvider = describerProvider;
+            _describers = describers.ToArray();
         }
 
         public IEnumerator<IFeatureDescriber> GetEnumerator()
         {
-            return _describerProvider.Describers.Values.GetEnumerator();
+            return _describers.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _describerProvider.Describers.Values.GetEnumerator();
+            return _describers.GetEnumerator();
         }
     }
 }

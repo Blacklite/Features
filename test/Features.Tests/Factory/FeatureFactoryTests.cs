@@ -40,7 +40,7 @@ namespace Features.Tests.Factory
                 get { throw new NotImplementedException(); }
             }
 
-            public T Configure<T>(T feature, IFeatureDescriber describer)
+            public T Configure<T>(T feature, IFeatureDescriber describer, IFeatureFactory factory)
             {
                 if (this._feature != null)
                     return (T)this._feature;

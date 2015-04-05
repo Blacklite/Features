@@ -26,6 +26,7 @@ namespace Blacklite.Framework.Features.Factory
         public IFeature GetFeature(Type featureType)
         {
             IFeatureDescriber describer = _featureDescriberProvider.Describers[featureType];
+
             if (describer.IsObservable)
                 return Compose(featureType, describer);
 
@@ -35,7 +36,7 @@ namespace Blacklite.Framework.Features.Factory
         private IFeature Compose(Type featureType, IFeatureDescriber describer)
         {
             return (IFeature)GetComposers(featureType)
-                .Aggregate(Activator.CreateInstance(featureType), (feature, setup) => setup.Configure(feature, describer));
+                .Aggregate(Activator.CreateInstance(featureType), (feature, setup) => setup.Configure(feature, describer, this));
         }
 
         protected virtual IEnumerable<IFeatureComposition> GetComposers(Type featureType)

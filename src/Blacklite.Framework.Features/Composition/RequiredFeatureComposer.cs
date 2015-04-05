@@ -1,4 +1,5 @@
 ﻿using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.OptionsModel;
 using System;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Blacklite.Framework.Features.Composition
 
         public int Priority { get; } = 0;
 
-        public T Configure<T>(T feature, IFeatureDescriber describer)
+        public T Configure<T>(T feature, IFeatureDescriber describer, IFeatureFactory factory)
         {
             var trait = feature as ISwitch;
 

@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 
 namespace Blacklite.Framework.Features.Composition
 {
@@ -17,7 +18,7 @@ namespace Blacklite.Framework.Features.Composition
 
         public int Priority { get; } = int.MaxValue;
 
-        public T Configure<T>(T feature, IFeatureDescriber describer)
+        public T Configure<T>(T feature, IFeatureDescriber describer, IFeatureFactory factory)
         {
             var traitOptions = feature as IFeatureOptions;
             if (traitOptions != null)
@@ -25,8 +26,7 @@ namespace Blacklite.Framework.Features.Composition
                 object options;
                 if (typeof(IFeature).GetTypeInfo().IsAssignableFrom(describer.Options.TypeInfo))
                 {
-                    var optionsType = typeof(Feature<>).MakeGenericType(describer.Options.Type);
-                    options = ((Feature<object>)_serviceProvider.GetService(optionsType)).Value;
+                    options = factory.GetFeature(describer.Options.Type);
                 }
                 else
                 {

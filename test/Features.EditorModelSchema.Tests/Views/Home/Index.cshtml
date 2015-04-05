@@ -1,4 +1,4 @@
-﻿@model Blacklite.Framework.Features.EditorModel.IFeatureEditor
+﻿@model Blacklite.Framework.Features.Editors.IFeatureEditor
 @addtaghelper "Blacklite.Framework.Features.Mvc"
 @addtaghelper "Microsoft.AspNet.Mvc.TagHelpers.FormTagHelper, Microsoft.AspNet.Mvc.TagHelpers"
 @{
@@ -20,3 +20,8 @@
 
     <input class="btn btn-success btn-sm" type="submit" value="Save" />
 </form>
+
+@section scripts {
+    <script src="@Url.Action("Resources")"></script>
+    <feature-editor-script editor="Model" />
+}

@@ -255,30 +255,33 @@ namespace Blacklite.Framework.Features.Editors
             {
                 var featureOptions = _getFeatureOption(model.FeatureType);
                 var currentValue = JObject.FromObject(featureOptions, _serializer) as IDictionary<string, JToken>;
-                IDictionary<string, JToken> settings;
-                if (model.OptionsIsFeature)
+                IDictionary<string, JToken> settings = null;
+                if (model.OptionsIsFeature && model.OptionsFeature != null)
                     settings = Model[model.OptionsFeature.Name] as IDictionary<string, JToken>;
-                else
+                else if (!model.OptionsIsFeature)
                     settings = json[FeatureEditor.OptionsKey] as IDictionary<string, JToken>;
 
-                foreach (var item in currentValue
-                    .Join(settings, x => x.Key, x => x.Key, (current, setting) => new { current, setting })
-                    .Join(model.Options, x => x.current.Key, x => x.Key.CamelCase(), (anon, property) => new { key = anon.current.Key, current = currentValue[anon.current.Key] as JValue, setting = settings[anon.setting.Key] as JValue, property = property.Value })
-                    .Where(x => !x.property.IsReadOnly)
-                    .Where(x => !JValueEqual(x.current, x.setting)))
+                if (settings != null)
                 {
-                    if (item.setting.Type == JTokenType.Null)
-                        item.property.SetValue(featureOptions, null);
-                    else
-                        item.property.SetValue(featureOptions, item.setting.ToObject(item.property.Type));
+                    foreach (var item in currentValue
+                        .Join(settings, x => x.Key, x => x.Key, (current, setting) => new { current, setting })
+                        .Join(model.Options, x => x.current.Key, x => x.Key.CamelCase(), (anon, property) => new { key = anon.current.Key, current = currentValue[anon.current.Key] as JValue, setting = settings[anon.setting.Key] as JValue, property = property.Value })
+                        .Where(x => !x.property.IsReadOnly)
+                        .Where(x => !JValueEqual(x.current, x.setting)))
+                    {
+                        if (item.setting.Type == JTokenType.Null)
+                            item.property.SetValue(featureOptions, null);
+                        else
+                            item.property.SetValue(featureOptions, item.setting.ToObject(item.property.Type));
 
-                    if (!model.OptionsIsFeature)
-                    {
-                        featureChanged = true;
-                    }
-                    else
-                    {
-                        optionFeature = (IFeature)featureOptions;
+                        if (!model.OptionsIsFeature)
+                        {
+                            featureChanged = true;
+                        }
+                        else
+                        {
+                            optionFeature = (IFeature)featureOptions;
+                        }
                     }
                 }
             }

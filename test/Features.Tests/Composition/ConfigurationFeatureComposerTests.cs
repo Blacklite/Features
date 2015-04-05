@@ -1,6 +1,7 @@
 ﻿using Blacklite.Framework.Features;
 using Blacklite.Framework.Features.Composition;
 using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.OptionsModel;
 using Microsoft.Framework.ConfigurationModel;
 using NSubstitute;
@@ -88,7 +89,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 new TestSwitch(),
-                testSwitchDescriber
+                testSwitchDescriber,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.Received().TryGet($"TestSwitch:IsEnabled", out value);
@@ -113,21 +115,24 @@ namespace Features.Tests.Composition
             var describer = describers.Single(x => x.Type == typeof(TestSwitchFeature));
             composer.Configure(
                 new TestSwitchFeature(),
-                describer
+                describer,
+                Substitute.For<IFeatureFactory>()
             );
             configuration.Received().TryGet($"TestSwitchFeature:IsEnabled", out value);
 
             describer = describers.Single(x => x.Type == typeof(AlwaysOnSwitch));
             composer.Configure(
                 new AlwaysOnSwitch(),
-                describer
+                describer,
+                Substitute.For<IFeatureFactory>()
             );
             configuration.DidNotReceive().TryGet($"AlwaysOnSwitch:IsEnabled", out value);
 
             describer = describers.Single(x => x.Type == typeof(AlwaysOffSwitch));
             composer.Configure(
                 new AlwaysOffSwitch(),
-                describer
+                describer,
+                Substitute.For<IFeatureFactory>()
             );
             configuration.DidNotReceive().TryGet($"AlwaysOffSwitch:IsEnabled", out value);
         }
@@ -154,7 +159,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 new TestSwitch(),
-                testSwitchDescriber
+                testSwitchDescriber,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.Received().TryGet($"TestSwitch:IsEnabled", out value);
@@ -185,7 +191,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 new TestFeature(),
-                testFeatureDescriber
+                testFeatureDescriber,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.Received().TryGet($"TestFeature:Property1", out value);
@@ -193,7 +200,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 new TestSwitchFeature(),
-                testSwitchFeatureDescriber
+                testSwitchFeatureDescriber,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.Received().TryGet($"TestSwitchFeature:Property1", out value);
@@ -201,7 +209,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 new TestFeatureOptions(),
-                testFeatureOptionsDescriber
+                testFeatureOptionsDescriber,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.Received().TryGet($"TestFeatureOptions:Property1", out value);
@@ -232,7 +241,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 new TestOptionsSwitch(),
-                testOptionsSwitchDescriber
+                testOptionsSwitchDescriber,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.Received().TryGet($"TestOptionsSwitch:Options:Property1", out value);
@@ -240,7 +250,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 new TestFeatureOptionsSwitch(),
-                testFeatureOptionsSwitchDescriber
+                testFeatureOptionsSwitchDescriber,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.DidNotReceive().TryGet($"TestFeatureOptionsSwitch:Options:Property1", out value);
@@ -274,7 +285,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 testOptionsSwitch,
-                describer
+                describer,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.DidNotReceive().TryGet($"ReadOnlyOptionsSwitch:Options:Property1", out value);
@@ -283,7 +295,8 @@ namespace Features.Tests.Composition
             describer = describers.Single(x => x.Type == typeof(ReadOnlyFeatureOptions));
             composer.Configure(
                 new ReadOnlyFeatureOptions(),
-                describer
+                describer,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.Received().TryGet($"ReadOnlyFeatureOptions:Property1", out value);
@@ -317,7 +330,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 testOptionsSwitch,
-                testOptionsSwitchDescriber
+                testOptionsSwitchDescriber,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.Received().TryGet($"TestOptionsSwitch:Options:Property1", out value);
@@ -325,7 +339,8 @@ namespace Features.Tests.Composition
 
             composer.Configure(
                 new TestFeatureOptionsSwitch(),
-                testFeatureOptionsSwitchDescriber
+                testFeatureOptionsSwitchDescriber,
+                Substitute.For<IFeatureFactory>()
             );
 
             configuration.DidNotReceive().TryGet($"TestFeatureOptionsSwitch:Options:Property1", out value);

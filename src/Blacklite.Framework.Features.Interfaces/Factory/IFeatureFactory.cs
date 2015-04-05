@@ -6,8 +6,4 @@ namespace Blacklite.Framework.Features.Factory
     {
         IFeature GetFeature(Type featureType);
     }
-
-    public interface IScopedFeatureFactory : IFeatureFactory { }
-
-    public interface ISingletonFeatureFactory : IFeatureFactory { }
 }

@@ -1,8 +1,8 @@
 ﻿using Blacklite.Framework.Features.Describers;
-using Blacklite.Framework.Features.Factory;
+using Blacklite.Framework.Features.Observables;
 using Blacklite.Framework.Multitenancy.Features;
 using Blacklite.Framework.Multitenancy.Features.Describers;
-using Blacklite.Framework.Multitenancy.Features.Factory;
+using Blacklite.Framework.Multitenancy.Features.Observables;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using System;
@@ -19,9 +19,9 @@ namespace Blacklite.Framework.Features
             var describe = new ServiceDescriber(configuration);
 
             yield return describe.Singleton<IFeatureDescriberFactory, MultitenancyFeatureDescriberFactory>();
-            yield return describe.Singleton<IApplicationOnlyFeatureFactory, ApplicationOnlyFeatureFactory>();
-            yield return describe.Singleton<ITenantOnlyFeatureFactory, TenantOnlyFeatureFactory>();
-            yield return describe.Singleton<IFeatureFactory, MultitenancyCompositeFeatureFactory>();
+            yield return describe.Singleton<IApplicationOnlyFeatureSubjectFactory, ApplicationOnlyFeatureSubjectFactory>();
+            yield return describe.Singleton<ITenantOnlyFeatureSubjectFactory, TenantOnlyFeatureSubjectFactory>();
+            yield return describe.Singleton<IFeatureSubjectFactory, MultitenancyCompositeFeatureSubjectFactory>();
         }
     }
 }

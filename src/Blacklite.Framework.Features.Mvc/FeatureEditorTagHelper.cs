@@ -24,14 +24,27 @@ namespace Blacklite.Framework.Features.Mvc
             output.TagName = "div";
             var renderer = EditorProvider.GetJsonEditor(Editor.Schema, Editor.Prefix, TabsJsonEditorResolver).Build();
             output.Content = renderer.Render(Editor.Model);
-            var jsContent = renderer.JavaScript(Editor.Model);
-            /*
+        }
+    }
 
-        elements['{item.id}'].data('bootstrapSwitch').onSwitchChange(function() {{
-            callbacks.forEach(function(x) {{ x(); }});
-        }}),*/
-            output.Content += $@"<script>
-window.document.ready = function() {{
+    public class FeatureEditorScriptTagHelper : TagHelper
+    {
+        [Required]
+        public IFeatureEditor Editor { get; set; }
+
+        [Activate]
+        public IJsonEditorProvider EditorProvider { get; private set; }
+
+        [Activate]
+        public TabsJsonEditorResolver TabsJsonEditorResolver { get; private set; }
+
+        public override void Process(TagHelperContext context, TagHelperOutput output)
+        {
+            output.TagName = "script";
+            var renderer = EditorProvider.GetJsonEditor(Editor.Schema, Editor.Prefix, TabsJsonEditorResolver).Build();
+            var jsContent = renderer.JavaScript(Editor.Model);
+            output.Content = $@"
+$(function() {{
 
     var size = 42;
     $.fn.bootstrapSwitch.defaults.size = 'mini';
@@ -71,15 +84,14 @@ window.document.ready = function() {{
     var elements = {{}};
     var callbacks = [];
 
-    { jsContent}
+    {jsContent}
 
     for (var i in elements) {{
         if (i.indexOf('_') > -1) {{
         }}
     }}
     callbacks.forEach(function(x) {{ x(); }});
-}};
-</script>";
+}});";
         }
     }
 }

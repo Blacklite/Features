@@ -50,7 +50,7 @@ namespace Features.Tests.Composition
             var feature = new SwitchFeatureOptions();
 
             var describer = new FeatureDescriberFactory().Create(new[] { typeof(SwitchFeatureOptions).GetTypeInfo() }).Single();
-            composer.Configure(feature, describer);
+            composer.Configure(feature, describer, factorySub);
 
             Assert.Same(featureSub.Value, feature.Options);
         }
@@ -66,7 +66,7 @@ namespace Features.Tests.Composition
             var feature = new SwitchOptions();
 
             var describer = new FeatureDescriberFactory().Create(new[] { typeof(SwitchOptions).GetTypeInfo() }).Single();
-            composer.Configure(feature, describer);
+            composer.Configure(feature, describer, Substitute.For<IFeatureFactory>());
 
             Assert.Same(sub.Options, feature.Options);
         }

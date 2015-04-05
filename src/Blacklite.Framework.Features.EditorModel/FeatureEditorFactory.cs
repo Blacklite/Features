@@ -15,21 +15,20 @@ namespace Blacklite.Framework.Features.Editors
     }
 
     public class FeatureEditorFactory<T> : IFeatureEditorFactory
-        where T : IFeatureDescriberEnumerable
+        where T : FeatureDescriberCollection
     {
         private readonly IFeatureDescriberProvider _describerProvider;
         private readonly IServiceProvider _serviceProvider;
-        private readonly T _describers;
         private readonly IFeatureManager _featureManager;
         private readonly EditorFeatureFactory _featureFactory;
+        private readonly IEnumerable<IFeatureDescriber> _describers;
 
         public FeatureEditorFactory(IFeatureDescriberProvider describerProvider,
-            T describers,
             IServiceProvider serviceProvider,
             IFeatureManager featureManager,
             EditorFeatureFactory featureFactory)
         {
-            _describers = describers;
+            _describers = (IEnumerable<IFeatureDescriber>)Activator.CreateInstance(typeof(T), describerProvider.Describers.Values);
             _describerProvider = describerProvider;
             _serviceProvider = serviceProvider;
             _featureManager = featureManager;
@@ -139,14 +138,6 @@ namespace Blacklite.Framework.Features.Editors
 
             var service = _serviceProvider.GetService(typeof(IFeatureOptions<>).MakeGenericType(describer.Options.Type)) as IFeatureOptions<object>;
             return service.Options;
-        }
-    }
-
-    public class DefaultFeatureEditorFactory : FeatureEditorFactory<DefaultFeatureDescriberEnumerable>
-    {
-        public DefaultFeatureEditorFactory(IFeatureDescriberProvider describerProvider, DefaultFeatureDescriberEnumerable describers, IServiceProvider serviceProvider, IFeatureManager featureManager, EditorFeatureFactory featureFactory)
-            : base(describerProvider, describers, serviceProvider, featureManager, featureFactory)
-        {
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 using Microsoft.Framework.ConfigurationModel;
 using System;
 using System.ComponentModel;
@@ -25,7 +26,7 @@ namespace Blacklite.Framework.Features.Composition
 
         public int Priority { get; } = 100;
 
-        public T Configure<T>(T feature, IFeatureDescriber describer)
+        public T Configure<T>(T feature, IFeatureDescriber describer, IFeatureFactory factory)
         {
             string value;
 

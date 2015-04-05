@@ -1,6 +1,7 @@
 ﻿using Blacklite.Framework.Features;
 using Blacklite.Framework.Features.Composition;
 using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.OptionsModel;
 using NSubstitute;
 using System;
@@ -61,11 +62,11 @@ namespace Features.Tests.Composition
             describer.When(x => x.SetIsEnabled<bool>(Arg.Any<object>(), Arg.Any<bool>()))
                 .Do(x => feature.IsEnabled = ((bool)x.Args()[1]));
 
-            composer.Configure(feature, describer);
+            composer.Configure(feature, describer, Substitute.For<IFeatureFactory>());
             Assert.Equal(false, feature.IsEnabled);
 
             feature = new Switch1() { IsEnabled = true };
-            composer.Configure(feature, describer);
+            composer.Configure(feature, describer, Substitute.For<IFeatureFactory>());
             Assert.Equal(true, feature.IsEnabled);
         }
 
@@ -83,11 +84,11 @@ namespace Features.Tests.Composition
             describer.When(x => x.SetIsEnabled<bool>(Arg.Any<object>(), Arg.Any<bool>()))
                 .Do(x => feature.IsEnabled = ((bool)x.Args()[1]));
 
-            composer.Configure(feature, describer);
+            composer.Configure(feature, describer, Substitute.For<IFeatureFactory>());
             Assert.Equal(false, feature.IsEnabled);
 
             feature = new Switch1() { IsEnabled = true };
-            composer.Configure(feature, describer);
+            composer.Configure(feature, describer, Substitute.For<IFeatureFactory>());
             Assert.Equal(false, feature.IsEnabled);
         }
     }

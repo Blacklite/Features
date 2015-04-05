@@ -20,7 +20,6 @@ namespace Blacklite.Framework.Features.Editors
             var describe = new ServiceDescriber(configuration);
 
             yield return describe.Scoped<IFeatureJsonEditorDecorator, DefaultFeatureJsonEditorDecorator>();
-            yield return describe.Scoped<IFeatureEditorFactory, DefaultFeatureEditorFactory>();
             yield return describe.Scoped(typeof(FeatureEditorFactory<>), typeof(FeatureEditorFactory<>));
             yield return describe.Scoped(typeof(IFeatureEditor<>), typeof(FeatureEditor<>));
             yield return describe.Scoped<EditorFeatureFactory, EditorFeatureFactory>();

@@ -13,10 +13,11 @@ using Temp.Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using Blacklite.Json.Schema;
 using Blacklite.Framework.Features.Mvc;
+using Blacklite.Framework.Features.Describers;
 
 namespace Features.EditorModelSchema.Tests.Controllers
 {
-    public class HomeController : FeatureController<IFeatureEditorFactory>
+    public class HomeController : FeatureController<FeatureDescriberCollection>
     {
         public IActionResult About()
         {

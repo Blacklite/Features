@@ -144,7 +144,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
                 if (!_definitions.TryGetValue(model.OptionsName, out bogus))
                     _definitions.Add(model.OptionsName, options);
             }
-            else if (model.HasOptions && model.OptionsIsFeature)
+            else if (model.HasOptions && model.OptionsIsFeature && model.OptionsFeature != null)
             {
                 // Produce editor for feature options....
                 options = GetSchema(model.OptionsFeature);
