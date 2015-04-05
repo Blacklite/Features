@@ -1,0 +1,151 @@
+﻿@model Blacklite.Framework.Features.Editors.IFeatureEditor
+@addtaghelper "Blacklite.Framework.Features.Mvc"
+@addtaghelper "Microsoft.AspNet.Mvc.TagHelpers.FormTagHelper, Microsoft.AspNet.Mvc.TagHelpers"
+
+@{
+    ViewBag.Title = "Features";
+}
+@section styles {
+    <link rel="stylesheet" href="@Url.Action(nameof(Mvc.Sample.Controllers.FeaturesController.Styles))" />
+    <style>
+        /**
+        *  Bootstrap pull 3.x-1.1 for Twitter Bootstrap v3.
+        *
+        *  To have pull-right and pull-left to Bootstrap v3 for xs, sm, md, lg media.
+        *  This will help having some complex behavior for contents.
+        *  https://github.com/Natshah/bootstrap-pull
+        *
+        */
+        @@media (max-width: 767px) {
+            /** Pull left xs **/
+            .pull-left-xs {
+                float: left !important;
+            }
+
+            /** Pull right xs **/
+            .pull-right-xs {
+                float: right !important;
+            }
+        }
+
+        @@media (min-width: 768px) {
+            /** Pull left sm **/
+            .pull-left-sm {
+                float: left !important;
+            }
+
+            /** Pull right sm **/
+            .pull-right-sm {
+                float: right !important;
+            }
+        }
+
+        @@media (min-width: 992px) {
+            /** Pull left **/
+            .pull-left-md {
+                float: left !important;
+            }
+
+            /** Pull right **/
+            .pull-right-md {
+                float: right !important;
+            }
+        }
+
+        @@media (min-width: 1200px) {
+            /** Pull left **/
+            .pull-left-lg {
+                float: left !important;
+            }
+
+            /** Pull right **/
+            .pull-right-lg {
+                float: right !important;
+            }
+        }
+
+        .feature {
+            padding-top: 4px;
+        }
+
+        @@media (max-width: 767px) {
+            .feature .btn {
+                margin-left: 2px;
+            }
+        }
+
+        @@media (min-width: 768px) {
+            .feature .btn {
+                margin-right: 2px;
+            }
+        }
+
+        .feature-label {
+            margin-top: 5px;
+        }
+    </style>
+}
+
+<form asp-action="Index" method="post">
+    <div class="row">
+        <div class="col-md-12">
+            <feature-editor editor="Model" />
+        </div>
+    </div>
+
+    <input class="btn btn-success btn-sm" type="submit" value="Save" />
+</form>
+
+@section scripts {
+    <script src="@Url.Action(nameof(Mvc.Sample.Controllers.FeaturesController.Scripts))"></script>
+    @{
+        var TabsJsonEditorResolver = (Blacklite.Framework.Features.Editors.JsonEditors.Resolvers.TabsJsonEditorResolver)this.ViewContext.HttpContext.RequestServices.GetService(typeof(Blacklite.Framework.Features.Editors.JsonEditors.Resolvers.TabsJsonEditorResolver));
+        var EditorProvider = (Blacklite.Json.Schema.IJsonEditorProvider)this.ViewContext.HttpContext.RequestServices.GetService(typeof(Blacklite.Json.Schema.IJsonEditorProvider));
+        var renderer = EditorProvider.GetJsonEditor(Model.Schema, Model.Prefix, TabsJsonEditorResolver).Build();
+        var jsContent = renderer.JavaScript(Model.Model);
+
+        <script>
+            $(function () {
+                var size = 42;
+                $.fn.bootstrapSwitch.defaults.size = 'mini';
+                $.fn.bootstrapSwitch.defaults.labelWidth = size / 2;
+                $.fn.bootstrapSwitch.defaults.handleWidth = size;
+
+                // bug in bootswitch :(
+                $.fn.bootstrapSwitch.Constructor.prototype._width = function () {
+                    var $handles, handleWidth;
+                    $handles = this.$on.add(this.$off);
+                    $handles.add(this.$label).css('width', '');
+                    var handleAuto = this.options.handleWidth === 'auto';
+                    var labelAuto = this.options.labelWidth === 'auto';
+                    handleWidth = handleAuto ? Math.max(this.$on.width(), this.$off.width()) : this.options.handleWidth;
+                    $handles.css('width', handleWidth);
+                    this.$label.css('width', (function (_this) {
+                        return function (index, width) {
+                            if (_this.options.labelWidth !== 'auto') {
+                                return _this.options.labelWidth;
+                            }
+                            if (width < handleWidth) {
+                                return handleWidth;
+                            } else {
+                                return width;
+                            }
+                        };
+                    })(this));
+                    this._handleWidth = handleAuto ? this.$on.outerWidth() : this.options.handleWidth;
+                    this._labelWidth = labelAuto ? this.$label.outerWidth() : this.options.labelWidth;
+                    this.$container.css('width', (this._handleWidth * 2) + this._labelWidth);
+                    return this.$wrapper.css('width', this._handleWidth + this._labelWidth);
+                }
+
+                $('input[type=\'checkbox\']').bootstrapSwitch();
+                $('[data-toggle=""popover""]').popover();
+
+                var elements = {};
+                var callbacks = [];
+                @jsContent
+                callbacks.forEach(function (x) { x(); });
+            });
+        </script>
+    }
+}
