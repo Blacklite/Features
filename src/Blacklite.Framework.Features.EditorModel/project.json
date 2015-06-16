@@ -5,7 +5,7 @@
         "Blacklite.Json.Schema": "1.0.0-*"
     },
 
-   "devDependencies": {
+    "devDependencies": {
         "NR6Pack": "0.5.0.0"
     },
 
@@ -14,12 +14,15 @@
     },
 
     "frameworks": {
-        "aspnet50": {
+        "dnx451": {
             "frameworkAssemblies": {
-                "System.Runtime": "4.0.10.0",
-                "System.ComponentModel.DataAnnotations": "4.0.0.0"
-            },
+                "System.Collections": "4.0.0.0"
+            }
+        },
+        "dnxcore50": {
             "dependencies": {
+                "System.Runtime": "4.0.20-beta-*",
+                "System.Collections": "4.0.10-beta-*"
             }
         }
     }

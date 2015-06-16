@@ -3,7 +3,7 @@ using Microsoft.Framework.OptionsModel;
 using System;
 using Microsoft.AspNet.Mvc.Rendering;
 using System.Linq;
-using Temp.Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema;
 
 namespace Blacklite.Framework.Features.Editors.JsonEditors
 {

@@ -1,9 +1,9 @@
-﻿using Temp.Newtonsoft.Json;
-using Temp.Newtonsoft.Json.Converters;
-using Temp.Newtonsoft.Json.Linq;
-using Temp.Newtonsoft.Json.Schema;
-using Temp.Newtonsoft.Json.Schema.Generation;
-using Temp.Newtonsoft.Json.Serialization;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema.Generation;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

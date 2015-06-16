@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Temp.Newtonsoft.Json;
-using Temp.Newtonsoft.Json.Linq;
-using Temp.Newtonsoft.Json.Schema;
-using Temp.Newtonsoft.Json.Schema.Generation;
-using Temp.Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema.Generation;
+using Newtonsoft.Json.Serialization;
 
 namespace Blacklite.Framework.Features.Editors.Schema
 {
@@ -40,8 +40,8 @@ namespace Blacklite.Framework.Features.Editors.Schema
             _schemaGenerator.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
             _serializer = new JsonSerializer();
-            _serializer.Converters.Add(new Temp.Newtonsoft.Json.Converters.StringEnumConverter());
-            _serializer.ContractResolver = new Temp.Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+            _serializer.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+            _serializer.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
         }
 
         private IEnumerable<EditorModel> GetOrderedEditorModels(IEnumerable<EditorGroupOrModel> gom)
@@ -318,7 +318,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
 
             schema.ExtensionData["readonly"] = new JValue(property.IsReadOnly);
 
-            schema.Type = schema.Type.Value & (JSchemaType.String | JSchemaType.Float | JSchemaType.Integer | JSchemaType.Boolean | JSchemaType.Object | JSchemaType.Array);
+            schema.Type = schema.Type.Value & (JSchemaType.String | JSchemaType.Number | JSchemaType.Integer | JSchemaType.Boolean | JSchemaType.Object | JSchemaType.Array);
 
             return schema;
         }
@@ -331,7 +331,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
 
             schema.ExtensionData["readonly"] = new JValue(model.Enabled.IsReadOnly);
 
-            schema.Type = schema.Type.Value & (JSchemaType.String | JSchemaType.Float | JSchemaType.Integer | JSchemaType.Boolean | JSchemaType.Object | JSchemaType.Array);
+            schema.Type = schema.Type.Value & (JSchemaType.String | JSchemaType.Number | JSchemaType.Integer | JSchemaType.Boolean | JSchemaType.Object | JSchemaType.Array);
 
             return schema;
         }

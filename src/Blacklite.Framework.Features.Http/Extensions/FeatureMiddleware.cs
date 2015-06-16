@@ -2,11 +2,11 @@
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Builder;
 using System.Threading.Tasks;
-using Temp.Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using Blacklite.Framework.Features.Editors;
 using Blacklite.Json.Schema;
 using System.Linq;
-using Temp.Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema;
 using Microsoft.AspNet.FileProviders;
 using System.IO;
 using Blacklite.Json.Schema.Editors;
@@ -39,13 +39,13 @@ namespace Blacklite.Framework.Features.Http.Extensions
             if (httpContext.Request.Path.Value.EndsWith("/model"))
             {
                 await httpContext.Response.WriteAsync(
-                    Temp.Newtonsoft.Json.JsonConvert.SerializeObject(editor.Model, Temp.Newtonsoft.Json.Formatting.Indented)
+                    Newtonsoft.Json.JsonConvert.SerializeObject(editor.Model, Newtonsoft.Json.Formatting.Indented)
                 );
             }
             else if (httpContext.Request.Path.Value.EndsWith("/schema"))
             {
                 await httpContext.Response.WriteAsync(
-                    Temp.Newtonsoft.Json.JsonConvert.SerializeObject(editor.Schema, Temp.Newtonsoft.Json.Formatting.Indented)
+                    Newtonsoft.Json.JsonConvert.SerializeObject(editor.Schema, Newtonsoft.Json.Formatting.Indented)
                 );
             }
             else

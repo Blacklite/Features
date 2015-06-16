@@ -6,13 +6,11 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Routing;
-using Microsoft.AspNet.Security.Cookies;
 using Microsoft.Data.Entity;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
-using Mvc.Sample.Models;
 using Blacklite.Framework.Multitenancy.Http;
 using System.Linq;
 using Autofac;
@@ -24,9 +22,10 @@ namespace Mvc.Sample
         public Startup(IHostingEnvironment env)
         {
             // Setup configuration sources.
-            Configuration = new Configuration()
+            Configuration = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables()
+                .Build();
         }
 
         public IConfiguration Configuration { get; set; }
@@ -34,15 +33,6 @@ namespace Mvc.Sample
         // This method gets called by the runtime.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            // Add EF services to the services container.
-            services.AddEntityFramework(Configuration)
-                .AddSqlServer()
-                .AddDbContext<ApplicationDbContext>();
-
-            // Add Identity services to the services container.
-            services.AddIdentity<ApplicationUser, IdentityRole>(Configuration)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-
             // Add MVC services to the services container.
             services.AddMvc();
 
@@ -68,7 +58,7 @@ namespace Mvc.Sample
             // Add the following to the request pipeline only in development environment.
             if (string.Equals(env.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
             {
-                app.UseBrowserLink();
+                //app.UseBrowserLink();
                 app.UseErrorPage(ErrorPageOptions.ShowAll);
                 app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
             }
@@ -79,7 +69,7 @@ namespace Mvc.Sample
                 app.UseErrorHandler("/Home/Error");
             }
 
-            app.UseMultitenancy(false);
+            app.UseMultitenancy(/*false*/);
 
             // Add static files to the request pipeline.
             app.UseStaticFiles();

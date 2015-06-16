@@ -4,7 +4,7 @@ using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.OptionsModel;
 using Blacklite.Framework.Features.Repositories;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
 using System;
@@ -16,11 +16,9 @@ namespace Blacklite.Framework.Features.Mvc
 {
     public static class BlackliteFeaturesMvcServices
     {
-        internal static IEnumerable<IServiceDescriptor> GetFeaturesMvc(IServiceCollection services, IConfiguration configuration = null)
+        internal static IEnumerable<ServiceDescriptor> GetFeaturesMvc(IServiceCollection services)
         {
-            var describe = new ServiceDescriber(configuration);
-
-            return Enumerable.Empty<IServiceDescriptor>();
+            return Enumerable.Empty<ServiceDescriptor>();
         }
     }
 }

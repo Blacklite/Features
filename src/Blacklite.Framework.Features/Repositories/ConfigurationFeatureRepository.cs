@@ -1,5 +1,5 @@
 ﻿using Blacklite.Framework.Features.Describers;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using System;
 using System.Linq;
 using System.Reflection;

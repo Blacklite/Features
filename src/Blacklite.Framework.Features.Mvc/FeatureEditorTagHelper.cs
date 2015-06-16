@@ -10,40 +10,46 @@ namespace Blacklite.Framework.Features.Mvc
 {
     public class FeatureEditorTagHelper : TagHelper
     {
+        private readonly IJsonEditorProvider _editorProvider;
+        private readonly TabsJsonEditorResolver _tabsJsonEditorResolver;
+
+        public FeatureEditorTagHelper(IJsonEditorProvider editorProvider, TabsJsonEditorResolver tabsJsonEditorResolver)
+        {
+            _editorProvider = editorProvider;
+            _tabsJsonEditorResolver = tabsJsonEditorResolver;
+        }
+
         [Required]
         public IFeatureEditor Editor { get; set; }
-
-        [Activate]
-        public IJsonEditorProvider EditorProvider { get; private set; }
-
-        [Activate]
-        public TabsJsonEditorResolver TabsJsonEditorResolver { get; private set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = "div";
-            var renderer = EditorProvider.GetJsonEditor(Editor.Schema, Editor.Prefix, TabsJsonEditorResolver).Build();
-            output.Content = renderer.Render(Editor.Model);
+            var renderer = _editorProvider.GetJsonEditor(Editor.Schema, Editor.Prefix, _tabsJsonEditorResolver).Build();
+            output.Content.Append(renderer.Render(Editor.Model));
         }
     }
 
     public class FeatureEditorScriptTagHelper : TagHelper
     {
+        private readonly IJsonEditorProvider _editorProvider;
+        private readonly TabsJsonEditorResolver _tabsJsonEditorResolver;
+
+        public FeatureEditorScriptTagHelper(IJsonEditorProvider editorProvider, TabsJsonEditorResolver tabsJsonEditorResolver)
+        {
+            _editorProvider = editorProvider;
+            _tabsJsonEditorResolver = tabsJsonEditorResolver;
+        }
+
         [Required]
         public IFeatureEditor Editor { get; set; }
-
-        [Activate]
-        public IJsonEditorProvider EditorProvider { get; private set; }
-
-        [Activate]
-        public TabsJsonEditorResolver TabsJsonEditorResolver { get; private set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = "script";
-            var renderer = EditorProvider.GetJsonEditor(Editor.Schema, Editor.Prefix, TabsJsonEditorResolver).Build();
+            var renderer = _editorProvider.GetJsonEditor(Editor.Schema, Editor.Prefix, _tabsJsonEditorResolver).Build();
             var jsContent = renderer.JavaScript(Editor.Model);
-            output.Content = $@"
+            output.Content.Append($@"
 $(function() {{
 
     var size = 42;
@@ -91,7 +97,7 @@ $(function() {{
         }}
     }}
     callbacks.forEach(function(x) {{ x(); }});
-}});";
+}});");
         }
     }
 }

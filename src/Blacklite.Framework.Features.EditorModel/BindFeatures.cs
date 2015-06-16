@@ -3,8 +3,8 @@ using Microsoft.AspNet.Http;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Temp.Newtonsoft.Json.Linq;
-using Temp.Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
 
 namespace Blacklite.Framework.Features.Editors
 {

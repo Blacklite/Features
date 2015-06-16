@@ -3,7 +3,7 @@ using Blacklite.Framework.Features.Editors.JsonEditors;
 using Blacklite.Framework.Features.Editors.JsonEditors.Resolvers;
 using Blacklite.Framework.Features.OptionsModel;
 using Blacklite.Json.Schema;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
 using System;
@@ -15,22 +15,18 @@ namespace Blacklite.Framework.Features.Editors
 {
     public static class BlackliteFeaturesEditorModelServices
     {
-        internal static IEnumerable<IServiceDescriptor> GetFeatureEditorModel(IServiceCollection services, IConfiguration configuration = null)
+        internal static IEnumerable<ServiceDescriptor> GetFeatureEditorModel(IServiceCollection services)
         {
-            var describe = new ServiceDescriber(configuration);
-
-            yield return describe.Scoped<IFeatureJsonEditorDecorator, DefaultFeatureJsonEditorDecorator>();
-            yield return describe.Scoped(typeof(FeatureEditorFactory<>), typeof(FeatureEditorFactory<>));
-            yield return describe.Scoped(typeof(IFeatureEditor<>), typeof(FeatureEditor<>));
-            yield return describe.Scoped<EditorFeatureFactory, EditorFeatureFactory>();
+            yield return ServiceDescriptor.Scoped<IFeatureJsonEditorDecorator, DefaultFeatureJsonEditorDecorator>();
+            yield return ServiceDescriptor.Scoped(typeof(FeatureEditorFactory<>), typeof(FeatureEditorFactory<>));
+            yield return ServiceDescriptor.Scoped(typeof(IFeatureEditor<>), typeof(FeatureEditor<>));
+            yield return ServiceDescriptor.Scoped<EditorFeatureFactory, EditorFeatureFactory>();
         }
 
-        internal static IEnumerable<IServiceDescriptor> GetFeatureEditorModelImplementations(IServiceCollection services, IConfiguration configuration = null)
+        internal static IEnumerable<ServiceDescriptor> GetFeatureEditorModelImplementations(IServiceCollection services)
         {
-            var describe = new ServiceDescriber(configuration);
-
-            yield return describe.Transient<TabsJsonEditorResolver, TabsJsonEditorResolver>();
-            yield return describe.Transient<IConfigureOptions<JsonEditorOptions>, ConfigureJsonEditorOptions>();
+            yield return ServiceDescriptor.Transient<TabsJsonEditorResolver, TabsJsonEditorResolver>();
+            yield return ServiceDescriptor.Transient<IConfigureOptions<JsonEditorOptions>, ConfigureJsonEditorOptions>();
         }
     }
 }

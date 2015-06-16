@@ -3,7 +3,7 @@ using Blacklite.Framework.Features.Observables;
 using Blacklite.Framework.Multitenancy.Features;
 using Blacklite.Framework.Multitenancy.Features.Describers;
 using Blacklite.Framework.Multitenancy.Features.Observables;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -14,14 +14,12 @@ namespace Blacklite.Framework.Features
 {
     public static class BlackliteMultitenancyFeaturesServices
     {
-        internal static IEnumerable<IServiceDescriptor> GetMultitenancyFeatures(IConfiguration configuration = null)
+        internal static IEnumerable<ServiceDescriptor> GetMultitenancyFeatures()
         {
-            var describe = new ServiceDescriber(configuration);
-
-            yield return describe.Singleton<IFeatureDescriberFactory, MultitenancyFeatureDescriberFactory>();
-            yield return describe.Singleton<IApplicationOnlyFeatureSubjectFactory, ApplicationOnlyFeatureSubjectFactory>();
-            yield return describe.Singleton<ITenantOnlyFeatureSubjectFactory, TenantOnlyFeatureSubjectFactory>();
-            yield return describe.Singleton<IFeatureSubjectFactory, MultitenancyCompositeFeatureSubjectFactory>();
+            yield return ServiceDescriptor.Singleton<IFeatureDescriberFactory, MultitenancyFeatureDescriberFactory>();
+            yield return ServiceDescriptor.Singleton<IApplicationOnlyFeatureSubjectFactory, ApplicationOnlyFeatureSubjectFactory>();
+            yield return ServiceDescriptor.Singleton<ITenantOnlyFeatureSubjectFactory, TenantOnlyFeatureSubjectFactory>();
+            yield return ServiceDescriptor.Singleton<IFeatureSubjectFactory, MultitenancyCompositeFeatureSubjectFactory>();
         }
     }
 }

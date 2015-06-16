@@ -12,9 +12,6 @@
     },
 
     "frameworks": {
-        "aspnet50": {
-            "dependencies": {
-            }
-        }
+        "dnx451": { }
     }
 }

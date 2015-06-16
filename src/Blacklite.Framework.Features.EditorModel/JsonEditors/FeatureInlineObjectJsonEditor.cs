@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Temp.Newtonsoft.Json.Linq;
-using Temp.Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
 
 namespace Blacklite.Framework.Features.Editors.JsonEditors
 {

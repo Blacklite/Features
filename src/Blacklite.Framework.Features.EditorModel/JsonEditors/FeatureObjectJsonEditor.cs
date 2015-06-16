@@ -1,10 +1,10 @@
 ﻿using Blacklite.Json.Schema;
 using System;
 using Blacklite.Json.Schema.Editors;
-using Temp.Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema;
 using Microsoft.AspNet.Mvc.Rendering;
 using System.Linq;
-using Temp.Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Text;
 

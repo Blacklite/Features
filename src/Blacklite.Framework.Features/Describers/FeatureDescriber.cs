@@ -31,8 +31,8 @@ namespace Blacklite.Framework.Features.Describers
             if (HasEnabled)
             {
                 var isEnabledProperty = Type.GetRuntimeProperty(nameof(ISwitch.IsEnabled));
-                // If we are not observable, and our lifecycle is a singleton, changes in our value cannot accurately be observed.
-                IsReadOnly = !isEnabledProperty.CanWrite;// || (!IsObservable && Lifecycle == LifecycleKind.Singleton);
+                // If we are not observable, and our Lifetime is a singleton, changes in our value cannot accurately be observed.
+                IsReadOnly = !isEnabledProperty.CanWrite;// || (!IsObservable && Lifetime == ServiceLifetime.Singleton);
                 _isEnabledProperty = isEnabledProperty;
             }
 

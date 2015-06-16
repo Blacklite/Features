@@ -2,7 +2,7 @@
 using Blacklite.Framework.Features.Describers;
 using Blacklite.Framework.Features.OptionsModel;
 using Blacklite.Framework.Features.Repositories;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using NSubstitute;
 using System;
 using System.Linq;

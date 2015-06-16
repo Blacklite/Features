@@ -4,9 +4,9 @@ using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.OptionsModel;
 using Blacklite.Framework.Features.Repositories;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Framework.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,15 +16,13 @@ namespace Blacklite.Framework.Features.Http
 {
     public static class BlackliteFeaturesHttpServices
     {
-        internal static IEnumerable<IServiceDescriptor> GetFeaturesHttp(IServiceCollection services, IConfiguration configuration = null)
+        internal static IEnumerable<ServiceDescriptor> GetFeaturesHttp(IServiceCollection services)
         {
-            var describe = new ServiceDescriber(configuration);
+            yield return ServiceDescriptor.Singleton<IClaimUidExtractor, DefaultClaimUidExtractor>();
+            yield return ServiceDescriptor.Singleton<AntiForgery, AntiForgery>();
+            yield return ServiceDescriptor.Singleton<IAntiForgeryAdditionalDataProvider, DefaultAntiForgeryAdditionalDataProvider>();
 
-            yield return describe.Singleton<IClaimUidExtractor, DefaultClaimUidExtractor>();
-            yield return describe.Singleton<AntiForgery, AntiForgery>();
-            yield return describe.Singleton<IAntiForgeryAdditionalDataProvider, DefaultAntiForgeryAdditionalDataProvider>();
-
-            yield return describe.Scoped(typeof(IScopedInstance<>), typeof(ScopedInstance<>));
+            yield return ServiceDescriptor.Scoped(typeof(IScopedInstance<>), typeof(ScopedInstance<>));
         }
     }
 }

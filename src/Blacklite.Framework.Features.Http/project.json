@@ -3,18 +3,12 @@
     "dependencies": {
         "Blacklite.Framework.Features": "1.0.0-*",
         "Blacklite.Framework.Features.EditorModel": "1.0.0-*",
-        "Microsoft.AspNet.Http": "1.0.0-beta3",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-beta3"
+        "Microsoft.AspNet.Http": "1.0.0-beta5-*",
+        "Microsoft.AspNet.StaticFiles": "1.0.0-beta5-*"
     },
 
     "frameworks": {
-        "aspnet50": {
-            "frameworkAssemblies": {
-                "System.Runtime": "4.0.10.0"
-            },
-            "dependencies": {
-            }
-        }
+        "dnx451": { }
     },
     "scripts": {
         "postrestore": [ "npm install" ],

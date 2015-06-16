@@ -1,28 +1,25 @@
 ﻿{
-    /* Click to learn more about project.json  http://go.microsoft.com/fwlink/?LinkID=517074 */
     "webroot": "wwwroot",
     "version": "1.0.0-*",
     "dependencies": {
-        "Microsoft.AspNet.Mvc": "6.0.0-beta3",
-        "Microsoft.AspNet.Diagnostics": "1.0.0-beta3",
-        "Microsoft.AspNet.Security.Cookies": "1.0.0-beta3",
-        "Microsoft.AspNet.Server.IIS": "1.0.0-beta3",
-        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta3",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-beta3",
-        "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta3",
-        "Microsoft.Framework.Logging": "1.0.0-beta3",
-        "Microsoft.Framework.Logging.Console": "1.0.0-beta3",
-        "Blacklite.Framework.Features.Mvc": "",
-        "Blacklite.Framework.Features.Http": "",
-        "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-beta3",
-        "Blacklite.Json.Schema.TagHelpers": ""
+        "Microsoft.AspNet.Mvc": "6.0.0-beta5-*",
+        "Microsoft.AspNet.Diagnostics": "1.0.0-beta5-*",
+        "Microsoft.AspNet.Server.IIS": "1.0.0-beta5-*",
+        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta5-*",
+        "Microsoft.AspNet.StaticFiles": "1.0.0-beta5-*",
+        "Microsoft.Framework.Configuration.Json": "1.0.0-beta5-*",
+        "Microsoft.Framework.Logging": "1.0.0-beta5-*",
+        "Microsoft.Framework.Logging.Console": "1.0.0-beta5-*",
+        "Blacklite.Framework.Features.Mvc": "1.0.0-*",
+        "Blacklite.Framework.Features.Http": "1.0.0-*",
+        "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-beta5-*",
+        "Blacklite.Json.Schema.TagHelpers": "1.0.0-*"
     },
     "commands": {
-        /* Change the port number when you are self hosting this application */
         "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000"
     },
     "frameworks": {
-        "aspnet50": { }
+        "dnx451": { }
     },
     "exclude": [
         "wwwroot",
@@ -37,7 +34,5 @@
         "**.vspscc"
     ],
     "scripts": {
-        /*"postrestore": [ "npm install" ],
-        "prepare": [ "grunt bower:install" ]*/
     }
 }

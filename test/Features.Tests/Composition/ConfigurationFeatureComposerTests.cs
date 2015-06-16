@@ -3,7 +3,7 @@ using Blacklite.Framework.Features.Composition;
 using Blacklite.Framework.Features.Describers;
 using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.OptionsModel;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using NSubstitute;
 using System;
 using System.ComponentModel;

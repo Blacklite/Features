@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-#if ASPNET50 || ASPNETCORE50
+#if DNX451 || DNXCORE50
 using Microsoft.Framework.Runtime;
 #endif
 
@@ -11,12 +11,12 @@ namespace Blacklite.Framework.Features.Describers
     public class FeatureAssemblyProvider : IFeatureAssemblyProvider
     {
         public FeatureAssemblyProvider(
-#if ASPNET50 || ASPNETCORE50
+#if DNX451 || DNXCORE50
             ILibraryManager libraryManager,
 #endif
             IFeatureDescriberFactory factory)
         {
-#if ASPNET50 || ASPNETCORE50
+#if DNX451 || DNXCORE50
             var assemblies = GetAssemblies(libraryManager);
 #else
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -26,7 +26,7 @@ namespace Blacklite.Framework.Features.Describers
 
         public IEnumerable<Assembly> Assemblies { get; }
 
-#if ASPNET50 || ASPNETCORE50
+#if DNX451 || DNXCORE50
         protected virtual HashSet<string> ReferenceAssemblies
         { get; }
         = new HashSet<string>(StringComparer.Ordinal) {

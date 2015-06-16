@@ -2,15 +2,14 @@
 using Blacklite.Json.Schema;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.OptionDescriptors;
 using Microsoft.Framework.OptionsModel;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Temp.Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using Microsoft.Framework.DependencyInjection;
 using System.Reflection;
-using Temp.Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema;
 
 namespace Blacklite.Framework.Features.Mvc
 {

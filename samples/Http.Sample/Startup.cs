@@ -4,7 +4,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.Framework.DependencyInjection;
 using Blacklite.Framework.Features;
 using System.Threading.Tasks;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.AspNet.Hosting;
 
 namespace Http.Sample
@@ -18,8 +18,9 @@ namespace Http.Sample
         public Startup(IHostingEnvironment env)
         {
             // Setup configuration sources.
-            Configuration = new Configuration()
-                .AddEnvironmentVariables();
+            Configuration = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
         }
 
         public IConfiguration Configuration { get; set; }

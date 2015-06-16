@@ -5,8 +5,7 @@ using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
-using Microsoft.AspNet.Security.Cookies;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
@@ -22,9 +21,10 @@ namespace Features.EditorModelSchema.Tests
         public Startup(IHostingEnvironment env)
         {
             // Setup configuration sources.
-            Configuration = new Configuration()
+            Configuration = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables()
+                .Build();
         }
 
         public IConfiguration Configuration { get; set; }
@@ -42,7 +42,7 @@ namespace Features.EditorModelSchema.Tests
                 .AddFeatureEditorModel()
                 .AddFeaturesMvc()
                 .AddFeaturesHttp()
-                .AddFeaturesConfiguration(Configuration.GetSubKey("Features"));
+                .AddFeaturesConfiguration(Configuration.GetConfigurationSection("Features"));
         }
 
         // Configure is called after ConfigureServices is called.
@@ -72,7 +72,7 @@ namespace Features.EditorModelSchema.Tests
             {
                 b.Use(async (httpContext, next) =>
                 {
-                    var root = this.Configuration as IConfigurationSourceContainer;
+                    var root = this.Configuration as IConfigurationSource;
                     var keys = root.OfType<BaseConfigurationSource>()
                         .SelectMany(z => z.Data)
                         .Where(x => x.Key.StartsWith("Features:", StringComparison.Ordinal))

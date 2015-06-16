@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22609.0
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features", "src\Blacklite.Framework.Features\Blacklite.Framework.Features.kproj", "{3BA65948-EB15-468B-8CBD-F9AC58A90F32}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features", "src\Blacklite.Framework.Features\Blacklite.Framework.Features.xproj", "{3BA65948-EB15-468B-8CBD-F9AC58A90F32}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Interfaces", "..\Common\src\Blacklite.Framework.Interfaces\Blacklite.Framework.Interfaces.kproj", "{B31A377D-1905-4438-A02B-CD4EEAD8DCC7}"
 EndProject
@@ -11,13 +11,13 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Shared.
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Shared", "..\Common\src\Blacklite.Framework.Shared\Blacklite.Framework.Shared.kproj", "{7D364B90-7F31-4B54-B00D-2B5518610917}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Editors", "src\Blacklite.Framework.Features.EditorModel\Blacklite.Framework.Features.Editors.kproj", "{4BFB9998-E37D-48CB-A6AE-4DF1FA965DDC}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Editors", "src\Blacklite.Framework.Features.EditorModel\Blacklite.Framework.Features.Editors.xproj", "{4BFB9998-E37D-48CB-A6AE-4DF1FA965DDC}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Json.Schema.TagHelpers", "..\JsonSchema\src\Blacklite.Json.Schema.TagHelpers\Blacklite.Json.Schema.TagHelpers.kproj", "{82C0A8FB-34B1-4A12-9231-D794A288E1CE}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Json.Schema", "..\JsonSchema\src\Blacklite.Json.Schema\Blacklite.Json.Schema.kproj", "{7BF32597-7D8D-4BAF-ACB0-00D875FFF68B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Licenses", "src\Blacklite.Framework.Licenses\Blacklite.Framework.Licenses.kproj", "{F4F627BD-662B-4FBF-ADDD-C388EF2577EB}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Licenses", "src\Blacklite.Framework.Licenses\Blacklite.Framework.Licenses.xproj", "{F4F627BD-662B-4FBF-ADDD-C388EF2577EB}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Events", "..\Common\src\Blacklite.Framework.Events\Blacklite.Framework.Events.kproj", "{161CF813-CA55-49ED-B0A5-CB1A7F1CC43D}"
 EndProject
@@ -44,35 +44,47 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{0486
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0A5EFDC9-0EF6-4B86-A791-05D5D4C94A33}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Features.EditorModelSchema.Tests", "test\Features.EditorModelSchema.Tests\Features.EditorModelSchema.Tests.kproj", "{3413290B-9A4D-4861-9F53-84AC203DC8EF}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Features.EditorModelSchema.Tests", "test\Features.EditorModelSchema.Tests\Features.EditorModelSchema.Tests.xproj", "{3413290B-9A4D-4861-9F53-84AC203DC8EF}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Features.Tests", "test\Features.Tests\Features.Tests.kproj", "{D34F04B2-1984-4A19-93DA-0E3D577C3291}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Features.Tests", "test\Features.Tests\Features.Tests.xproj", "{D34F04B2-1984-4A19-93DA-0E3D577C3291}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Licenses.Tests", "test\Licenses.Tests\Licenses.Tests.kproj", "{F735EB61-14CA-4009-9758-76DF0B20CDD8}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Licenses.Tests", "test\Licenses.Tests\Licenses.Tests.xproj", "{F735EB61-14CA-4009-9758-76DF0B20CDD8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Interfaces", "src\Blacklite.Framework.Features.Interfaces\Blacklite.Framework.Features.Interfaces.kproj", "{AD0BC872-A551-49AD-8D5F-9AB1221312FD}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Features", "src\Blacklite.Framework.Multitenancy.Features\Blacklite.Framework.Multitenancy.Features.xproj", "{DF91599A-632F-45D2-811D-6C524D01A180}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Features", "src\Blacklite.Framework.Multitenancy.Features\Blacklite.Framework.Multitenancy.Features.kproj", "{DF91599A-632F-45D2-811D-6C524D01A180}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy", "..\Multitenancy\src\Blacklite.Framework.Multitenancy\Blacklite.Framework.Multitenancy.xproj", "{1628899E-71FF-4D91-8AD3-42E5C8DC384E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy", "..\Multitenancy\src\Blacklite.Framework.Multitenancy\Blacklite.Framework.Multitenancy.kproj", "{1628899E-71FF-4D91-8AD3-42E5C8DC384E}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Interfaces", "..\Multitenancy\src\Blacklite.Framework.Multitenancy.Interfaces\Blacklite.Framework.Multitenancy.Interfaces.xproj", "{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Interfaces", "..\Multitenancy\src\Blacklite.Framework.Multitenancy.Interfaces\Blacklite.Framework.Multitenancy.Interfaces.kproj", "{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Mvc", "src\Blacklite.Framework.Features.Mvc\Blacklite.Framework.Features.Mvc.xproj", "{1AD8937A-6D19-4E0F-8D1A-DB884C480EDF}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Mvc", "src\Blacklite.Framework.Features.Mvc\Blacklite.Framework.Features.Mvc.kproj", "{1AD8937A-6D19-4E0F-8D1A-DB884C480EDF}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Http", "src\Blacklite.Framework.Features.Http\Blacklite.Framework.Features.Http.kproj", "{78322DD3-879D-48C8-9AD2-4CD3CE636FFB}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Http", "src\Blacklite.Framework.Features.Http\Blacklite.Framework.Features.Http.xproj", "{78322DD3-879D-48C8-9AD2-4CD3CE636FFB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{8D9337F1-4B36-4FEF-9D0D-77FDD77C95CD}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Http.Sample", "samples\Http.Sample\Http.Sample.kproj", "{C62F63CA-E401-4353-81E4-9E241B636876}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Http.Sample", "samples\Http.Sample\Http.Sample.xproj", "{C62F63CA-E401-4353-81E4-9E241B636876}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Mvc.Multitenancy.Sample", "samples\Mvc.Multitenancy.Sample\Mvc.Multitenancy.Sample.kproj", "{1B5214F4-957C-4191-ADFA-3622AEF170DE}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Mvc.Multitenancy.Sample", "samples\Mvc.Multitenancy.Sample\Mvc.Multitenancy.Sample.xproj", "{1B5214F4-957C-4191-ADFA-3622AEF170DE}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Http", "..\Multitenancy\src\Blacklite.Framework.Multitenancy.Http\Blacklite.Framework.Multitenancy.Http.kproj", "{180EF4D3-982B-49B9-8B29-0BFE292B14C8}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Http", "..\Multitenancy\src\Blacklite.Framework.Multitenancy.Http\Blacklite.Framework.Multitenancy.Http.xproj", "{180EF4D3-982B-49B9-8B29-0BFE292B14C8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Autofac", "..\Multitenancy\src\Blacklite.Framework.Multitenancy.Autofac\Blacklite.Framework.Multitenancy.Autofac.kproj", "{5019B6F0-FFB5-4403-819D-403C9C0C4ED2}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Multitenancy.Autofac", "..\Multitenancy\src\Blacklite.Framework.Multitenancy.Autofac\Blacklite.Framework.Multitenancy.Autofac.xproj", "{5019B6F0-FFB5-4403-819D-403C9C0C4ED2}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Mvc.Sample", "samples\Mvc.Sample\Mvc.Sample.kproj", "{A96837B9-926B-4C85-9067-D45C66D906A0}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Mvc.Sample", "samples\Mvc.Sample\Mvc.Sample.xproj", "{A96837B9-926B-4C85-9067-D45C66D906A0}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Events", "..\Common\src\Blacklite.Framework.Events\Blacklite.Framework.Events.xproj", "{DB13AD1C-956E-478C-847A-EC5EF42E9C3A}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Abstractions", "..\Common\src\Blacklite.Framework.Abstractions\Blacklite.Framework.Abstractions.xproj", "{CC207591-CDDA-4998-B6C8-292808EFA169}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Shared", "..\Common\src\Blacklite.Framework.Shared\Blacklite.Framework.Shared.xproj", "{78B092F3-2082-45A7-8A8A-714C63C62F48}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Features.Abstractions", "src\Blacklite.Framework.Features.Abstractions\Blacklite.Framework.Features.Abstractions.xproj", "{0C3A26C8-8F02-4B13-89BA-461F0F6226C8}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Framework.Shared.Reflection", "..\Common\src\Blacklite.Framework.Shared.Reflection\Blacklite.Framework.Shared.Reflection.xproj", "{D2880B27-E33A-4F4A-83B3-6C5BB460EDEC}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Json.Schema.TagHelpers", "..\Json.Schema.Editor\src\Blacklite.Json.Schema.TagHelpers\Blacklite.Json.Schema.TagHelpers.xproj", "{30037064-60F7-4571-8519-D6AC57D49C0E}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Blacklite.Json.Schema", "..\Json.Schema.Editor\src\Blacklite.Json.Schema\Blacklite.Json.Schema.xproj", "{109881C2-8300-431B-A3A5-CD2F31F62570}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -128,10 +140,6 @@ Global
 		{F735EB61-14CA-4009-9758-76DF0B20CDD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F735EB61-14CA-4009-9758-76DF0B20CDD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F735EB61-14CA-4009-9758-76DF0B20CDD8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AD0BC872-A551-49AD-8D5F-9AB1221312FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AD0BC872-A551-49AD-8D5F-9AB1221312FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AD0BC872-A551-49AD-8D5F-9AB1221312FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AD0BC872-A551-49AD-8D5F-9AB1221312FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF91599A-632F-45D2-811D-6C524D01A180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DF91599A-632F-45D2-811D-6C524D01A180}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF91599A-632F-45D2-811D-6C524D01A180}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -172,6 +180,34 @@ Global
 		{A96837B9-926B-4C85-9067-D45C66D906A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A96837B9-926B-4C85-9067-D45C66D906A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A96837B9-926B-4C85-9067-D45C66D906A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB13AD1C-956E-478C-847A-EC5EF42E9C3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB13AD1C-956E-478C-847A-EC5EF42E9C3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB13AD1C-956E-478C-847A-EC5EF42E9C3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB13AD1C-956E-478C-847A-EC5EF42E9C3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC207591-CDDA-4998-B6C8-292808EFA169}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC207591-CDDA-4998-B6C8-292808EFA169}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC207591-CDDA-4998-B6C8-292808EFA169}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC207591-CDDA-4998-B6C8-292808EFA169}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78B092F3-2082-45A7-8A8A-714C63C62F48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78B092F3-2082-45A7-8A8A-714C63C62F48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78B092F3-2082-45A7-8A8A-714C63C62F48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78B092F3-2082-45A7-8A8A-714C63C62F48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C3A26C8-8F02-4B13-89BA-461F0F6226C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C3A26C8-8F02-4B13-89BA-461F0F6226C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C3A26C8-8F02-4B13-89BA-461F0F6226C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C3A26C8-8F02-4B13-89BA-461F0F6226C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2880B27-E33A-4F4A-83B3-6C5BB460EDEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2880B27-E33A-4F4A-83B3-6C5BB460EDEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2880B27-E33A-4F4A-83B3-6C5BB460EDEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2880B27-E33A-4F4A-83B3-6C5BB460EDEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30037064-60F7-4571-8519-D6AC57D49C0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30037064-60F7-4571-8519-D6AC57D49C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30037064-60F7-4571-8519-D6AC57D49C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30037064-60F7-4571-8519-D6AC57D49C0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{109881C2-8300-431B-A3A5-CD2F31F62570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{109881C2-8300-431B-A3A5-CD2F31F62570}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{109881C2-8300-431B-A3A5-CD2F31F62570}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{109881C2-8300-431B-A3A5-CD2F31F62570}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -189,7 +225,6 @@ Global
 		{3413290B-9A4D-4861-9F53-84AC203DC8EF} = {0A5EFDC9-0EF6-4B86-A791-05D5D4C94A33}
 		{D34F04B2-1984-4A19-93DA-0E3D577C3291} = {0A5EFDC9-0EF6-4B86-A791-05D5D4C94A33}
 		{F735EB61-14CA-4009-9758-76DF0B20CDD8} = {0A5EFDC9-0EF6-4B86-A791-05D5D4C94A33}
-		{AD0BC872-A551-49AD-8D5F-9AB1221312FD} = {0EF595D5-BBE7-4FC0-A0BB-1D988664DF7E}
 		{DF91599A-632F-45D2-811D-6C524D01A180} = {0EF595D5-BBE7-4FC0-A0BB-1D988664DF7E}
 		{1628899E-71FF-4D91-8AD3-42E5C8DC384E} = {81DDC007-B8E5-41CF-821D-4970D46138B4}
 		{57A8E605-6ADB-4683-854E-D8ABB6CF2BCC} = {81DDC007-B8E5-41CF-821D-4970D46138B4}
@@ -198,5 +233,6 @@ Global
 		{C62F63CA-E401-4353-81E4-9E241B636876} = {8D9337F1-4B36-4FEF-9D0D-77FDD77C95CD}
 		{1B5214F4-957C-4191-ADFA-3622AEF170DE} = {8D9337F1-4B36-4FEF-9D0D-77FDD77C95CD}
 		{A96837B9-926B-4C85-9067-D45C66D906A0} = {8D9337F1-4B36-4FEF-9D0D-77FDD77C95CD}
+		{0C3A26C8-8F02-4B13-89BA-461F0F6226C8} = {0EF595D5-BBE7-4FC0-A0BB-1D988664DF7E}
 	EndGlobalSection
 EndGlobal

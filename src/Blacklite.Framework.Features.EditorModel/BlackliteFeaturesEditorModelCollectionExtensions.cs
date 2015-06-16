@@ -2,7 +2,7 @@
 using Blacklite.Framework;
 using Blacklite.Framework.Features;
 using Blacklite.Framework.Features.Editors;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -11,16 +11,14 @@ namespace Microsoft.Framework.DependencyInjection
 {
     public static class BlackliteFeaturesEditorModelCollectionExtensions
     {
-        public static IServiceCollection AddFeatureEditorModel(
-            [NotNull] this IServiceCollection services,
-            IConfiguration configuration = null)
+        public static IServiceCollection AddFeatureEditorModel([NotNull] this IServiceCollection services)
         {
-            services.AddFeatures(configuration)
-                    .AddJsonSchemaEditor(configuration);
+            services.AddFeatures()
+                    .AddJsonSchemaEditor();
 
-            services.TryAdd(BlackliteFeaturesEditorModelServices.GetFeatureEditorModel(services, configuration));
-            services.TryAddImplementation(BlackliteFeaturesEditorModelServices.GetFeatureEditorModelImplementations(services, configuration));
-            services.TryAdd(OptionsServiceCollectionExtensions.AddOptions(services, configuration));
+            services.TryAdd(BlackliteFeaturesEditorModelServices.GetFeatureEditorModel(services));
+            services.TryAddImplementation(BlackliteFeaturesEditorModelServices.GetFeatureEditorModelImplementations(services));
+            services.TryAdd(OptionsServiceCollectionExtensions.AddOptions(services));
             return services;
         }
     }
