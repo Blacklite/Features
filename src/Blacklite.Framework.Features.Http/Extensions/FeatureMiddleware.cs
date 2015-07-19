@@ -10,7 +10,7 @@ using Newtonsoft.Json.Schema;
 using Microsoft.AspNet.FileProviders;
 using System.IO;
 using Blacklite.Json.Schema.Editors;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Antiforgery;
 
 namespace Blacklite.Framework.Features.Http.Extensions
 {
@@ -32,7 +32,7 @@ namespace Blacklite.Framework.Features.Http.Extensions
         }
 
         // TODO: Property construct the AntiForgery so it doesn't require Mvc be added.
-        public async Task Invoke(HttpContext httpContext, IJsonEditorProvider jsonEditorProvider, AntiForgery antiForgery)
+        public async Task Invoke(HttpContext httpContext, IJsonEditorProvider jsonEditorProvider, Antiforgery antiForgery)
         {
             var editor = _factory.GetFeatureEditor();
 

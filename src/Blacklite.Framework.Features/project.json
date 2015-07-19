@@ -5,7 +5,7 @@
         "Blacklite.Framework.Shared": "1.0.0-*",
         "Blacklite.Framework.Features.Abstractions": "1.0.0-*",
         "Microsoft.Framework.Configuration.Abstractions": "1.0.0-beta5-*",
-        "Microsoft.Framework.DependencyInjection": "1.0.0-beta5-*",
+        "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-beta5-*",
         "Rx-Core": "2.2.5",
         "Rx-Linq": "2.2.5"
     },

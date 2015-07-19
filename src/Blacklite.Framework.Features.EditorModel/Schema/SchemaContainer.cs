@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
 using Newtonsoft.Json.Serialization;
+using System.Reflection;
 
 namespace Blacklite.Framework.Features.Editors.Schema
 {
@@ -22,6 +23,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
         private readonly IDictionary<string, JSchema> _optionSchemas;
         private readonly IDictionary<string, JSchema> _modelSchemas;
         private readonly JSchemaGenerator _schemaGenerator;
+        private Func<Type, JSchema> _generateMethod;
         private readonly JsonSerializer _serializer;
         private readonly JObject _definitions;
         private readonly JSchema _schema;
@@ -42,6 +44,12 @@ namespace Blacklite.Framework.Features.Editors.Schema
             _serializer = new JsonSerializer();
             _serializer.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
             _serializer.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+
+            _generateMethod = (type) =>
+            {
+                var method = typeof(JSchemaGenerator).GetTypeInfo().GetDeclaredMethod("GenerateInternal");
+                return (JSchema)method.Invoke(_schemaGenerator, new object[] { type, Required.Always, null, null });
+            };
         }
 
         private IEnumerable<EditorModel> GetOrderedEditorModels(IEnumerable<EditorGroupOrModel> gom)
@@ -108,15 +116,6 @@ namespace Blacklite.Framework.Features.Editors.Schema
         private JSchema GetSchema(EditorGroup group)
         {
             return GetGroupSchema(group);
-            /*
-            JSchema schema;
-            if (!_modelSchemas.TryGetValue(group.Name, out schema))
-            {
-                schema = GetGroupSchema(group);
-                _modelSchemas.Add(group.Name, schema);
-            }
-
-            return schema;*/
         }
 
         private JSchema GetSchema(EditorModel model)
@@ -137,7 +136,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
             if (model.HasOptions && !model.OptionsIsFeature)
             {
                 JToken bogus;
-                options = _schemaGenerator.Generate(model.OptionsType);
+                options = _generateMethod(model.OptionsType);
                 options.Title = "Settings";
                 options.Format = FeatureEditor.OptionsKey;
 
@@ -192,11 +191,6 @@ namespace Blacklite.Framework.Features.Editors.Schema
                     })
             );
 
-            //var hidden = new JSchema();
-            //hidden.Type = JSchemaType.String;
-            //hidden.ExtensionData[FeatureEditor.OptionsKey] = JObject.FromObject(new { hidden = true }, _serializer);
-            //schema.Properties.Add(model.Name, hidden);
-
             schema.AllowAdditionalProperties = false;
             schema.AllowAdditionalItems = false;
 
@@ -212,7 +206,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
 
             if (model.HasProperties)
             {
-                var propertySchema = _schemaGenerator.Generate(model.FeatureType);
+                var propertySchema = _generateMethod(model.FeatureType);
                 //_optionSchemas.Add(model.Name, propertySchema);
                 propertySchema.Title = model.Title;
                 if (propertySchema.ExtensionData.ContainsKey(FeatureEditor.OptionsKey))
@@ -312,7 +306,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
         private JSchema GetOrUpdatePropertySchema(EditorOptionPropertyModel property, JSchema schema = null)
         {
             // change this
-            schema = schema ?? _schemaGenerator.Generate(property.Type);
+            schema = schema ?? _generateMethod(property.Type);
             schema.Title = property.Title;
             schema.Description = property.Description;
 
@@ -325,7 +319,7 @@ namespace Blacklite.Framework.Features.Editors.Schema
 
         private JSchema GetEnabledPropertySchema(EditorModel model)
         {
-            var schema = _schemaGenerator.Generate(model.Enabled.Type);
+            var schema = _generateMethod(model.Enabled.Type);
             schema.Title = model.Enabled.Title;
             schema.Description = model.Description;
 

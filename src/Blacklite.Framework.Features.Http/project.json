@@ -3,8 +3,9 @@
     "dependencies": {
         "Blacklite.Framework.Features": "1.0.0-*",
         "Blacklite.Framework.Features.EditorModel": "1.0.0-*",
-        "Microsoft.AspNet.Http": "1.0.0-beta5-*",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-beta5-*"
+        "Microsoft.AspNet.Antiforgery": "1.0.0-beta5",
+        "Microsoft.AspNet.StaticFiles": "1.0.0-beta5",
+        "Microsoft.AspNet.FileProviders.Embedded": "1.0.0-beta5"
     },
 
     "frameworks": {

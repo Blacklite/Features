@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework.Features.Composition;
+using Blacklite.Framework.Features.Composition;
 using Blacklite.Framework.Features.Describers;
 using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.Observables;
@@ -39,10 +39,13 @@ namespace Blacklite.Framework.Features
             yield return ServiceDescriptor.Singleton(typeof(IFeatureOptions<>), typeof(FeatureOptionsManager<>));
 
             yield return ServiceDescriptor.Transient<FeatureDescriberCollection, FeatureDescriberCollection>();
+            yield return ServiceDescriptor.Singleton<IFeatureRepositoryProvider, FeatureRepositoryProvider>();
+        }
 
+        internal static IEnumerable<ServiceDescriptor> GetEnumerableFeatures(IServiceCollection services)
+        {
             yield return ServiceDescriptor.Transient<IPreFeatureComposition, OptionsFeatureComposer>();
             yield return ServiceDescriptor.Transient<IPostFeatureComposition, RequiredFeatureComposer>();
-            yield return ServiceDescriptor.Singleton<IFeatureRepositoryProvider, FeatureRepositoryProvider>();
         }
 
         internal static IEnumerable<ServiceDescriptor> GetFeaturesConfiguration(IServiceCollection services, IConfiguration configuration, Func<IFeatureDescriber, bool> predicate = null)

@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework;
+using Blacklite.Framework;
 using Blacklite.Framework.Features.Editors;
 using Blacklite.Framework.Features.Http.Extensions;
 using Microsoft.AspNet.Builder;
@@ -8,6 +8,7 @@ using Microsoft.AspNet.StaticFiles;
 using System;
 using Microsoft.Framework.DependencyInjection;
 using Blacklite.Framework.Features.Editors.JsonEditors.Resolvers;
+using Blacklite.Framework.Features.Describers;
 
 namespace Microsoft.AspNet.Builder
 {
@@ -41,10 +42,10 @@ namespace Microsoft.AspNet.Builder
         {
             return builder
                 .Map(pathMatch, b => configuration(b).UseFeaturesHttp(new FeatureOptions(pathMatch.Value)
-            {
-                Factory = factory,
-                Path = pathMatch.Value
-            }));
+                {
+                    Factory = factory,
+                    Path = pathMatch.Value
+                }));
         }
 
         public static IApplicationBuilder UseFeaturesHttp([NotNull] this IApplicationBuilder builder,
@@ -57,7 +58,7 @@ namespace Microsoft.AspNet.Builder
         {
             if (options.Factory == null)
             {
-                options.Factory = builder.ApplicationServices.GetService<IFeatureEditorFactory>();
+                options.Factory = builder.ApplicationServices.GetService<FeatureEditorFactory<FeatureDescriberCollection>>();
             }
 
             if (options.JsonEditorResolver == null)
@@ -70,7 +71,6 @@ namespace Microsoft.AspNet.Builder
                 {
                     FileProvider = options.FileProvider
                 })
-                .UseRequestServices()
                 .UseMiddleware<FeatureMiddleware>(options);
         }
     }

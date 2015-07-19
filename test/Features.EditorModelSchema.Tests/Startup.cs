@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
@@ -22,7 +22,7 @@ namespace Features.EditorModelSchema.Tests
         {
             // Setup configuration sources.
             Configuration = new ConfigurationBuilder()
-                .AddJsonFile("config.json")
+                //.AddJsonFile("config.json")
                 .AddEnvironmentVariables()
                 .Build();
         }
@@ -73,12 +73,13 @@ namespace Features.EditorModelSchema.Tests
                 b.Use(async (httpContext, next) =>
                 {
                     var root = this.Configuration as IConfigurationSource;
-                    var keys = root.OfType<BaseConfigurationSource>()
-                        .SelectMany(z => z.Data)
-                        .Where(x => x.Key.StartsWith("Features:", StringComparison.Ordinal))
+                    var keys = this.Configuration
+                        .GetConfigurationSection("Features")
+                        .GetConfigurationSections()
                         .GroupBy(z => z.Key)
                         .Select(z => z.First())
                         .ToArray();
+
                     await httpContext.Response.WriteAsync(string.Join("\n", keys.Select(z => $"{z.Key}: {z.Value}")));
                 });
             });

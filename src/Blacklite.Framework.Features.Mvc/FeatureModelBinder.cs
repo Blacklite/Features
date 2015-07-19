@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework.Features.Editors;
+using Blacklite.Framework.Features.Editors;
 using Blacklite.Json.Schema;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
@@ -15,17 +15,17 @@ namespace Blacklite.Framework.Features.Mvc
 {
     public class FeatureModelBinder : IModelBinder
     {
-        public async Task<bool> BindModelAsync(ModelBindingContext bindingContext)
+        public async Task<ModelBindingResult> BindModelAsync(ModelBindingContext bindingContext)
         {
             if (!typeof(IFeatureEditor).GetTypeInfo().IsAssignableFrom(bindingContext.ModelType.GetTypeInfo()))
             {
-                return false;
+                return new ModelBindingResult(null, null, false);
             }
 
             var request = bindingContext.OperationBindingContext.HttpContext.Request;
             if (!request.HasFormContentType)
             {
-                return false;
+                return new ModelBindingResult(null, null, false);
             }
 
             var editor = (IFeatureEditor)bindingContext.OperationBindingContext.HttpContext.RequestServices.GetService(bindingContext.ModelType);
@@ -37,7 +37,7 @@ namespace Blacklite.Framework.Features.Mvc
 
             bindingContext.Model = editor;
 
-            return result;
+            return new ModelBindingResult(editor, "Model", true);
         }
     }
 }

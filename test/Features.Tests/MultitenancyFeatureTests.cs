@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework.Features;
+using Blacklite.Framework.Features;
 using Blacklite.Framework.Multitenancy;
 using Blacklite.Framework.Multitenancy.Features;
 using Blacklite.Framework.Multitenancy.Features.Describers;

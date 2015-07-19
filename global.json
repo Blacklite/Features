@@ -1,5 +1,5 @@
 ﻿{
-    "projects": [ "src", "test", "../Common/src", "../Multitenancy/src", "../Json.Schema.Editor/src" ],
+    "projects": [ "src", "test", "../Common/src", "../Multitenancy/src", "../JsonSchema/src" ],
     "sdk": {
         "version": "1.0.0-beta5"
     }

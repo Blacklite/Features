@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
 using Microsoft.Framework.DependencyInjection;
@@ -36,7 +36,6 @@ namespace Http.Sample
         {
             app.UseFeaturesHttp("/features");
 
-            app.UseRequestServices();
             app.UseMiddleware<MiddlewareA>();
             app.UseMiddleware<MiddlewareB>();
             app.UseMiddleware<MiddlewareC>();

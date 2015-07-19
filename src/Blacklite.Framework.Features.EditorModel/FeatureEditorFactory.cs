@@ -108,7 +108,7 @@ namespace Blacklite.Framework.Features.Editors
 
             if (groupedModels.Where(group => !string.IsNullOrWhiteSpace(group.Key)).Any())
             {
-                foreach (var group in groupedModels)
+                foreach (var group in groupedModels.Where(group => !string.IsNullOrWhiteSpace(group.Key)))
                 {
                     var grouping = (EditorGroup)groupingContainer[group.Key];
                     foreach (var model in group.Models)

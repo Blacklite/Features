@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blacklite.Framework.Features.Mvc
 {
+    [TargetElement("feature-editor")]
     public class FeatureEditorTagHelper : TagHelper
     {
         private readonly IJsonEditorProvider _editorProvider;
@@ -30,6 +31,7 @@ namespace Blacklite.Framework.Features.Mvc
         }
     }
 
+    [TargetElement("feature-editor-script")]
     public class FeatureEditorScriptTagHelper : TagHelper
     {
         private readonly IJsonEditorProvider _editorProvider;

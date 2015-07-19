@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework.Features.Describers;
+using Blacklite.Framework.Features.Describers;
 using Blacklite.Framework.Features.Editors;
 using Microsoft.AspNet.FileProviders;
 using Microsoft.AspNet.Mvc;
@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Blacklite.Framework.Features.Mvc
 {
@@ -15,7 +16,7 @@ namespace Blacklite.Framework.Features.Mvc
         protected readonly IFileProvider FileProvider;
         public FeatureController()
         {
-            FileProvider = new EmbeddedFileProvider(typeof(FeatureController<>).Assembly);
+            FileProvider = new EmbeddedFileProvider(typeof(FeatureController<>).GetTypeInfo().Assembly);
         }
 
         [HttpGet]

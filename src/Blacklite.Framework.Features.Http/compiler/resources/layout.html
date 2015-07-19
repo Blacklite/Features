@@ -1,63 +1,154 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
 
-    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap-switch/css/bootstrap-switch.min.css" />
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.blue_grey-blue.min.css" />
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        html,
+        body {
+            font-family: 'Roboto', 'Helvetica', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .mdl-layout__header-row {
+            padding-left: 40px;
+        }
+
+        .mdl-layout.is-small-screen .mdl-layout__header-row h3 {
+            font-size: inherit;
+        }
+
+        .mdl-layout__tab-bar-button {
+            display: none;
+        }
+
+        .mdl-layout.is-small-screen .mdl-layout__tab-bar .mdl-button {
+            display: none;
+        }
+
+        .mdl-layout:not(.is-small-screen) .mdl-layout__tab-bar,
+        .mdl-layout:not(.is-small-screen) .mdl-layout__tab-bar-container {
+            overflow: visible;
+        }
+
+        .mdl-layout__tab-bar-container {
+            height: 64px;
+        }
+
+        .mdl-layout__tab-bar {
+            padding: 0;
+            padding-left: 16px;
+            box-sizing: border-box;
+            height: 100%;
+            width: 100%;
+        }
+
+        .mdl-layout__tab-bar .mdl-layout__tab {
+            height: 64px;
+            line-height: 64px;
+        }
+
+        .mdl-layout__tab-bar .mdl-layout__tab.is-active::after {
+            background-color: white;
+            height: 4px;
+        }
+
+        .mdl-menu__container {
+            z-index: 99;
+        }
+
+        .mdl-layout__tab-panel {
+            padding: 0;
+        }
+
+        .mdl-tabs__tab-bar {
+            justify-content: flex-start;
+            padding-left: 18px;
+            border-bottom-width: 0;
+        }
+
+        .mdl-card > .mdl-card__title {
+            height: 50px;
+        }
+    </style>
 </head>
-<body>
-    <div class="container body-content">
-        <form action="{{path}}" method="post">
+
+<body class="mdl-color--grey-900 mdl-color-text--grey-300 mdl-base">
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary  mdl-layout__header--waterfall ">
+            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+                <h3>{{title}}</h3>
+            </div>
+            <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--primary-dark">
+                <a href="#overview" class="mdl-layout__tab is-active">Overview</a>
+                <a href="#features" class="mdl-layout__tab">Features</a>
+                <a href="#features" class="mdl-layout__tab">Details</a>
+                <a href="#features" class="mdl-layout__tab">Technology</a>
+                <a href="#features" class="mdl-layout__tab">FAQ</a>
+            </div>
+        </header>
+        <main class="mdl-layout__content">
+            <div class="mdl-layout__tab-panel is-active" id="overview">
+                <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+                    <div class="mdl-tabs__tab-bar mdl-color--accent-contrast">
+                        <a href="#starks-panel" class="mdl-tabs__tab is-active">Starks</a>
+                        <a href="#lannisters-panel" class="mdl-tabs__tab">Lannisters</a>
+                        <a href="#targaryens-panel" class="mdl-tabs__tab">Targaryens</a>
+                    </div>
+                    <div class="mdl-tabs__panel is-active" id="starks-panel">
+                        <div class="mdl-grid">
+                            <div class="mdl-cell mdl-cell--6-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-card mdl-shadow--2dp">
+                                <div class="mdl-card__supporting-text">
+                                    <h2 class="mdl-card__title-text">Update</h2>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenan convallis.
+                                </div>
+                                <div class="mdl-card__actions mdl-card--border">
+                                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">View Updates</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-tabs__panel" id="lannisters-panel"></div>
+                </div>
+            </div>
+            <div class="mdl-layout__tab-panel" id="features">
+                <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+                    <div class="mdl-tabs__tab-bar mdl-color--accent-contrast">
+                        <a href="#starks-panel2" class="mdl-tabs__tab">Starks</a>
+                        <a href="#lannisters-panel2" class="mdl-tabs__tab is-active">Lannisters</a>
+                        <a href="#targaryens-panel2" class="mdl-tabs__tab">Targaryens</a>
+                    </div>
+                    <div class="mdl-tabs__panel" id="starks-panel2">
+                        <div class="mdl-grid">
+                            <div class="mdl-cell mdl-cell--6-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-card mdl-shadow--2dp">
+                                <div class="mdl-card__supporting-text">
+                                    <h2 class="mdl-card__title-text">Update</h2>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenan convallis.
+                                </div>
+                                <div class="mdl-card__actions mdl-card--border">
+                                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">View Updates</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-tabs__panel is-active" id="lannisters-panel2"></div>
+                </div>
+            </div>
+        </main>
+        <!--<form action="{{path}}" method="post">
             {{content}}
             <input class="btn btn-success btn-sm" type="submit" value="Save">
             {{antiforgery}}
-        </form>
+        </form>-->
     </div>
-    <script src="~/lib/jquery/js/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
-    <script src="~/lib/bootstrap-switch/js/bootstrap-switch.min.js"></script>
-    <script>
-        $(function () {
-
-            var size = 42;
-            $.fn.bootstrapSwitch.defaults.size = 'mini';
-            $.fn.bootstrapSwitch.defaults.labelWidth = size / 2;
-            $.fn.bootstrapSwitch.defaults.handleWidth = size;
-
-            // bug in bootswitch :(
-            $.fn.bootstrapSwitch.Constructor.prototype._width = function () {
-                var $handles, handleWidth;
-                $handles = this.$on.add(this.$off);
-                $handles.add(this.$label).css('width', '');
-                var handleAuto = this.options.handleWidth === 'auto';
-                var labelAuto = this.options.labelWidth === 'auto';
-                handleWidth = handleAuto ? Math.max(this.$on.width(), this.$off.width()) : this.options.handleWidth;
-                $handles.css('width', handleWidth);
-                this.$label.css('width', (function (_this) {
-                    return function (index, width) {
-                        if (_this.options.labelWidth !== 'auto') {
-                            return _this.options.labelWidth;
-                        }
-                        if (width < handleWidth) {
-                            return handleWidth;
-                        } else {
-                            return width;
-                        }
-                    };
-                })(this));
-                this._handleWidth = handleAuto ? this.$on.outerWidth() : this.options.handleWidth;
-                this._labelWidth = labelAuto ? this.$label.outerWidth() : this.options.labelWidth;
-                this.$container.css('width', (this._handleWidth * 2) + this._labelWidth);
-                return this.$wrapper.css('width', this._handleWidth + this._labelWidth);
-            }
-
-            $('input[type="checkbox"]').bootstrapSwitch();
-            $('[data-toggle="popover"]').popover();
-        });
-    </script>
-    {{scripts}}
+    <!--{{scripts}}-->
 </body>
+
 </html>

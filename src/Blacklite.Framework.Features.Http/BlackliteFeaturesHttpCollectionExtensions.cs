@@ -1,4 +1,4 @@
-﻿using Blacklite;
+using Blacklite;
 using Blacklite.Framework;
 using Blacklite.Framework.Features;
 using Blacklite.Framework.Features.Describers;
@@ -16,7 +16,8 @@ namespace Microsoft.Framework.DependencyInjection
         public static IServiceCollection AddFeaturesHttp([NotNull] this IServiceCollection services)
         {
             services.AddFeatureEditorModel()
-                    .AddDataProtection();
+                    .AddDataProtection()
+                    .AddAntiforgery();
             services.TryAdd(BlackliteFeaturesHttpServices.GetFeaturesHttp(services));
             return services;
         }

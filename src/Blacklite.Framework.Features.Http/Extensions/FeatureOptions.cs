@@ -1,8 +1,9 @@
-﻿using Blacklite.Framework.Features.Editors;
+using Blacklite.Framework.Features.Editors;
 using Blacklite.Json.Schema;
 using Microsoft.AspNet.FileProviders;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Blacklite.Framework.Features.Http.Extensions
 {
@@ -10,7 +11,7 @@ namespace Blacklite.Framework.Features.Http.Extensions
     {
         public FeatureOptions(string basePath)
         {
-            FileProvider = new EmbeddedFileProvider(typeof(FeatureOptions).Assembly);
+            FileProvider = new EmbeddedFileProvider(typeof(FeatureOptions).GetTypeInfo().Assembly, "Blacklite.Framework.Features.Http");
                 _layout = new Lazy<string>(() =>
             {
                 using (var stream = FileProvider.GetFileInfo("compiler/resources/layout.html").CreateReadStream())

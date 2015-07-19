@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework.Features.Editors.Factory;
+using Blacklite.Framework.Features.Editors.Factory;
 using Blacklite.Framework.Features.Editors.JsonEditors;
 using Blacklite.Framework.Features.Editors.JsonEditors.Resolvers;
 using Blacklite.Framework.Features.OptionsModel;
@@ -21,11 +21,11 @@ namespace Blacklite.Framework.Features.Editors
             yield return ServiceDescriptor.Scoped(typeof(FeatureEditorFactory<>), typeof(FeatureEditorFactory<>));
             yield return ServiceDescriptor.Scoped(typeof(IFeatureEditor<>), typeof(FeatureEditor<>));
             yield return ServiceDescriptor.Scoped<EditorFeatureFactory, EditorFeatureFactory>();
+            yield return ServiceDescriptor.Transient<TabsJsonEditorResolver, TabsJsonEditorResolver>();
         }
 
-        internal static IEnumerable<ServiceDescriptor> GetFeatureEditorModelImplementations(IServiceCollection services)
+        internal static IEnumerable<ServiceDescriptor> GetFeatureEditorModelEnumerables(IServiceCollection services)
         {
-            yield return ServiceDescriptor.Transient<TabsJsonEditorResolver, TabsJsonEditorResolver>();
             yield return ServiceDescriptor.Transient<IConfigureOptions<JsonEditorOptions>, ConfigureJsonEditorOptions>();
         }
     }
