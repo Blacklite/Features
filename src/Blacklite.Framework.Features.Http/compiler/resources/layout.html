@@ -148,6 +148,10 @@
             text-overflow: ellipsis;
         }
 
+        .mdl-card__title-text {
+            white-space: nowrap;
+        }
+
         .mdl-tabs.is-upgraded .mdl-tabs__tab.is-active:after {
             background: white;
         }
@@ -156,8 +160,44 @@
             -webkit-align-self: center;
             align-self: center;
         }
+
         .mdl-card {
             min-height: 0;
+        }
+
+        .feature .mdl-card__actions {
+            text-align: center;
+        }
+
+        .feature .mdl-card__actions > .mdl-button {
+            width: 80%;
+        }
+
+        .mdl-grid {
+            align-items: baseline;
+        }
+
+        .mdl-card__title {
+            padding-right: 4px;
+        }
+
+        .feature .feature {
+            margin: 0;
+            width: 100%;
+        }
+
+        .settings-properties {
+            display: none;
+        }
+
+        @media (max-width: 479px) {
+            .mdl-tabs__tab-bar {
+                padding-left: 0;
+            }
+            .mdl-tabs__tab {
+                padding: 0 6px;
+                text-overflow: ellipsis;
+            }
         }
     </style>
 </head>
@@ -173,11 +213,26 @@
         <main class="mdl-layout__content">
             <form action="{{path}}" method="post">
                 {{tab-content}}
-                <input class="btn btn-success btn-sm" type="submit" value="Save"> {{antiforgery}}
+                <!--<input class="btn btn-success btn-sm" type="submit" value="Save">-->{{antiforgery}}
             </form>
         </main>
     </div>
     <!--{{scripts}}-->
+    <script type="text/javascript">
+        window.addEventListener('click', function(e) {
+            if (e.target.parentElement.classList.contains('settings-button')) {
+                var items = e.target.closest('.feature').querySelectorAll('.settings-properties');
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i];
+
+                    if (item.style.display === 'block')
+                        item.style.display = 'none';
+                    else
+                        item.style.display = 'block';
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

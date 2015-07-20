@@ -138,6 +138,10 @@ namespace Blacklite.Framework.Features.Http.Extensions
             {
                 sb.Append($@"<div class=""mdl-grid"">");
                 var enumerator = GetNextColor().GetEnumerator();
+                var total = group.Name.Aggregate(0, (a, b) => a + b) % 5;
+                for (var i = 0; i < total; i++) {
+                    enumerator.MoveNext();
+                }
 
                 foreach (var item in group.Items)
                 {
@@ -157,23 +161,28 @@ namespace Blacklite.Framework.Features.Http.Extensions
             return sb.ToString();
         }
 
-        private string GetModelContent(IFeatureEditor editor, IEnumerator<KeyValuePair<string, string>> enumerator, string id, Model model)
+        private string GetModelContent(IFeatureEditor editor, IEnumerator<KeyValuePair<string, string>> enumerator, string id, Model model, bool isChild = false)
         {
             enumerator.MoveNext();
             var background = enumerator.Current.Key;
             var text = enumerator.Current.Value;
             var sb = new StringBuilder();
-            sb.Append($@"<div class=""feature mdl-cell mdl-cell--3-col-desktop mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-card mdl-shadow--2dp"">");
+            var valueModel = editor.Values[model.Name];
+            sb.Append($@"<div class=""feature mdl-cell {(isChild ? "mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone" : "mdl-cell--3-col-desktop mdl-cell--4-col-tablet mdl-cell--4-col-phone")} mdl-card mdl-shadow--2dp"">");
             if (model.HasEnabled)
             {
                 sb.Append($@"
                     <div class=""mdl-card__title mdl-card--border {background} {text}"">
-                        <label class=""mdl-switch mdl-js-switch mdl-js-ripple-effect"" for=""{id}"">
+                        <label class=""mdl-switch mdl-js-switch"" for=""{id}"">
                             <input type=""hidden"" name=""{editor.Prefix}.{model.Name}"" id=""{id}_hidden"" value=""false"" />
-                            <input type=""checkbox"" name=""{editor.Prefix}.{model.Name}"" id=""{id}"" class=""mdl-switch__input"" value=""true"" {(editor.Values[model.Name].IsEnabled.HasValue && editor.Values[model.Name].IsEnabled.Value == true ? "checked" : "")} />
+                            <input type=""checkbox"" name=""{editor.Prefix}.{model.Name}"" id=""{id}"" class=""mdl-switch__input"" value=""true"" {(valueModel.IsEnabled.HasValue && valueModel.IsEnabled.Value == true ? "checked" : "")} />
                             <span class=""mdl-switch__label""></span>
                             <h2 class=""mdl-card__title-text"">{model.Title}</h2>
                         </label>
+                        {((model.HasOptions && !model.OptionsIsFeature) || model.HasProperties || model.Description != null ? @"
+                        <a href=""#"" class=""settings-button mdl-button mdl-js-button mdl-button--icon"">
+                            <i class=""material-icons"">settings</i>
+                        </a>" : "")}
                     </div>
                     ");
             }
@@ -186,24 +195,51 @@ namespace Blacklite.Framework.Features.Http.Extensions
                         ");
             }
 
-            if (model.Description != null)
+            if (model.HasOptions || model.HasProperties)
             {
-                sb.Append($@"
-                    <div class=""mdl-card__supporting-text"">
-                    {model.Description}
-                    </div>
-                    ");
+                if (model.Description != null)
+                {
+                    sb.Append($@"
+                        <div class=""settings-properties mdl-card__supporting-text"">
+                        {model.Description}
+                        </div>
+                        ");
+                }
+
+                if (model.HasProperties)
+                {
+                    sb.Append($@"<div class=""settings-properties mdl-card__actions mdl-card--border"">");
+                    foreach (var property in model.Properties)
+                    {
+                        var propertyModel = valueModel.Properties[property.Key];
+                        sb.Append($@"<div>{property.Value.Name} {propertyModel?.ToString()}</div>");
+                    }
+                    sb.Append($@"</div>");
+                }
+
+                if (model.HasOptions)
+                {
+                    if (model.OptionsIsFeature)
+                    {
+                        var parts = id.Split('.');
+                        var cid = string.Join(".", parts.Take(parts.Length - 1));
+                        sb.Append(GetModelContent(editor, enumerator, $"{cid}.{model.OptionsFeature.Name}", model.OptionsFeature, true));
+                    }
+                    else
+                    {
+                        sb.Append($@"<div class=""settings-properties mdl-card__actions mdl-card--border"">");
+                        foreach (var option in model.Options)
+                        {
+                            var optionModel = valueModel.Options[option.Key];
+                            sb.Append($@"<div>{option.Value.Name} {optionModel?.ToString()}</div>");
+                        }
+                        sb.Append($@"</div>");
+                    }
+                }
             }
 
-            sb.Append($@"
-                <div class=""mdl-card__actions mdl-card--border"">
-                    <a class=""mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"">View Updates</a>
-                </div>
-            ");
 
-            sb.Append($@"
-            </div>
-            ");
+            sb.Append($@"</div>");
 
             /*
             <div class="mdl-cell mdl-cell--6-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-card mdl-shadow--2dp">
@@ -223,8 +259,6 @@ namespace Blacklite.Framework.Features.Http.Extensions
 
             return sb.ToString();
         }
-
-
 
         private static IEnumerable<KeyValuePair<string, string>> GetNextColor()
         {
