@@ -3,7 +3,7 @@
     "dependencies": {
         "Microsoft.AspNet.FileProviders.Embedded": "1.0.0-beta5-*",
         "Blacklite.Framework.Features": "1.0.0-*",
-        "Blacklite.Framework.Features.EditorModel": "1.0.0-*",
+        "Blacklite.Framework.Features.Editors": "1.0.0-*",
         "Microsoft.AspNet.Mvc": "6.0.0-beta5-*"
     },
 

@@ -3,7 +3,6 @@ using Blacklite.Framework;
 using Blacklite.Framework.Features;
 using Blacklite.Framework.Features.Describers;
 using Blacklite.Framework.Features.Http;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using System;

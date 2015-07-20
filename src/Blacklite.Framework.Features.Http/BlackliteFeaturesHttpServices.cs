@@ -3,7 +3,6 @@ using Blacklite.Framework.Features.Describers;
 using Blacklite.Framework.Features.Factory;
 using Blacklite.Framework.Features.OptionsModel;
 using Blacklite.Framework.Features.Repositories;
-using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using System;

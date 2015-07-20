@@ -7,7 +7,6 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.StaticFiles;
 using System;
 using Microsoft.Framework.DependencyInjection;
-using Blacklite.Framework.Features.Editors.JsonEditors.Resolvers;
 using Blacklite.Framework.Features.Describers;
 
 namespace Microsoft.AspNet.Builder
@@ -59,11 +58,6 @@ namespace Microsoft.AspNet.Builder
             if (options.Factory == null)
             {
                 options.Factory = builder.ApplicationServices.GetService<FeatureEditorFactory<FeatureDescriberCollection>>();
-            }
-
-            if (options.JsonEditorResolver == null)
-            {
-                options.JsonEditorResolver = builder.ApplicationServices.GetService<TabsJsonEditorResolver>();
             }
 
             return builder

@@ -1,5 +1,4 @@
 using Blacklite.Framework.Features.Editors;
-using Blacklite.Json.Schema;
 using Microsoft.AspNet.FileProviders;
 using System;
 using System.IO;
@@ -24,7 +23,6 @@ namespace Blacklite.Framework.Features.Http.Extensions
 
         public IFeatureEditorFactory Factory { get; set; }
         public IFileProvider FileProvider { get; set; }
-        public IJsonEditorResolver JsonEditorResolver { get; set; }
         public string Path { get; set; } = "/";
 
         private readonly Lazy<string> _layout;

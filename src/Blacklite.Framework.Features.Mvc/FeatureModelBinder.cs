@@ -1,5 +1,4 @@
 using Blacklite.Framework.Features.Editors;
-using Blacklite.Json.Schema;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.Framework.OptionsModel;
@@ -30,10 +29,10 @@ namespace Blacklite.Framework.Features.Mvc
 
             var editor = (IFeatureEditor)bindingContext.OperationBindingContext.HttpContext.RequestServices.GetService(bindingContext.ModelType);
 
-            var model = editor.Model;
-            var jsonEditorProvider = bindingContext.OperationBindingContext.HttpContext.RequestServices.GetService<IJsonEditorProvider>();
+            var model = editor.JToken;
+            //var jsonEditorProvider = bindingContext.OperationBindingContext.HttpContext.RequestServices.GetService<IJsonEditorProvider>();
 
-            var result = await BindFeatures.LoadFormData(bindingContext.OperationBindingContext.HttpContext, editor, jsonEditorProvider);
+            var result = await BindFeatures.LoadFormData(bindingContext.OperationBindingContext.HttpContext, editor);
 
             bindingContext.Model = editor;
 

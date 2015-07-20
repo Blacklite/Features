@@ -4,8 +4,7 @@
     "dependencies": {
         "Blacklite.Framework.Features.Http": " 1.0.0-*",
         "Microsoft.AspNet.Server.IIS": "1.0.0-beta5-*",
-        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta5-*",
-        "Blacklite.Json.Schema": "1.0.0-beta-11"
+        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta5-*"
     },
     "frameworks": {
         "dnx451": { }

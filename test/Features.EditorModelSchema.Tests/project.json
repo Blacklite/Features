@@ -12,8 +12,7 @@
         "Microsoft.Framework.Logging.Console": "1.0.0-beta5-*",
         "Blacklite.Framework.Features.Mvc": "1.0.0-*",
         "Blacklite.Framework.Features.Http": "1.0.0-*",
-        "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-beta5-*",
-        "Blacklite.Json.Schema.TagHelpers": "1.0.0-*"
+        "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-beta5-*"
     },
     "commands": {
         "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000"

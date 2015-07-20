@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework.Features.OptionsModel;
+using Blacklite.Framework.Features.OptionsModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -51,7 +51,7 @@ namespace Blacklite.Framework.Features.Describers
             DependsOn = new ReadOnlyDictionary<IFeatureDescriber, bool>(new Dictionary<IFeatureDescriber, bool>());
             Children = Enumerable.Empty<IFeatureDescriber>();
 
-            DisplayName = TypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? Type.Name;
+            DisplayName = TypeInfo.GetCustomAttribute<FeatureDisplayNameAttribute>()?.DisplayName ?? Type.Name.AsUserFriendly();
             Description = TypeInfo.GetCustomAttribute<FeatureDescriptionAttribute>()?.Description;
 
             Groups = TypeInfo.GetCustomAttributes<FeatureGroupAttribute>()?.SelectMany(x => x.Groups).ToArray();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
@@ -10,7 +10,6 @@ using Blacklite.Framework;
 using Microsoft.AspNet.Http;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
-using Blacklite.Json.Schema;
 using Blacklite.Framework.Features.Mvc;
 using Blacklite.Framework.Features.Describers;
 

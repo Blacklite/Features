@@ -1,4 +1,4 @@
-﻿using Blacklite.Framework.Features;
+using Blacklite.Framework.Features;
 using System;
 using Blacklite.Framework.Features.OptionsModel;
 using Microsoft.Framework.DependencyInjection;
@@ -13,6 +13,7 @@ namespace Features.EditorModelSchema.Tests.Features
     }
 
     [FeatureGroup("API", "Development"), ConfigurationFeature]
+    [FeatureDescription("Description text...")]
     public class ApiDevelopmentFeatureA : Feature.AlwaysOn, IObservableFeature
     {
         public string CustomProperty { get; set; }

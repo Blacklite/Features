@@ -1,4 +1,3 @@
-using Blacklite.Json.Schema;
 using Microsoft.AspNet.Http;
 using System;
 using System.Linq;
@@ -10,9 +9,9 @@ namespace Blacklite.Framework.Features.Editors
 {
     public static class BindFeatures
     {
-        public static async Task<bool> LoadFormData(HttpContext httpContext, IFeatureEditor editor, IJsonEditorProvider jsonEditorProvider)
+        public static async Task<bool> LoadFormData(HttpContext httpContext, IFeatureEditor editor)
         {
-            var model = editor.Model;
+            var model = editor.JToken;
 
             var form = await httpContext.Request.ReadFormAsync();
 
@@ -20,31 +19,16 @@ namespace Blacklite.Framework.Features.Editors
             {
                 if (item.Key.StartsWith(editor.Prefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    // If they have duplicate values, take the last one put in
-                    // This helps solve the checkbox case (hidden = false, checked = true)
                     var formValue = item.Value.Last();
-                    var definitions = (JObject)editor.Schema.ExtensionData["definitions"];
-                    var keys = item.Key.Substring(editor.Prefix.Length + 1).Split('.');
-                    var schema = (JSchema)definitions[keys[0]];
-                    var parent = model[keys[0]];
+                    var key = item.Key.Substring(editor.Prefix.Length + 1);
+                    var editorModel = editor.Models.FirstOrDefault(x => {
+                        return x.Name.Equals(key, StringComparison.OrdinalIgnoreCase);
+                    });
 
-                    keys = keys.Skip(1).ToArray();
-
-                    var valueKey = keys.Last();
-                    foreach (var key in keys.Take(keys.Length - 1))
+                    var jValue = model[editorModel.Name];
+                    if (!editorModel.Describer.IsReadOnly && jValue?.ToString() != formValue)
                     {
-                        parent = parent?[key];
-                        schema = schema.Properties?[key];
-                    }
-
-                    schema = schema.Properties?[valueKey];
-                    var resolutionContext = jsonEditorProvider.GetResolutionContext(schema, editor.Prefix);
-
-                    var value = parent[valueKey];
-
-                    if (!resolutionContext.Options.ReadOnly && value?.ToString() != formValue)
-                    {
-                        switch (value.Type)
+                        switch (jValue.Type)
                         {
                             case JTokenType.Integer:
                                 int @int;

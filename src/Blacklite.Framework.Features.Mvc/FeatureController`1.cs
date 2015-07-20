@@ -35,14 +35,14 @@ namespace Blacklite.Framework.Features.Mvc
             return View(editor);
         }
 
-        public virtual string Schema([FromServices] IFeatureEditor<FeatureEditorFactory<TCollection>> editor)
+        /*public virtual string Schema([FromServices] IFeatureEditor<FeatureEditorFactory<TCollection>> editor)
         {
             return editor.Schema.ToString();
-        }
+        }*/
 
         public virtual string Json([FromServices] IFeatureEditor<FeatureEditorFactory<TCollection>> editor)
         {
-            return editor.Model.ToString();
+            return editor.JToken.ToString();
         }
 
         private string _resources;
